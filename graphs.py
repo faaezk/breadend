@@ -13,5 +13,29 @@ players = [("silentwhispers", "0000"),
     ("oshaoshawott", "oce"), 
     ("therealrobdez", "3333")]
 
-    
+def make_graph(username):
 
+    file1 = open('elo_history/{}.txt'.format(username), 'r')
+
+    y = [x.strip() for x in file1.readlines()]
+    y.pop(0)
+
+    x = []
+    for i in range(0, len(y)):
+        y[i] = int(y[i])
+        x.append(i)
+
+    plt.plot(x, y)
+    plt.xlabel('your mother')
+    plt.ylabel('mmr')
+    plt.title(username + '\'s elo but the x axis has no meaning cause i cbs')
+
+    plt.savefig('elo_graphs/{}.png'.format(username))
+    file1.close()
+    plt.clf()
+
+def make_all_graphs():
+    for i in range(0, len(players)):
+        make_graph(players[i][0])
+
+make_all_graphs()

@@ -4,6 +4,7 @@ import weather
 import valorant
 import valorant_online
 import configparser
+from io import BytesIO
 
 def get_config():
     c = configparser.ConfigParser()
@@ -46,6 +47,14 @@ async def on_message(message):
                 msg += john[i][0] + ": " + john[i][1] + '\n'
 
         await message.channel.send("```\n" + msg + "\n```")
+
+    if message.content.lower().startswith('=graph'):
+        username = message.content[6:].strip()
+
+        with open("elo_graphs/{}.png".format(username), 'rb') as f:
+            picture = discord.File(f)
+            await message.channel.send(file=picture)
+    
 
     if message.content.lower().startswith('good evening'):
         await message.channel.send(file=discord.File('good_evening.mp4'))
