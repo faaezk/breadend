@@ -1,5 +1,3 @@
-import configparser
-from sys import flags
 import requests
 import json
 import os
@@ -55,9 +53,8 @@ def elo_leaderboard():
     return leaderboard
 
 def get_elo_history(username, tagline):
-    url = "https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{}/{}".format(username, tagline)
     
-
+    url = "https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{}/{}".format(username, tagline)
     r = requests.get(url)
 
     if str(r) == "<Response [204]>":
@@ -66,18 +63,6 @@ def get_elo_history(username, tagline):
     john = json.loads(r.text)
 
     return john
-
-def make_elo_list(username, tagline):
-    data = get_elo_history(username, tagline)
-    if data == False:
-        return
-
-    elo_list = []
-    
-    for i in range(0, len(data['data'])):
-        elo_list.append(data['data'][i]['elo'])
-    
-    return elo_list
 
 def initialise_file(username):
 
