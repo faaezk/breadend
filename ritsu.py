@@ -2,6 +2,7 @@ import discord
 import os
 import weather
 import valorant
+import valorant_online
 import configparser
 
 def get_config():
@@ -31,6 +32,19 @@ async def on_message(message):
     if '$leaderboard' in message.content.lower():
         john = valorant.elo_leaderboard()
         await message.channel.send("```\n" + john + "\n```")
+
+    if '=online' in message.content.lower():
+        await message.channel.send("please wait...")
+        john = valorant_online.everything()
+        msg = ""
+
+        for i in range(0, len(john)):
+            if john[i][0] == "no parties":
+                msg += john[i][0] + '\n'
+            else:  
+                msg += john[i][0] + ": " + john[i][1] + '\n'
+
+        await message.channel.send("```\n" + msg + "\n```")
 
     if message.content.lower().startswith('good evening'):
         await message.channel.send(file=discord.File('good_evening.mp4'))
