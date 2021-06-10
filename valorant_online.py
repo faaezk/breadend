@@ -58,6 +58,13 @@ def form_partys():
         party_id = get_party(players[i][0], players[i][1])
         players[i].append(party_id)
     
+    players = [ 
+    ["Fakinator", "4269", "4555982f-e7d1-4ee2-beed-e7c0fcc0c59d"],
+    ["8888", "nadi", "4555982f-e7d1-4ee2-beed-e7c0fcc0c595"], 
+    ["dilka30003", "0000", "4555982f-e7d1-4ee2-beed-e7c0fcc0c595"],
+    ["slumonaire", "oce", "4555982f-e7d1-4ee2-beed-e7c0fcc0c59d"]
+    ]
+    
     players.sort(key=lambda x: str(x[2]))
 
     count = 0
@@ -82,14 +89,14 @@ def form_partys():
 def everything():
     
     players = playerlist()
-    final = {}
+    final = []
     for i in range(0, len(players)):
-        final[players[i][0]] = get_status(players[i][0], players[i][1])
+        final.append((players[i][0], get_status(players[i][0], players[i][1])))
     
     parties = form_partys()
 
     for i in range(0, len(parties)):
-        final["party" + str(i)] = parties[i]
+        final.append((("party" + str(i)), parties[i]))
 
     return final
 
