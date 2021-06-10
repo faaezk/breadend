@@ -5,7 +5,7 @@ import configparser
 
 def get_config():
     c = configparser.ConfigParser()
-    c.read('/home/ubuntu/DBot/config.ini')
+    c.read('/home/ubuntu/discord_bot/config.ini')
 
     return c['openweathermap']['api'], c['openweathermap']['city_id'], c['discord']['token']
 
