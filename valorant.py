@@ -109,7 +109,7 @@ def update_elo_history(username, tagline):
 
     #if first_time == True:
     #    new_elo_list.append(player_data['data'][i]['elo'])
-
+    print("john")
     while latest_game <= date_raw:
         
         new_elo_list.append(player_data['data'][i]['elo'])
