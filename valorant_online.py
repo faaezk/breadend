@@ -13,10 +13,13 @@ players = [
     ]
 
 all_data = {}
-for i in range(0, len(players)):
-    url = "https://api.henrikdev.xyz/valorant/v1/live-match/{}/{}".format(players[i][0], players[i][1])
-    r = requests.get(url)
-    all_data[players[i][0]] = json.loads(r.text)
+
+def get_all_data():
+    global all_data
+    for i in range(0, len(players)):
+        url = "https://api.henrikdev.xyz/valorant/v1/live-match/{}/{}".format(players[i][0], players[i][1])
+        r = requests.get(url, headers={'Cache-Control': 'no-cache'})
+        all_data[players[i][0]] = json.loads(r.text)
 
 
 def get_data(username, tagline):
@@ -92,9 +95,6 @@ def everything():
         final.append((("party" + str(i)), parties[i]))
 
     return final
-
-print(all_data)
-print(everything())
 
 #{'status': '200', 'data': {'custom_game': False, 'gamemode': 'unrated', 'current_state': 'INGAME', 
 # 'party_accessibility': 'CLOSED', 'client_version': 'release-02.11-shipping-9-567060', 
