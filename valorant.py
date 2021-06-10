@@ -70,11 +70,6 @@ def make_elo_list(username, tagline):
     
     return elo_list
 
-#def earliest_elo_update(username, tagline):
-    data = get_elo_history(username, tagline)
-
-    return data["data"][-1]["date_raw"]
-
 def initialise_file(username):
 
     f = open('elo_history/{}.txt'.format(username), "x")
@@ -136,7 +131,6 @@ def update_elo_history(username, tagline):
 def update_all_elo_history():
 
     players = playerlist()
-    print(players)
     for i in range(0, len(players)):
         update_elo_history(players[i][0], players[i][1])
 
