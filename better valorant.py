@@ -95,7 +95,6 @@ def everything():
 
 print(all_data)
 print(everything())
-
 #{'status': '200', 'data': {'custom_game': False, 'gamemode': 'unrated', 'current_state': 'INGAME', 
 # 'party_accessibility': 'CLOSED', 'client_version': 'release-02.11-shipping-9-567060', 
 # 'map': 'Split', 'score_ally_team': 12, 'score_enemy_team': 12, 'queue_entry_time': '2021.06.10-08.42.38', 'party_id': 'f75696dd-6295-4368-9a90-6bfb35544a1c'}}

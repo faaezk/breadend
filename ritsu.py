@@ -36,6 +36,7 @@ async def on_message(message):
     if '=online' in message.content.lower():
         await message.channel.send("please wait...")
         john = valorant_online.everything()
+        #await message.channel.send("```\n" + john[0][0] + "\n```")
         msg = ""
 
         for i in range(0, len(john)):

@@ -44,7 +44,7 @@ async def on_message(message):
                 msg += john[i][0] + '\n'
             else:  
                 msg += john[i][0] + ": " + john[i][1] + '\n'
-        
+
         await message.channel.send("```\n" + msg + "\n```")
 
 config = get_config()
