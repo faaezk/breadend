@@ -70,18 +70,17 @@ def make_elo_list(username, tagline):
     
     return elo_list
 
-def earliest_elo_update(username, tagline):
+#def earliest_elo_update(username, tagline):
     data = get_elo_history(username, tagline)
 
     return data["data"][-1]["date_raw"]
 
-def initialise_file(username, tagline):
+def initialise_file(username):
 
     f = open('elo_history/{}.txt'.format(username), "x")
     f.close()
     f = open('elo_history/{}.txt'.format(username), "w")
-    #f.writelines(str(earliest_elo_update(username, tagline)))
-    f.writelines(str(0))
+    f.writelines(str(0) + '\n')
     f.close()
 
     return
@@ -89,12 +88,10 @@ def initialise_file(username, tagline):
 def update_elo_history(username, tagline):
 
     player_file_path = 'elo_history/{}.txt'.format(username)
-    first_time = False
-    if os.path.isfile(player_file_path) == False:
-        initialise_file(username, tagline)
-        first_time = True
 
-    current_elo_list = make_elo_list(username, tagline)
+    if os.path.isfile(player_file_path) == False:
+        initialise_file(username)
+
     player_data = get_elo_history(username, tagline)
 
     # Dates of last update
@@ -103,31 +100,26 @@ def update_elo_history(username, tagline):
     last_file_update = int(player_file.readline())
     player_file.close()
 
-    print(date_raw)
-    print(last_file_update)
-
     new_elo_list = []
     i = 0
 
     if last_file_update == 0:
         for i in range(0, len(player_data['data'])):
-            print("i = " + i)
             new_elo_list.append(player_data['data'][i]['elo'])
 
     else:
-        while last_file_update <= date_raw:
+        while last_file_update < date_raw:
             
             new_elo_list.append(player_data['data'][i]['elo'])
-            date_raw = player_data['data'][i]['date_raw']
             if last_file_update != date_raw:
                 i += 1
+            date_raw = player_data['data'][i]['date_raw']
 
     correctly_sorted_new_elo_list = new_elo_list[::-1]
 
     player_file = open(player_file_path, 'a')
     
     for elem in range(0, len(correctly_sorted_new_elo_list)):
-        print(elem)
         player_file.writelines(str(correctly_sorted_new_elo_list[elem]) + '\n')
 
     player_file.close()
@@ -144,12 +136,10 @@ def update_elo_history(username, tagline):
 def update_all_elo_history():
 
     players = playerlist()
-
+    print(players)
     for i in range(0, len(players)):
         update_elo_history(players[i][0], players[i][1])
 
     return
 
-print(update_elo_history("Fakinator", "4269"))
-print(make_elo_list("Fakinator", "4269"))
-print(get_elo_history("Fakinator", "4269"))
+print(get_elo_history("YoVivels", "1830"))
