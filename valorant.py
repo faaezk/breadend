@@ -1,4 +1,5 @@
 import configparser
+from sys import flags
 import requests
 import json
 import os
@@ -79,7 +80,8 @@ def initialise_file(username, tagline):
     f = open('elo_history/{}.txt'.format(username), "x")
     f.close()
     f = open('elo_history/{}.txt'.format(username), "w")
-    f.writelines(str(earliest_elo_update(username, tagline)))
+    #f.writelines(str(earliest_elo_update(username, tagline)))
+    f.writelines(str(0))
     f.close()
 
     return
@@ -98,24 +100,27 @@ def update_elo_history(username, tagline):
     # Dates of last update
     date_raw = player_data["data"][0]["date_raw"]
     player_file = open(player_file_path, 'r')
-    latest_game = int(player_file.readline())
+    last_file_update = int(player_file.readline())
     player_file.close()
 
     print(date_raw)
-    print(latest_game)
+    print(last_file_update)
 
     new_elo_list = []
     i = 0
 
-    #if first_time == True:
-    #    new_elo_list.append(player_data['data'][i]['elo'])
-    print("john")
-    while latest_game <= date_raw:
-        
-        new_elo_list.append(player_data['data'][i]['elo'])
-        date_raw = player_data['data'][i]['date_raw']
-        if latest_game != date_raw:
-            i += 1
+    if last_file_update == 0:
+        for i in range(0, len(player_data['data'])):
+            print("i = " + i)
+            new_elo_list.append(player_data['data'][i]['elo'])
+
+    else:
+        while last_file_update <= date_raw:
+            
+            new_elo_list.append(player_data['data'][i]['elo'])
+            date_raw = player_data['data'][i]['date_raw']
+            if last_file_update != date_raw:
+                i += 1
 
     correctly_sorted_new_elo_list = new_elo_list[::-1]
 
