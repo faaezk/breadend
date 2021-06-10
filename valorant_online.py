@@ -82,11 +82,15 @@ def form_partys():
 def everything():
     
     players = playerlist()
+    parties = form_partys()
     final = []
+    
     for i in range(0, len(players)):
         final.append((players[i][0], get_status(players[i][0], players[i][1])))
     
-    parties = form_partys()
+    if len(parties) == 0:
+        final.append("no parties")
+        return final
 
     for i in range(0, len(parties)):
         final.append((("party" + str(i)), parties[i]))
