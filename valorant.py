@@ -56,13 +56,22 @@ def elo_leaderboard():
 
 def get_elo_history(username, tagline):
     url = "https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{}/{}".format(username, tagline)
+    
+
     r = requests.get(url)
+
+    if str(r) == "<Response [204]>":
+        return False
+
     john = json.loads(r.text)
 
     return john
 
 def make_elo_list(username, tagline):
     data = get_elo_history(username, tagline)
+    if data == False:
+        return
+
     elo_list = []
     
     for i in range(0, len(data['data'])):
@@ -82,12 +91,14 @@ def initialise_file(username):
 
 def update_elo_history(username, tagline):
 
+    player_data = get_elo_history(username, tagline)
+    if player_data == False:
+        return
+    
     player_file_path = 'elo_history/{}.txt'.format(username)
 
     if os.path.isfile(player_file_path) == False:
         initialise_file(username)
-
-    player_data = get_elo_history(username, tagline)
 
     # Dates of last update
     date_raw = player_data["data"][0]["date_raw"]
@@ -136,4 +147,4 @@ def update_all_elo_history():
 
     return
 
-print(get_elo_history("YoVivels", "1830"))
+update_all_elo_history()
