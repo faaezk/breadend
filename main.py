@@ -2,6 +2,7 @@ import discord
 import os
 import weather
 import configparser
+import valorant_online
 
 def get_config():
     c = configparser.ConfigParser()
@@ -32,6 +33,19 @@ async def on_message(message):
 
     if "wow" in message.content.lower() and message.author.id == 203311457666990082:
         await message.add_reaction("<:stevens:785800069957943306>")
+    
+    if '$online' in message.content.lower():
+        await message.channel.send("please wait...")
+        john = valorant_online.everything()
+        msg = ""
+
+        for i in range(0, len(john)):
+            if john[i][0] == "no parties":
+                msg += john[i][0] + '\n'
+            else:  
+                msg += john[i][0] + ": " + john[i][1] + '\n'
+        
+        await message.channel.send("```\n" + msg + "\n```")
 
 config = get_config()
 token = config[2]

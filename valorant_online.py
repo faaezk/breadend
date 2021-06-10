@@ -30,9 +30,9 @@ def get_status(username, tagline):
             status = "Online and in menu"
         if state == 'INGAME':
             game_mode = data['data']['gamemode']
-            score = str(data['data']['score_ally_team']) + ' - ' + str(data['data']['score_enemy_team'])
+            score = str(data['data']['score_ally_team']) + '-' + str(data['data']['score_enemy_team'])
             map = data['data']['map']
-            status = "Online in", game_mode, "going", score, "on", map
+            status = "Online in " + game_mode + " going " + score + " on " + map
     else:
         status = "Offline"
     
@@ -89,7 +89,7 @@ def everything():
         final.append((players[i][0], get_status(players[i][0], players[i][1])))
     
     if len(parties) == 0:
-        final.append("no parties")
+        final.append(("no parties", ""))
         return final
 
     for i in range(0, len(parties)):
