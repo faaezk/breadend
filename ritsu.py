@@ -2,7 +2,7 @@ import discord
 import os
 import weather
 import valorant
-import valorant_online
+import valorant_online_beta
 import configparser
 import graphs
 
@@ -36,13 +36,15 @@ async def on_message(message):
 
     if '=online' in message.content.lower():
         await message.channel.send("please wait...")
-        valorant_online.get_all_data()
-        john = valorant_online.everything()
+        valorant_online_beta.get_all_data()
+        john = valorant_online_beta.everything()
         msg = ""
 
         for i in range(0, len(john)):
-            if john[i][0] == "no parties":
+            if john[i][0] == "no parties" or john[i][0] == "Players:":
                 msg += john[i][0] + '\n'
+            elif john[i][0] == "Parties:":
+                msg += '\n' + john[i][0] + '\n'
             else:  
                 msg += john[i][0] + ": " + john[i][1] + '\n'
 

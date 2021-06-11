@@ -29,15 +29,11 @@ def get_elos():
     bohn = []
 
     for i in range(0, len(players)):
-        if players[i][0] == "8888":
-            bohn.append((69, players[i][0]))
-            
-        else:
-            data = get_player_data(players[i][0], players[i][1])
-            if data == None:
-                continue
-            john = json.loads(data)
-            bohn.append((john['data']['elo'], players[i][0]))
+        data = get_player_data(players[i][0], players[i][1])
+        if data == None:
+            continue
+        john = json.loads(data)
+        bohn.append((john['data']['elo'], players[i][0]))
 
     return sorted(bohn, reverse=True)
 
