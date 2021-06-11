@@ -19,9 +19,12 @@ game_names = {"Faaez" : "Fakinator", "Hadi" : "8888", "Dhiluka" : "dilka30003",
         "Chris" : "slumonaire", "Ben" : "Hoben222", "Rasindu" : "silentwhispers",
         "Dylan" : "imabandwagon"}
 
+offline = {'data' : {'party_id' : None}}
 all_data = {}
+
 def get_all_data():
     global all_data
+    all_data = {}
     for i in range(0, len(players)):
         url = "https://api.henrikdev.xyz/valorant/v1/live-match/{}/{}".format(players[i][0], players[i][1])
         r = requests.get(url, headers={'Cache-Control': 'no-cache'})
@@ -37,7 +40,7 @@ def get_data(username, tagline):
 def get_status(username):
     data = all_data[username]
     status = ""
-    if data['status'] == '200':
+    if data['status'] == '200' and data != offline: # I think the problem was here
         state = data['data']['current_state']
         if state == 'PREGAME':
             status = "Online and in agent select"
@@ -53,9 +56,11 @@ def get_status(username):
     
     return status
 
+#I think the problem was here
 def get_party(username):
     data = all_data[username]
     if data['status'] == "500":
+        data['data'] = {'party_id' : None}
         return
     return data['data']['party_id']
 
@@ -104,7 +109,7 @@ def everything():
         randos = 0
         user = game_names[parties[i][0]]
         if all_data[user]['data']['current_state'] == 'MENUS' and len(parties[i]) != all_data[user]['data']['party_size']:
-            randos = len(parties[i]) - all_data[user]['data']['party_size']      
+            randos = all_data[user]['data']['party_size'] - len(parties[i])
         
         a_party = ""
         for player in parties[i]:
@@ -112,7 +117,10 @@ def everything():
         a_party = a_party[:-2]
 
         if randos != 0:
-            a_party += " with " + str(randos) + " other people"
+            if randos == 1:
+                a_party += " (with " + str(randos) + " other person)"
+            else:
+                a_party += " (with " + str(randos) + " other people)"
 
         final.append((("Party " + str(i + 1)), a_party))
 
@@ -120,9 +128,8 @@ def everything():
 
 print(get_all_data())
 
-print(get_data("8888", "nadi"))
+print(get_data("slumonaire", "oce"))
 print(everything())
-
 
 '''
     #print(players)

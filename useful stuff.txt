@@ -10,7 +10,7 @@ see crontab logs: tail -f /var/log/syslog
 tail -f elo_history/run_check.out
 
 git add .
-git commit -m "set up crontab to run elo_history.py daily at midnight, hopefully" -a
+git commit -m "insert message" -a
 git push
 
 sudo systemctl restart discordbot.service
