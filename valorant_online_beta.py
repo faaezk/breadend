@@ -15,6 +15,10 @@ names = {"Fakinator" : "Faaez", "8888" : "Hadi", "dilka30003" : "Dhiluka",
         "slumonaire" : "Chris", "Hoben222" : "Ben", "silentwhispers" : "Rasindu",
         "imabandwagon" : "Dylan"}
 
+game_names = {"Faaez" : "Fakinator", "Hadi" : "8888", "Dhiluka" : "dilka30003", 
+        "Chris" : "slumonaire", "Ben" : "Hoben222", "Rasindu" : "silentwhispers",
+        "Dylan" : "imabandwagon"}
+
 all_data = {}
 def get_all_data():
     global all_data
@@ -97,11 +101,18 @@ def everything():
         return final
 
     for i in range(0, len(parties)):
-
+        randos = 0
+        user = game_names[parties[i][0]]
+        if all_data[user]['data']['current_state'] == 'MENUS' and len(parties[i]) != all_data[user]['data']['party_size']:
+            randos = len(parties[i]) - all_data[user]['data']['party_size']      
+        
         a_party = ""
         for player in parties[i]:
             a_party = a_party + player + ", "
         a_party = a_party[:-2]
+
+        if randos != 0:
+            a_party += " with " + str(randos) + " other people"
 
         final.append((("Party " + str(i + 1)), a_party))
 
@@ -109,4 +120,20 @@ def everything():
 
 print(get_all_data())
 
+print(get_data("8888", "nadi"))
 print(everything())
+
+
+'''
+    #print(players)
+
+    players = [ 
+    ["Fakinator", "4269", "4555982f-e7d1-4ee2-beed-e7c0fcc0c59d"],
+    ["8888", "nadi", "4555982f-e7d1-4ee2-beed-e7c0fcc0c595"], 
+    ["dilka30003", "0000", "4555982f-e7d1-4ee2-beed-e7c0fcc0c595"],
+    ["slumonaire", "oce", "4555982f-e7d1-4ee2-beed-e7c0fcc0c59d"]
+    ]
+
+    players.sort(key=lambda x: str(x[2]))
+    print(players)
+'''

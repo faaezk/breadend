@@ -30,3 +30,20 @@ python3: /usr/bin/python3
 /usr/include/python3.8 
 /usr/share/python3 
 /usr/share/man/man1/python3.1.gz
+
+{'status': '200', 'data': {'custom_game': False, 'gamemode': 'unrated', 'current_state': 'INGAME', 
+'party_accessibility': 'CLOSED', 'client_version': 'release-02.11-shipping-9-567060', 
+'map': 'Icebox', 'score_ally_team': 12, 'score_enemy_team': 10, 
+'queue_entry_time': '2021.06.11-10.18.58', 'party_id': '23736d32-2c4b-4d26-8fde-17bde7c4e8a3'}}
+
+{'status': '200', 'data': {'current_selected_gamemode': 'unrated', 'current_state': 'MENUS', 
+'party_accessibility': 'CLOSED', 'client_version': 'release-02.11-shipping-9-567060', 
+'party_size': 4, 'party_id': '23736d32-2c4b-4d26-8fde-17bde7c4e8a3'}}
+
+{"status":"200","data":{"custom_game":false,"gamemode":"unrated","current_state":"PREGAME",
+"party_accessibility":"CLOSED","client_version":"release-02.11-shipping-9-567060","map":"Ascent",
+"score_ally_team":0,"score_enemy_team":0,"queue_entry_time":"2021.06.11-11.13.51",
+"party_id":"23736d32-2c4b-4d26-8fde-17bde7c4e8a3"}}
+
+{'status': '500', 'message': "User is playing league_of_legends, can't track live game data"}
+{'status': '500', 'message': "User offline, can't track live game data"}
