@@ -20,6 +20,8 @@ players = [("silentwhispers", "0000"),
 def get_player_data(username, tagline):
     url = "https://api.henrikdev.xyz/valorant/v1/mmr/ap/{}/{}".format(username, tagline)
     r = requests.get(url)
+    if r.text == "":
+        return None
     return r.text
 
 def get_elos():
@@ -32,6 +34,8 @@ def get_elos():
             
         else:
             data = get_player_data(players[i][0], players[i][1])
+            if data == None:
+                continue
             john = json.loads(data)
             bohn.append((john['data']['elo'], players[i][0]))
 
