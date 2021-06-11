@@ -33,9 +33,9 @@ def get_elo_history(username, tagline):
 
 def initialise_file(username):
 
-    f = open('elo_history/{}.txt'.format(username), "x")
+    f = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username), "x")
     f.close()
-    f = open('elo_history/{}.txt'.format(username), "w")
+    f = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username), "w")
     f.writelines(str(0) + '\n')
     f.close()
 
@@ -45,9 +45,9 @@ def update_elo_history(username, tagline):
 
     player_data = get_elo_history(username, tagline)
     if player_data == False:
-        return
+        return 0
     
-    player_file_path = 'elo_history/{}.txt'.format(username)
+    player_file_path = '/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username)
 
     if os.path.isfile(player_file_path) == False:
         initialise_file(username)
@@ -89,17 +89,16 @@ def update_elo_history(username, tagline):
     with open(player_file_path, "w") as f:
         f.writelines(lines)   
     
-    return
+    return len(correctly_sorted_new_elo_list)
 
 def update_all_elo_history():
-
+    update_count = 0
     for i in range(0, len(players)):
-        update_elo_history(players[i][0], players[i][1])
+        update_count += update_elo_history(players[i][0], players[i][1])
         #print("completed " + str(i + 1) + "/" + str(len(players)))
 
-    return
+    return str(update_count) + " updates"
 
-update_all_elo_history()
-
+updates = update_all_elo_history()
 now = datetime.now()
-print("completed on: " + now.strftime("%d/%m/%Y") + " at " + now.strftime("%H:%M:%S"))	
+print("completed on: " + now.strftime("%d/%m/%Y") + " at " + now.strftime("%H:%M:%S") + " with " + updates)
