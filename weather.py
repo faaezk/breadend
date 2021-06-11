@@ -1,6 +1,5 @@
 import configparser
 import requests
-from pprint import pprint
 import json
 
 def get_config():

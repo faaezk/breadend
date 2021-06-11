@@ -4,7 +4,6 @@ import weather
 import valorant
 import valorant_online
 import configparser
-from io import BytesIO
 
 def get_config():
     c = configparser.ConfigParser()

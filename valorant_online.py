@@ -1,9 +1,5 @@
-from typing import final
 import requests
 import json
-import os
-
-from requests.api import get
 
 players = [ 
     ["Fakinator", "4269"],
