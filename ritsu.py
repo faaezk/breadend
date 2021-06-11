@@ -4,6 +4,7 @@ import weather
 import valorant
 import valorant_online
 import configparser
+import graphs
 
 def get_config():
     c = configparser.ConfigParser()
@@ -49,7 +50,7 @@ async def on_message(message):
 
     if message.content.lower().startswith('=graph'):
         username = message.content[6:].strip()
-
+        graphs.make_graph(username)
         with open("elo_graphs/{}.png".format(username), 'rb') as f:
             picture = discord.File(f)
             await message.channel.send(file=picture)

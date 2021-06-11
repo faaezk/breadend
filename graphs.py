@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-
+import os
 
 players = [("silentwhispers", "0000"), 
     ("Fakinator", "4269"), 
@@ -11,10 +11,16 @@ players = [("silentwhispers", "0000"),
     ("imabandwagon", "oce"), 
     ("giroud", "8383"), 
     ("oshaoshawott", "oce"), 
-    ("therealrobdez", "3333")]
+    ("YoVivels", "1830"), 
+    ("therealrobdez", "3333"),
+    ("bento2", "box"), 
+    ("hoben222", "9327"), 
+    ("jokii", "oce")]
 
 def make_graph(username):
 
+    if os.path.isfile('elo_history/{}.txt'.format(username)) == False:
+        return
     file1 = open('elo_history/{}.txt'.format(username), 'r')
 
     y = [x.strip() for x in file1.readlines()]

@@ -12,7 +12,10 @@ players = [("silentwhispers", "0000"),
     ("giroud", "8383"), 
     ("oshaoshawott", "oce"), 
     ("YoVivels", "1830"), 
-    ("therealrobdez", "3333")]
+    ("therealrobdez", "3333"),
+    ("bento2", "box"), 
+    ("hoben222", "9327"), 
+    ("jokii", "oce")]
 
 def get_player_data(username, tagline):
     url = "https://api.henrikdev.xyz/valorant/v1/mmr/ap/{}/{}".format(username, tagline)
