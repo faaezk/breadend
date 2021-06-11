@@ -1,0 +1,24 @@
+import os
+import time
+
+str(int(time.time()))
+
+* 0 * * * cd /home/ubuntu/discord_bot && /usr/bin/python3.8 elo_history.py >> elo_history/run_check.out
+
+see crontab logs: tail -f /var/log/syslog
+
+tail -f elo_history/run_check.out
+
+python3: /usr/bin/python3 
+/usr/bin/python3.8-config 
+/usr/bin/python3.8 
+/usr/lib/python3 
+/usr/lib/python3.9 
+
+/usr/lib/python3.8 
+/etc/python3 
+/etc/python3.8 
+/usr/local/lib/python3.8 
+/usr/include/python3.8 
+/usr/share/python3 
+/usr/share/man/man1/python3.1.gz
