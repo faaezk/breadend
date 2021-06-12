@@ -47,3 +47,11 @@ python3: /usr/bin/python3
 
 {'status': '500', 'message': "User is playing league_of_legends, can't track live game data"}
 {'status': '500', 'message': "User offline, can't track live game data"}
+
+{'status': '200', 'data': 
+[{'currenttier': 7, 'currenttierpatched': 'Bronze 2', 'ranking_in_tier': 9, 'mmr_change_to_last_game': -26, 
+'elo': 409, 'date': 'Friday, June 11, 2021 2:33 PM', 'date_raw': 1623436405919}, 
+{'currenttier': 7, 'currenttierpatched': 'Bronze 2', 'ranking_in_tier': 35, 'mmr_change_to_last_game': 14, 
+'elo': 435, 'date': 'Wednesday, June 9, 2021 7:40 AM', 'date_raw': 1623238803153}, 
+{'currenttier': 7, 'currenttierpatched': 'Bronze 2', 'ranking_in_tier': 21, 'mmr_change_to_last_game': -28, 
+'elo': 421, 'date': 'Saturday, June 5, 2021 3:07 AM', 'date_raw': 1622876870696}]}

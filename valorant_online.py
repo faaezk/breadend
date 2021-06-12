@@ -18,6 +18,7 @@ names = {"Fakinator" : "Faaez", "8888" : "Hadi", "dilka30003" : "Dhiluka",
 all_data = {}
 def get_all_data():
     global all_data
+    all_data = {}
     for i in range(0, len(players)):
         url = "https://api.henrikdev.xyz/valorant/v1/live-match/{}/{}".format(players[i][0], players[i][1])
         r = requests.get(url, headers={'Cache-Control': 'no-cache'})
