@@ -62,7 +62,7 @@ def form_partys():
         party_id = get_party(players[i][0])
         players[i].append(party_id)
     
-    players.sort(key=lambda x: str(x[2]))
+    players.sort(key=lambda x: str(x[-1]))
     players.reverse()
     print(players)
     count = 0
