@@ -19,7 +19,7 @@ game_names = {"Faaez" : "Fakinator", "Hadi" : "8888", "Dhiluka" : "dilka30003",
         "Chris" : "slumonaire", "Ben" : "Hoben222", "Rasindu" : "silentwhispers",
         "Dylan" : "imabandwagon"}
 
-offline = {'data' : {'party_id' : None}}
+offline = {'party_id' : None}
 all_data = {}
 
 def get_all_data():
@@ -60,32 +60,35 @@ def get_status(username):
 def get_party(username):
     data = all_data[username]
     if data['status'] == "500":
-        data['data'] = {'party_id' : None}
-        return
+        data['data'] = offline
+        print(str(username) + "data:")
+        print(data)
+        return None
     return data['data']['party_id']
 
 def form_partys():
-
-    for i in range(0, len(players)):
-        party_id = get_party(players[i][0])
-        players[i].append(party_id)
+    local_players = players
+    for i in range(0, len(local_players)):
+        party_id = get_party(local_players[i][0])
+        local_players[i].append(party_id)
     
-    players.sort(key=lambda x: str(x[2]))
-    print(players)
+    local_players.sort(key=lambda x: str(x[2]))
+    local_players.reverse()
+    print(local_players)
     count = 0
     parties = []
-    a_party_id = players[0][2]
+    a_party_id = local_players[0][2]
 
-    while a_party_id != None and count < len(players):
+    while a_party_id != None:
         temp = []
-        while a_party_id == players[count][2]:
-            temp.append(names[players[count][0]])
+        while a_party_id == local_players[count][2]:
+            temp.append(names[local_players[count][0]])
             count += 1
-            if count == len(players):
+            if count == len(local_players):
                 break
         
-        if count != len(players):
-            a_party_id = players[count][2]
+        if count != len(local_players):
+            a_party_id = local_players[count][2]
         parties.append(temp)
 
     return parties
@@ -126,10 +129,9 @@ def everything():
 
     return final
 
-print(get_all_data())
+#print(get_all_data())
 
-print(get_data("slumonaire", "oce"))
-print(everything())
+#print(everything())
 
 '''
     #print(players)

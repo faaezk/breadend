@@ -35,7 +35,8 @@ async def on_message(message):
         await message.channel.send("```\n" + john + "\n```")
 
     if '=online' in message.content.lower():
-        await message.channel.send("please wait...")
+        
+        the_message = await message.channel.send("please wait...")
         valorant_online_beta.get_all_data()
         john = valorant_online_beta.everything()
         msg = ""
@@ -47,8 +48,8 @@ async def on_message(message):
                 msg += '\n' + john[i][0] + '\n'
             else:  
                 msg += john[i][0] + ": " + john[i][1] + '\n'
+        await the_message.edit(content="```\n" + msg + "\n```")
 
-        await message.channel.send("```\n" + msg + "\n```")
 
     if message.content.lower().startswith('=graph'):
         username = message.content[6:].strip()
