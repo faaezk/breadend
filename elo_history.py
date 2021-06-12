@@ -19,7 +19,15 @@ players = [("silentwhispers", "0000"),
     ("hoben222", "9327"), 
     ("jokii", "oce"),
     ("Lyçhii", "mai"),
-    ("lmao", "6548")
+    ("lmao", "6548"),
+    ("jack", "ytb"),
+    ("VKj", "4084"),
+    ("TallEwok", "6209"),
+    ("Fade", "1280"),
+    ("SkzCross", "OCE"),
+    ("lol", "4529"),
+    ("Crossaxis", "mippl"),
+    ("Azatory", "nike")
     ]
 
 def get_elo_history(username, tagline):
