@@ -48,7 +48,7 @@ async def on_message(message):
             else:  
                 msg += john[i][0] + ": " + john[i][1] + '\n'
 
-        await the_message.channel.send("```\n" + msg + "\n```")
+        await the_message.edit(content="```\n" + msg + "\n```")
 
 config = get_config()
 token = config[2]
