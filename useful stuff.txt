@@ -9,27 +9,38 @@ see crontab logs: tail -f /var/log/syslog
 
 tail -f elo_history/run_check.out
 
+/etc/systemd/system
+/*
+[Unit]
+Description=Discord Bot
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/That-Discord-Bot
+ExecStart=/usr/bin/python3 /home/ubuntu/That-Discord-Bot/main.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+*/
+
+sudo systemctl enable discordbot.service
+sudo systemctl restart discordbot.service
+sudo systemctl stop discordbot.service
+
+sudo systemctl enable ritsubot.service
+sudo systemctl restart ritsubot.service
+sudo systemctl stop ritsubot.service
+
+sudo systemctl enable stickerbot.service
+sudo systemctl restart stickerbot.service
+sudo systemctl stop stickerbot.service
+
 git add .
 git commit -m "insert message" -a
 git push
 
-sudo systemctl restart discordbot.service
-sudo systemctl restart ritsubot.service
-
-whereis python3
-python3: /usr/bin/python3 
-/usr/bin/python3.8-config 
-/usr/bin/python3.8 
-/usr/lib/python3 
-/usr/lib/python3.9 
-
-/usr/lib/python3.8 
-/etc/python3 
-/etc/python3.8 
-/usr/local/lib/python3.8 
-/usr/include/python3.8 
-/usr/share/python3 
-/usr/share/man/man1/python3.1.gz
 
 {'status': '200', 'data': {'custom_game': False, 'gamemode': 'unrated', 'current_state': 'INGAME', 
 'party_accessibility': 'CLOSED', 'client_version': 'release-02.11-shipping-9-567060', 
