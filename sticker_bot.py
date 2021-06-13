@@ -18,8 +18,11 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if '=hello' == message.content:
-        await message.channel.send('Hello!')
+    if 'jg-gasp' == message.content:
+        name = message.content[3:]
+        with open("stickers/{}.png".format(name), 'rb') as f:
+            picture = discord.File(f)
+            await message.channel.send(file=picture)
 
 token = get_token()
 

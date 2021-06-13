@@ -35,7 +35,7 @@ async def on_message(message):
         await message.add_reaction("<:stevens:785800069957943306>")
     
     if '$online' in message.content.lower():
-        await message.channel.send("please wait...")
+        the_message = await message.channel.send("please wait...")
         valorant_online.get_all_data()
         john = valorant_online.everything()
         msg = ""
@@ -48,7 +48,7 @@ async def on_message(message):
             else:  
                 msg += john[i][0] + ": " + john[i][1] + '\n'
 
-        await message.channel.send("```\n" + msg + "\n```")
+        await the_message.channel.send("```\n" + msg + "\n```")
 
 config = get_config()
 token = config[2]
