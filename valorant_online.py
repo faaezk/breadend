@@ -64,7 +64,11 @@ def form_partys():
         players[i].append(party_id)
     
     players.sort(key=lambda x: str(x[-1]))
-    print(players)
+    
+    for player in players:
+        if player[-1] == None:
+            players.append(players.pop(players.index(player)))
+
     count = 0
     parties = []
     a_party_id = players[0][-1]

@@ -77,13 +77,13 @@ def update_elo_history(username, tagline):
             new_elo_list.append(player_data['data'][i]['elo'])
 
     else:
-        while last_file_update < date_raw:
-            
-            new_elo_list.append(player_data['data'][i]['elo'])
-            if last_file_update != date_raw:
-                i += 1
+        for i in range(0, len(player_data['data'])):
             date_raw = player_data['data'][i]['date_raw']
-
+            if last_file_update < date_raw:
+                new_elo_list.append(player_data['data'][i]['elo'])
+            else:
+                break
+    
     correctly_sorted_new_elo_list = new_elo_list[::-1]
 
     player_file = open(player_file_path, 'a')
@@ -109,6 +109,7 @@ def update_all_elo_history():
         #print("completed " + str(i + 1) + "/" + str(len(players)))
 
     return str(update_count) + " updates"
+
 
 updates = update_all_elo_history()
 now = datetime.now()

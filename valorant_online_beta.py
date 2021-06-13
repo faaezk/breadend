@@ -73,8 +73,7 @@ def form_partys():
         local_players[i].append(party_id)
     
     local_players.sort(key=lambda x: str(x[2]))
-    local_players.reverse()
-    print(local_players)
+    #print(local_players)
     count = 0
     parties = []
     a_party_id = local_players[0][2]
