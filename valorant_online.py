@@ -67,18 +67,18 @@ def form_partys():
     print(players)
     count = 0
     parties = []
-    a_party_id = players[0][2]
+    a_party_id = players[0][-1]
 
     while a_party_id != None and count < len(players):
         temp = []
-        while a_party_id == players[count][2]:
+        while a_party_id == players[count][-1]:
             temp.append(names[players[count][0]])
             count += 1
             if count == len(players):
                 break
         
         if count != len(players):
-            a_party_id = players[count][2]
+            a_party_id = players[count][-1]
         parties.append(temp)
 
     return parties
