@@ -8,12 +8,13 @@ players = [
     ["slumonaire", "oce"],
     ["Hoben222", "9327"],
     ["silentwhispers", "0000"],
-    ["imabandwagon", "oce"]
+    ["imabandwagon", "oce"],
+    ["lmao", "6548"]
     ]
 
 names = {"Fakinator" : "Faaez", "8888" : "Hadi", "dilka30003" : "Dhiluka", 
         "slumonaire" : "Chris", "Hoben222" : "Ben", "silentwhispers" : "Rasindu",
-        "imabandwagon" : "Dylan"}
+        "imabandwagon" : "Dylan", "lmao" : "Joseph"}
 
 all_data = {}
 def get_all_data():
@@ -63,7 +64,6 @@ def form_partys():
         players[i].append(party_id)
     
     players.sort(key=lambda x: str(x[-1]))
-    players.reverse()
     print(players)
     count = 0
     parties = []
