@@ -42,7 +42,7 @@ async def on_message(message):
         msg = ""
 
         for i in range(0, len(john)):
-            if john[i][0] == "no parties" or john[i][0] == "Players:":
+            if john[i][0] == "no parties" or john[i][0] == "Players Online:":
                 msg += john[i][0] + '\n'
             elif john[i][0] == "Parties:":
                 msg += '\n' + john[i][0] + '\n'
