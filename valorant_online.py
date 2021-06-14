@@ -75,7 +75,8 @@ def form_partys():
 
     count = 0
     parties = []
-    a_party_id = party_players[0][-1]
+    if party_players != []:
+        a_party_id = party_players[0][-1]
 
     while count < len(party_players):
         temp = []
