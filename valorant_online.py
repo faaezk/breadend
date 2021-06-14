@@ -42,10 +42,14 @@ def get_status(username):
         if state == 'MENUS':
             status = "Online and in menu"
         if state == 'INGAME':
-            game_mode = data['data']['gamemode']
-            score = str(data['data']['score_ally_team']) + '-' + str(data['data']['score_enemy_team'])
             map = data['data']['map']
-            status = "Online in " + game_mode + " going " + score + " on " + map
+            if map == 'Range':
+                status = "Online in the range"
+            else:
+                game_mode = data['data']['gamemode']
+                score = str(data['data']['score_ally_team']) + '-' + str(data['data']['score_enemy_team'])
+                map = data['data']['map']
+                status = "Online in " + game_mode + " going " + score + " on " + map
     else:
         status = "Offline"
     
@@ -58,31 +62,31 @@ def get_party(username):
     return data['data']['party_id']
 
 def form_partys():
-
+    party_players = []
+    j = 0
     for i in range(0, len(players)):
         party_id = get_party(players[i][0])
-        players[i].append(party_id)
+        if party_id != None:
+            party_players.append(players[i])
+            party_players[j].append(party_id)
+            j += 1
     
-    players.sort(key=lambda x: str(x[-1]))
-    
-    for player in players:
-        if player[-1] == None:
-            players.append(players.pop(players.index(player)))
+    party_players.sort(key=lambda x: str(x[-1]))
 
     count = 0
     parties = []
-    a_party_id = players[0][-1]
+    a_party_id = party_players[0][-1]
 
-    while a_party_id != None and count < len(players):
+    while count < len(party_players):
         temp = []
-        while a_party_id == players[count][-1]:
-            temp.append(names[players[count][0]])
+        while a_party_id == party_players[count][-1]:
+            temp.append(names[party_players[count][0]])
             count += 1
-            if count == len(players):
+            if count == len(party_players):
                 break
         
-        if count != len(players):
-            a_party_id = players[count][-1]
+        if count != len(party_players):
+            a_party_id = party_players[count][-1]
         parties.append(temp)
 
     return parties
