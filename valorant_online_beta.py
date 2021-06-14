@@ -8,16 +8,17 @@ players = [
     ["slumonaire", "oce"],
     ["Hoben222", "9327"],
     ["silentwhispers", "0000"],
-    ["imabandwagon", "oce"]
+    ["imabandwagon", "oce"],
+    ["lmao", "6548"]
     ]
 
 names = {"Fakinator" : "Faaez", "8888" : "Hadi", "dilka30003" : "Dhiluka", 
         "slumonaire" : "Chris", "Hoben222" : "Ben", "silentwhispers" : "Rasindu",
-        "imabandwagon" : "Dylan"}
+        "imabandwagon" : "Dylan", "lmao" : "Joseph"}
 
 game_names = {"Faaez" : "Fakinator", "Hadi" : "8888", "Dhiluka" : "dilka30003", 
         "Chris" : "slumonaire", "Ben" : "Hoben222", "Rasindu" : "silentwhispers",
-        "Dylan" : "imabandwagon"}
+        "Dylan" : "imabandwagon", "Joseph" : "lmao"}
 
 offline = {'party_id' : None}
 all_data = {}
@@ -47,10 +48,14 @@ def get_status(username):
         if state == 'MENUS':
             status = "Online and in menu"
         if state == 'INGAME':
-            game_mode = data['data']['gamemode']
-            score = str(data['data']['score_ally_team']) + '-' + str(data['data']['score_enemy_team'])
             map = data['data']['map']
-            status = "Online in " + game_mode + " going " + score + " on " + map
+            if map == 'Range':
+                status = "Online in the range"
+            else:
+                game_mode = data['data']['gamemode']
+                score = str(data['data']['score_ally_team']) + '-' + str(data['data']['score_enemy_team'])
+                map = data['data']['map']
+                status = "Online in " + game_mode + " going " + score + " on " + map
     else:
         status = "Offline"
     
@@ -61,33 +66,36 @@ def get_party(username):
     data = all_data[username]
     if data['status'] == "500":
         data['data'] = offline
-        print(str(username) + "data:")
-        print(data)
         return None
     return data['data']['party_id']
 
 def form_partys():
-    local_players = players
-    for i in range(0, len(local_players)):
-        party_id = get_party(local_players[i][0])
-        local_players[i].append(party_id)
+    party_players = []
+    j = 0
+    for i in range(0, len(players)):
+        party_id = get_party(players[i][0])
+        if party_id != None:
+            party_players.append(players[i].copy())
+            party_players[j].append(party_id)
+            j += 1
     
-    local_players.sort(key=lambda x: str(x[2]))
-    #print(local_players)
+    party_players.sort(key=lambda x: str(x[-1]))
+
     count = 0
     parties = []
-    a_party_id = local_players[0][2]
+    if party_players != []:
+        a_party_id = party_players[0][-1]
 
-    while a_party_id != None:
+    while count < len(party_players):
         temp = []
-        while a_party_id == local_players[count][2]:
-            temp.append(names[local_players[count][0]])
+        while a_party_id == party_players[count][-1]:
+            temp.append(names[party_players[count][0]])
             count += 1
-            if count == len(local_players):
+            if count == len(party_players):
                 break
         
-        if count != len(local_players):
-            a_party_id = local_players[count][2]
+        if count != len(party_players):
+            a_party_id = party_players[count][-1]
         parties.append(temp)
 
     return parties
@@ -95,11 +103,15 @@ def form_partys():
 def everything():
 
     parties = form_partys()
-    final = [("Players:", "")]
-    
-    for i in range(0, len(players)):
+    final = [("Players Online:", "")]
 
-        final.append((names[players[i][0]].ljust(8), get_status(players[i][0])))
+    for i in range(0, len(players)):
+        entry = (names[players[i][0]].ljust(8), get_status(players[i][0]))
+        if entry[1] != "Offline":
+            final.append(entry)
+
+    if len(final) == 1:
+        final.append(("All players offline", ""))
 
     final.append(("Parties:", ""))
 
@@ -110,7 +122,7 @@ def everything():
     for i in range(0, len(parties)):
         randos = 0
         user = game_names[parties[i][0]]
-        if all_data[user]['data']['current_state'] == 'MENUS' and len(parties[i]) != all_data[user]['data']['party_size']:
+        if all_data[user]['data']['current_state'] == 'MENUS' and len(parties[i]) < all_data[user]['data']['party_size']:
             randos = all_data[user]['data']['party_size'] - len(parties[i])
         
         a_party = ""
@@ -128,9 +140,9 @@ def everything():
 
     return final
 
-#print(get_all_data())
+print(get_all_data())
 
-#print(everything())
+print(everything())
 
 '''
     #print(players)
