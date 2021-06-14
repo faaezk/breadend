@@ -67,7 +67,7 @@ def form_partys():
     for i in range(0, len(players)):
         party_id = get_party(players[i][0])
         if party_id != None:
-            party_players.append(players[i])
+            party_players.append(players[i].copy())
             party_players[j].append(party_id)
             j += 1
     
