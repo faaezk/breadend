@@ -95,7 +95,7 @@ def form_partys():
 def everything():
 
     parties = form_partys()
-    final = [("Players:", "")]
+    final = [("Players Online:", "")]
     
     for i in range(0, len(players)):
         entry = (names[players[i][0]].ljust(8), get_status(players[i][0]))

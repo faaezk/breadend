@@ -62,5 +62,3 @@ def make_graph(username):
 def make_all_graphs():
     for i in range(0, len(players)):
         make_graph(players[i][0])
-
-make_all_graphs()

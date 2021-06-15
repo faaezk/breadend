@@ -106,7 +106,8 @@ def get_elolist(username):
     for player in players:
         if player[0] == username:
             tagline = player[1]
-
+            
+    update_elo_history(username, tagline)
     player_data = get_elo_history(username, tagline)
     if player_data == False:
         return 0
