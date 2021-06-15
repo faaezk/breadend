@@ -140,20 +140,3 @@ def everything():
 
     return final
 
-print(get_all_data())
-
-print(everything())
-
-'''
-    #print(players)
-
-    players = [ 
-    ["Fakinator", "4269", "4555982f-e7d1-4ee2-beed-e7c0fcc0c59d"],
-    ["8888", "nadi", "4555982f-e7d1-4ee2-beed-e7c0fcc0c595"], 
-    ["dilka30003", "0000", "4555982f-e7d1-4ee2-beed-e7c0fcc0c595"],
-    ["slumonaire", "oce", "4555982f-e7d1-4ee2-beed-e7c0fcc0c59d"]
-    ]
-
-    players.sort(key=lambda x: str(x[2]))
-    print(players)
-'''

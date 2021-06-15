@@ -5,6 +5,7 @@ import valorant
 import valorant_online_beta
 import configparser
 import graphs
+import elo_history
 
 def get_config():
     c = configparser.ConfigParser()
@@ -42,7 +43,7 @@ async def on_message(message):
         msg = ""
 
         for i in range(0, len(john)):
-            if john[i][0] == "no parties" or john[i][0] == "Players Online:":
+            if john[i][0] == "no parties" or john[i][0] == "Players Online:" or john[i][0] == "All players offline":
                 msg += john[i][0] + '\n'
             elif john[i][0] == "Parties:":
                 msg += '\n' + john[i][0] + '\n'
@@ -54,10 +55,14 @@ async def on_message(message):
     if message.content.lower().startswith('=graph'):
         username = message.content[6:].strip()
         graphs.make_graph(username)
-        with open("elo_graphs/{}.png".format(username), 'rb') as f:
+        with open("/home/ubuntu/discord_bot/elo_graphs/{}.png".format(username), 'rb') as f:
             picture = discord.File(f)
             await message.channel.send(file=picture)
-    
+
+    if message.content.startswith('=elolist'):
+        username = message.content[8:].strip()
+        elolist = elo_history.get_elolist(username)
+        await message.channel.send("```\n" + elolist + "\n```")
 
     if message.content.lower().startswith('good evening'):
         await message.channel.send(file=discord.File('good_evening.mp4'))

@@ -1,7 +1,6 @@
 import requests
 import json
 import os
-from datetime import datetime
 
 players = [("silentwhispers", "0000"), 
     ("Fakinator", "4269"), 
@@ -39,7 +38,6 @@ def get_elo_history(username, tagline):
         return False
 
     john = json.loads(r.text)
-
     return john
 
 def initialise_file(username):
@@ -102,15 +100,28 @@ def update_elo_history(username, tagline):
     
     return len(correctly_sorted_new_elo_list)
 
-def update_all_elo_history():
-    update_count = 0
-    for i in range(0, len(players)):
-        update_count += update_elo_history(players[i][0], players[i][1])
-        #print("completed " + str(i + 1) + "/" + str(len(players)))
+def get_elolist(username):
 
-    return str(update_count) + " updates"
+    tagline = ""
+    for player in players:
+        if player[0] == username:
+            tagline = player[1]
 
+    player_data = get_elo_history(username, tagline)
+    if player_data == False:
+        return 0
 
-updates = update_all_elo_history()
-now = datetime.now()
-print("completed on: " + now.strftime("%d/%m/%Y") + " at " + now.strftime("%H:%M:%S") + " with " + updates)
+    player_file_path = '/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username)
+
+    if os.path.isfile(player_file_path) == False:
+        return "Player not found or hasn't played any comp games recently"
+    
+    with open(player_file_path) as f:
+        lines = [line.rstrip() for line in f]
+    
+    lines = lines[1:]
+    elolist = ""
+    for elem in lines:
+        elolist += elem + ", "
+
+    return elolist[:-2]
