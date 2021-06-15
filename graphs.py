@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import os
+import elo_history
 
 players = [("silentwhispers", "0000"), 
     ("Fakinator", "4269"), 
@@ -32,6 +33,13 @@ def make_graph(username):
 
     if os.path.isfile('elo_history/{}.txt'.format(username)) == False:
         return
+    
+    tagline = ""
+    for player in players:
+        if player[0] == username:
+            tagline = player[1]
+    elo_history.update_elo_history(username, tagline)
+    
     file1 = open('elo_history/{}.txt'.format(username), 'r')
 
     y = [x.strip() for x in file1.readlines()]

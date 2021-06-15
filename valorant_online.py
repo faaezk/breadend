@@ -98,9 +98,13 @@ def everything():
     final = [("Players:", "")]
     
     for i in range(0, len(players)):
+        entry = (names[players[i][0]].ljust(8), get_status(players[i][0]))
+        if entry[1] != "Offline":
+            final.append(entry)
 
-        final.append((names[players[i][0]].ljust(8), get_status(players[i][0])))
-
+    if len(final) == 1:
+        final.append(("All players offline", ""))
+        
     final.append(("Parties:", ""))
 
     if len(parties) == 0:
@@ -118,6 +122,3 @@ def everything():
 
     return final
 
-print(get_all_data())
-
-print(everything())
