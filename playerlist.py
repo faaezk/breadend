@@ -24,7 +24,8 @@ players = [("silentwhispers", "0000"),
     ("lol", "4529"),
     ("crossaxis", "mippl"),
     ("azatory", "nike"),
-    ("quyteriyaki", "oce")
+    ("quyteriyaki", "oce"), 
+    ("talizorahrayya", "3303")
     ]
 
 online_players = [ 
@@ -39,10 +40,9 @@ online_players = [
     ]
 
 names = {"fakinator" : "Faaez", "8888" : "Hadi", "dilka30003" : "Dhiluka", 
-        "slumonaire" : "Chris", "hfoben222" : "Ben", "silentwhispers" : "Rasindu",
+        "slumonaire" : "Chris", "hoben222" : "Ben", "silentwhispers" : "Rasindu",
         "imabandwagon" : "Dylan", "lmao" : "Joseph"}
 
 game_names = {"Faaez" : "fakinator", "Hadi" : "8888", "Dhiluka" : "dilka30003", 
         "Chris" : "slumonaire", "Ben" : "hoben222", "Rasindu" : "silentwhispers",
         "Dylan" : "imabandwagon", "Joseph" : "lmao"}
-
