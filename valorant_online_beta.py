@@ -12,6 +12,18 @@ players = [
     ["lmao", "6548"]
     ]
 
+class player:
+    def __init__(self, ign, tag, name):
+        self.ign = ign
+        self.region = tag
+        self.name = name
+
+def get_key (dict, input_value):
+    for key, value in dict:
+        if input_value == value:
+            return key
+    return [key for key, value in dict if input_value == value]
+
 names = {"Fakinator" : "Faaez", "8888" : "Hadi", "dilka30003" : "Dhiluka", 
         "slumonaire" : "Chris", "Hoben222" : "Ben", "silentwhispers" : "Rasindu",
         "imabandwagon" : "Dylan", "lmao" : "Joseph"}
@@ -139,4 +151,3 @@ def everything():
         final.append((("Party " + str(i + 1)), a_party))
 
     return final
-
