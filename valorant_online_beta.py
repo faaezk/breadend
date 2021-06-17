@@ -1,16 +1,8 @@
 import requests
 import json
+import playerlist
 
-players = [ 
-    ["Fakinator", "4269"],
-    ["8888", "nadi"], 
-    ["dilka30003", "0000"],
-    ["slumonaire", "oce"],
-    ["Hoben222", "9327"],
-    ["silentwhispers", "0000"],
-    ["imabandwagon", "oce"],
-    ["lmao", "6548"]
-    ]
+players = playerlist.online_players
 
 class player:
     def __init__(self, ign, tag, name):
@@ -24,13 +16,9 @@ def get_key (dict, input_value):
             return key
     return [key for key, value in dict if input_value == value]
 
-names = {"Fakinator" : "Faaez", "8888" : "Hadi", "dilka30003" : "Dhiluka", 
-        "slumonaire" : "Chris", "Hoben222" : "Ben", "silentwhispers" : "Rasindu",
-        "imabandwagon" : "Dylan", "lmao" : "Joseph"}
+names = playerlist.names
 
-game_names = {"Faaez" : "Fakinator", "Hadi" : "8888", "Dhiluka" : "dilka30003", 
-        "Chris" : "slumonaire", "Ben" : "Hoben222", "Rasindu" : "silentwhispers",
-        "Dylan" : "imabandwagon", "Joseph" : "lmao"}
+game_names = playerlist.game_names
 
 offline = {'party_id' : None}
 all_data = {}

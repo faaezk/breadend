@@ -1,24 +1,8 @@
 import requests
 import json
+import playerlist
 
-players = [("silentwhispers", "0000"), 
-    ("Fakinator", "4269"), 
-    ("faqinator", "7895"), 
-    ("8888", "nadi"), 
-    ("dilka30003", "0000"),
-    ("slumonaire", "oce"),
-    ("KATCHAMPION", "oce"), 
-    ("imabandwagon", "oce"), 
-    ("giroud", "8383"), 
-    ("oshaoshawott", "oce"), 
-    ("YoVivels", "1830"), 
-    ("therealrobdez", "3333"),
-    ("bento2", "box"), 
-    ("hoben222", "9327"), 
-    ("jokii", "oce"),
-    ("Lyçhii", "mai"),
-    ("lmao", "6548")
-    ]
+players = playerlist.players
 
 def get_player_data(username, tagline):
     url = "https://api.henrikdev.xyz/valorant/v1/mmr/ap/{}/{}".format(username, tagline)

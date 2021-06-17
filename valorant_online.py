@@ -1,20 +1,10 @@
 import requests
 import json
+import playerlist
 
-players = [ 
-    ["Fakinator", "4269"],
-    ["8888", "nadi"], 
-    ["dilka30003", "0000"],
-    ["slumonaire", "oce"],
-    ["Hoben222", "9327"],
-    ["silentwhispers", "0000"],
-    ["imabandwagon", "oce"],
-    ["lmao", "6548"]
-    ]
+players = playerlist.online_players
 
-names = {"Fakinator" : "Faaez", "8888" : "Hadi", "dilka30003" : "Dhiluka", 
-        "slumonaire" : "Chris", "Hoben222" : "Ben", "silentwhispers" : "Rasindu",
-        "imabandwagon" : "Dylan", "lmao" : "Joseph"}
+names = playerlist.names
 
 all_data = {}
 def get_all_data():
