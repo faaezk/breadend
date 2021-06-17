@@ -37,6 +37,7 @@ async def on_message(message):
         await message.add_reaction("<:stevens:785800069957943306>")
     
     if '$online' in message.content.lower():
+        
         the_message = await message.channel.send("please wait...")
         valorant_online.get_all_data()
         john = valorant_online.everything()
@@ -53,15 +54,21 @@ async def on_message(message):
         await the_message.edit(content="```\n" + msg + "\n```")
 
     if message.content.lower().startswith('$graph'):
+
+        message = message.content.lower()
         username = message.content[6:].strip()
         graphs.make_graph(username)
+
         with open("/home/ubuntu/discord_bot/elo_graphs/{}.png".format(username), 'rb') as f:
             picture = discord.File(f)
             await message.channel.send(file=picture)
 
     if message.content.startswith('$elolist'):
+
+        message = message.content.lower()
         username = message.content[8:].strip()
         elolist = elo_history.get_elolist(username)
+
         await message.channel.send("```\n" + elolist + "\n```")
 
 config = get_config()
