@@ -26,7 +26,8 @@ players = [("silentwhispers", "0000"),
     ("SkzCross", "OCE"),
     ("lol", "4529"),
     ("Crossaxis", "mippl"),
-    ("Azatory", "nike")
+    ("Azatory", "nike"),
+    ("quyteriyaki", "oce")
     ]
 
 def get_elo_history(username, tagline):
