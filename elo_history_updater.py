@@ -1,32 +1,8 @@
 import elo_history
 from datetime import datetime
+import playerlist
 
-players = [("silentwhispers", "0000"), 
-    ("Fakinator", "4269"), 
-    ("faqinator", "7895"), 
-    ("8888", "nadi"), 
-    ("dilka30003", "0000"),
-    ("slumonaire", "oce"),
-    ("KATCHAMPION", "oce"), 
-    ("imabandwagon", "oce"), 
-    ("giroud", "8383"), 
-    ("oshaoshawott", "oce"), 
-    ("YoVivels", "1830"), 
-    ("therealrobdez", "3333"),
-    ("bento2", "box"), 
-    ("hoben222", "9327"), 
-    ("jokii", "oce"),
-    ("Lyçhii", "mai"),
-    ("lmao", "6548"),
-    ("jack", "ytb"),
-    ("VKj", "4084"),
-    ("TallEwok", "6209"),
-    ("Fade", "1280"),
-    ("SkzCross", "OCE"),
-    ("lol", "4529"),
-    ("Crossaxis", "mippl"),
-    ("Azatory", "nike")
-    ]
+players = playerlist.players
 
 
 def update_all_elo_history():

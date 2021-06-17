@@ -34,6 +34,9 @@ def elo_leaderboard():
         user = bohn[i][1]
         elo = bohn[i][0]
         rank = i + 1
-        leaderboard += "{}. {} {}\n".format(rank, user, elo)
+        leaderboard += str(rank).ljust(3) + '.' + str(user).ljust(14) + str(elo).rjust(5) + '\n'
 
     return leaderboard
+
+
+print(elo_leaderboard())
