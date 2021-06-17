@@ -70,6 +70,12 @@ async def on_message(message):
     if "john" in message.content.lower():
         await message.add_reaction("\u2705")
 
+    if message.content.lower().startswith('=test'):
+        
+        reply = message.content.lower()
+
+        await message.channel.send(reply)    
+
 
 config = get_config()
 token = config[2]
