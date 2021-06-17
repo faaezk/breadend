@@ -36,7 +36,7 @@ async def on_message(message):
     if "wow" in message.content.lower() and message.author.id == 203311457666990082:
         await message.add_reaction("<:stevens:785800069957943306>")
     
-    if '$online' in message.content.lower():
+    if message.content.lower().startswith('$online'):
         
         the_message = await message.channel.send("please wait...")
         valorant_online.get_all_data()
