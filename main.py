@@ -55,8 +55,8 @@ async def on_message(message):
 
     if message.content.lower().startswith('$graph'):
 
-        message = message.content.lower()
-        username = message.content[6:].strip()
+        themessage = message.content.lower()
+        username = themessage[6:].strip()
         graphs.make_graph(username)
 
         with open("/home/ubuntu/discord_bot/elo_graphs/{}.png".format(username), 'rb') as f:
@@ -65,8 +65,8 @@ async def on_message(message):
 
     if message.content.startswith('$elolist'):
 
-        message = message.content.lower()
-        username = message.content[8:].strip()
+        themessage = message.content.lower()
+        username = themessage[8:].strip()
         elolist = elo_history.get_elolist(username)
 
         await message.channel.send("```\n" + elolist + "\n```")
