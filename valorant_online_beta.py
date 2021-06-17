@@ -3,6 +3,8 @@ import json
 import playerlist
 
 players = playerlist.online_players
+names = playerlist.names
+game_names = playerlist.game_names
 
 class player:
     def __init__(self, ign, tag, name):
@@ -16,9 +18,7 @@ def get_key (dict, input_value):
             return key
     return [key for key, value in dict if input_value == value]
 
-names = playerlist.names
 
-game_names = playerlist.game_names
 
 offline = {'party_id' : None}
 all_data = {}

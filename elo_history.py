@@ -14,6 +14,9 @@ def get_elo_history(username, tagline):
         return False
 
     john = json.loads(r.text)
+
+    if john['status'] == '404':
+        return False
     return john
 
 def initialise_file(username):
@@ -30,7 +33,7 @@ def update_elo_history(username, tagline):
 
     player_data = get_elo_history(username, tagline)
     if player_data == False:
-        return 0
+        return
     
     player_file_path = '/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username)
 
