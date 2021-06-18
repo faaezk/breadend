@@ -1,4 +1,53 @@
 
+class player:
+    def __init__(self, ign, tag, name, online):
+        self.ign = ign
+        self.tag = tag
+        self.name = name
+        self.online = online
+
+classyplayers = [
+    
+    player("silentwhispers", "0000", "Rasindu", True),
+    player("fakinator", "4269", "Faaez", True),
+    player("faqinator", "7895", "Faaez alt", False),
+    player("8888", "nadi", "Hadi", True),
+    player("dilka30003", "0000", "Dhiluka", True),
+    player("slumonaire", "oce", "Chris", True),
+    player("katchampion", "oce", "Albert", False),
+    player("imabandwagon", "oce", "Dylan", True),
+    player("giroud", "8383", "Dylan alt", False),
+    player("oshaoshawott", "oce", "Osha", False),
+    player("yovivels", "1830", "Viv", False),
+    player("therealrobdez", "3333", "Will", False),
+    player("bento2", "box", "Ben alt", False),
+    player("hoben222", "9327", "Ben", False),
+    player("jokii", "oce", "Henry", False),
+    player("lyçhii", "mai", "Bog", False),
+    player("lmao", "6548", "Joseph lmao", True),
+    player("jack", "ytb", "Jack", False),
+    player("vkj", "4084", "Rasindu alt", False),
+    player("tallewok", "6209", "Rasindu alt 2", False),
+    player("fade", "1280", "Rasindu gold smurf", False),
+    player("skzcross", "oce", "Bhairav", False),
+    player("lol", "1280", "Joseph lol", False),
+    player("crossaxis", "mippl", "Josh", False),
+    player("azatory", "nike", "Alex", False),
+    player("quyteriyaki", "oce", "James", False),
+    player("talizorahrayya", "3303", "worst child", False),
+    ]
+
+classyonline = [
+    
+    player("silentwhispers", "0000", "Rasindu", True),
+    player("fakinator", "4269", "Faaez", True),
+    player("8888", "nadi", "Hadi", True),
+    player("dilka30003", "0000", "Dhiluka", True),
+    player("slumonaire", "oce", "Chris", True),
+    player("imabandwagon", "oce", "Dylan", True),
+    player("lmao", "6548", "Joseph lmao", True),
+    ]
+
 players = [("silentwhispers", "0000"), 
     ("fakinator", "4269"), 
     ("faqinator", "7895"), 

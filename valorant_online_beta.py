@@ -2,15 +2,7 @@ import requests
 import json
 import playerlist
 
-players = playerlist.online_players
-names = playerlist.names
-game_names = playerlist.game_names
-
-class player:
-    def __init__(self, ign, tag, name):
-        self.ign = ign
-        self.region = tag
-        self.name = name
+players = playerlist.classyonline
 
 def get_key (dict, input_value):
     for key, value in dict:
@@ -26,10 +18,12 @@ all_data = {}
 def get_all_data():
     global all_data
     all_data = {}
-    for i in range(0, len(players)):
-        url = "https://api.henrikdev.xyz/valorant/v1/live-match/{}/{}".format(players[i][0], players[i][1])
+    for person in players:
+        if person.online == False:
+            continue
+        url = "https://api.henrikdev.xyz/valorant/v1/live-match/{}/{}".format(person.ign, person.tag)
         r = requests.get(url, headers={'Cache-Control': 'no-cache'})
-        all_data[players[i][0]] = json.loads(r.text)
+        all_data[person.ign] = json.loads(r.text)
 
 
 
@@ -73,9 +67,9 @@ def form_partys():
     party_players = []
     j = 0
     for i in range(0, len(players)):
-        party_id = get_party(players[i][0])
+        party_id = get_party(players[i].ign)
         if party_id != None:
-            party_players.append(players[i].copy())
+            party_players.append((players[i].ign, players[i].tag))
             party_players[j].append(party_id)
             j += 1
     
@@ -106,7 +100,7 @@ def everything():
     final = [("Players Online:", "")]
 
     for i in range(0, len(players)):
-        entry = (names[players[i][0]].ljust(8), get_status(players[i][0]))
+        entry = (players[i].name.ljust(8), get_status(players[i].ign))
         if entry[1] != "Offline":
             final.append(entry)
 
@@ -121,7 +115,7 @@ def everything():
 
     for i in range(0, len(parties)):
         randos = 0
-        user = game_names[parties[i][0]]
+        user = parties[i][0].ign
         if all_data[user]['data']['current_state'] == 'MENUS' and len(parties[i]) < all_data[user]['data']['party_size']:
             randos = all_data[user]['data']['party_size'] - len(parties[i])
         
@@ -139,3 +133,6 @@ def everything():
         final.append((("Party " + str(i + 1)), a_party))
 
     return final
+
+get_all_data()
+print(everything())
