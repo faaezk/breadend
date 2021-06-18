@@ -34,7 +34,3 @@ def make_graph(username):
     plt.savefig('/home/ubuntu/discord_bot/elo_graphs/{}.png'.format(username))
     file1.close()
     plt.clf()
-
-def make_all_graphs():
-    for i in range(0, len(players)):
-        make_graph(players[i][0])

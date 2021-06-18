@@ -133,6 +133,3 @@ def everything():
         final.append((("Party " + str(i + 1)), a_party))
 
     return final
-
-get_all_data()
-print(everything())

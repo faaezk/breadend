@@ -37,6 +37,3 @@ def elo_leaderboard():
         leaderboard += str(rank).ljust(3) + '.' + str(user).ljust(14) + str(elo).rjust(5) + '\n'
 
     return leaderboard
-
-
-print(elo_leaderboard())
