@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import os
 import elo_history
 import playerlist
+import math
 
 players = playerlist.players
 
@@ -24,7 +25,21 @@ def make_graph(username):
     x = []
     for i in range(0, len(y)):
         y[i] = int(y[i])
-        x.append(i)
+        x.append(i + 1)
+
+    ymin = min(y) - 25
+    ymax = max(y) + 25
+
+    axes = plt.gca()
+    axes.set_ylim([ymin,ymax])
+    
+    ticks = []
+    i = int(math.floor(ymin / 50.0)) * 50
+    while i < int(math.ceil(ymax / 50.0)) * 50:
+        ticks.append(i)
+        i += 25
+
+    axes.set_yticks(ticks)
 
     plt.plot(x, y)
     plt.xlabel('your mother')
