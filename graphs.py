@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import os
-import elo_history
+import valorant
 import playerlist
 import math
 
@@ -30,7 +30,7 @@ def make_graph(username):
     for player in players:
         if player[0] == username:
             tagline = player[1]
-    elo_history.update_elo_history(username, tagline)
+    valorant.update_elo_history(username, tagline)
     
     file1 = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username), 'r')
 

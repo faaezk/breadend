@@ -5,7 +5,6 @@ import valorant
 import valorant_online_beta
 import configparser
 import graphs
-import elo_history
 
 def get_config():
     c = configparser.ConfigParser()
@@ -63,7 +62,7 @@ async def on_message(message):
     if message.content.startswith('=elolist'):
         themessage = message.content.lower()
         username = themessage[8:].strip()
-        elolist = elo_history.get_elolist(username)
+        elolist = valorant.get_elolist(username)
         await message.channel.send("```\n" + elolist + "\n```")
 
     if message.content.lower().startswith('good evening'):

@@ -4,7 +4,7 @@ import weather
 import configparser
 import valorant_online
 import graphs
-import elo_history
+import valorant
 
 def get_config():
     c = configparser.ConfigParser()
@@ -67,7 +67,7 @@ async def on_message(message):
 
         themessage = message.content.lower()
         username = themessage[8:].strip()
-        elolist = elo_history.get_elolist(username)
+        elolist = valorant.get_elolist(username)
 
         await message.channel.send("```\n" + elolist + "\n```")
 

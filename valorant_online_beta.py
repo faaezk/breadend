@@ -2,17 +2,7 @@ import requests
 import json
 import playerlist
 
-players = playerlist.classyonline
-
-def get_key (dict, input_value):
-    for key, value in dict:
-        if input_value == value:
-            return key
-    return [key for key, value in dict if input_value == value]
-
-
-
-offline = {'party_id' : None}
+players = playerlist.classyplayers
 all_data = {}
 
 def get_all_data():
@@ -59,7 +49,6 @@ def get_status(username):
 def get_party(username):
     data = all_data[username]
     if data['status'] == "500":
-        data['data'] = offline
         return None
     return data['data']['party_id']
 
@@ -69,7 +58,7 @@ def form_partys():
     for i in range(0, len(players)):
         party_id = get_party(players[i].ign)
         if party_id != None:
-            party_players.append((players[i].ign, players[i].tag))
+            party_players.append([players[i].ign, players[i].tag])
             party_players[j].append(party_id)
             j += 1
     
@@ -83,7 +72,7 @@ def form_partys():
     while count < len(party_players):
         temp = []
         while a_party_id == party_players[count][-1]:
-            temp.append(names[party_players[count][0]])
+            temp.append(playerlist.get_attribute(party_players[count][0], "name"))
             count += 1
             if count == len(party_players):
                 break
@@ -115,7 +104,7 @@ def everything():
 
     for i in range(0, len(parties)):
         randos = 0
-        user = parties[i][0].ign
+        user = playerlist.get_attribute(parties[i][0], "ign")
         if all_data[user]['data']['current_state'] == 'MENUS' and len(parties[i]) < all_data[user]['data']['party_size']:
             randos = all_data[user]['data']['party_size'] - len(parties[i])
         
@@ -133,3 +122,6 @@ def everything():
         final.append((("Party " + str(i + 1)), a_party))
 
     return final
+
+get_all_data()
+print(everything())
