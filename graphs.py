@@ -70,6 +70,6 @@ def make_graph(username):
     plt.ylabel('mmr')
     plt.title(username + '\'s elo but the x axis has no meaning cause i cbs')
 
-    plt.savefig('/home/ubuntu/discord_bot/elo_graphs/{}.png'.format(username))
+    plt.savefig('/home/ubuntu/discord_bot/elo_graphs/{}.png'.format(username), bbox_inches="tight")
     file1.close()
     plt.clf()
