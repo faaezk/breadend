@@ -37,7 +37,7 @@ def make_graph(username):
 
     y = [x.strip() for x in file1.readlines()]
     if len(y) == 2:
-        return False
+        return None
     y.pop(0)
     x = []
 
@@ -79,3 +79,5 @@ def make_graph(username):
 
     file1.close()
     plt.clf()
+
+    return True
