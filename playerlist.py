@@ -64,7 +64,8 @@ players = [("silentwhispers", "0000"),
     ("crossaxis", "mippl"),
     ("azatory", "nike"),
     ("quyteriyaki", "oce"), 
-    ("talizorahrayya", "3303")
+    ("talizorahrayya", "3303"), 
+    ("quackinator", "2197")
     ]
 
 online_players = [ 
