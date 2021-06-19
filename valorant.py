@@ -17,22 +17,27 @@ def get_elo_history(username, tagline):
 
     if john['status'] == '404':
         return False
+    
     return john
 
 def get_elo_from_file(username):
 
     file_path = '/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username)
+
     if os.path.isfile(file_path) == False:
         return False
+
     f = open(file_path, 'r')
     lines = f.readlines()
     f.close()
+
     return int(lines[-1])
 
 def initialise_file(username):
 
     f = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username), "x")
     f.close()
+
     f = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username), "w")
     f.writelines(str(0) + '\n')
     f.close()
@@ -42,6 +47,7 @@ def initialise_file(username):
 def update_elo_history(username, tagline):
 
     player_data = get_elo_history(username, tagline)
+
     if player_data == False:
         return 0
     
@@ -65,7 +71,9 @@ def update_elo_history(username, tagline):
 
     else:
         for i in range(0, len(player_data['data'])):
+
             date_raw = player_data['data'][i]['date_raw']
+
             if last_file_update < date_raw:
                 new_elo_list.append(player_data['data'][i]['elo'])
             else:
@@ -83,7 +91,9 @@ def update_elo_history(username, tagline):
     #update timestamp in file
     with open(player_file_path) as f:
         lines = f.readlines()
+    
     lines[0] = str(player_data["data"][0]["date_raw"]) + '\n'
+
     with open(player_file_path, "w") as f:
         f.writelines(lines)   
     
@@ -92,12 +102,14 @@ def update_elo_history(username, tagline):
 def get_elolist(username):
 
     tagline = ""
+
     for player in players:
         if player[0] == username:
             tagline = player[1]
             
     update_elo_history(username, tagline)
     player_data = get_elo_history(username, tagline)
+
     if player_data == False:
         return 0
 
@@ -111,6 +123,7 @@ def get_elolist(username):
     
     lines = lines[1:]
     elolist = ""
+
     for elem in lines:
         elolist += elem + ", "
 
@@ -119,13 +132,18 @@ def get_elolist(username):
 def elo_leaderboard():
 
     bohn = []
+
     for i in range(0, len(players)):
         data = get_elo_history(players[i][0], players[i][1])
+
         if data == False:
             file_elo = get_elo_from_file(players[i][0])
+
             if file_elo != False:
                 bohn.append((file_elo, players[i][0]))
+
             continue
+
         bohn.append((data['data'][0]['elo'], players[i][0]))
 
     bohn = sorted(bohn, reverse=True)

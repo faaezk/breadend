@@ -42,24 +42,31 @@ async def on_message(message):
         msg = ""
 
         for i in range(0, len(john)):
+
             if john[i][0] == "no parties" or john[i][0] == "Players Online:" or john[i][0] == "All players offline":
                 msg += john[i][0] + '\n'
+
             elif john[i][0] == "Parties:":
                 msg += '\n' + john[i][0] + '\n'
+                
             else:  
                 msg += john[i][0] + ": " + john[i][1] + '\n'
+
         await the_message.edit(content="```\n" + msg + "\n```")
 
 
     if message.content.lower().startswith('=graph'):
+
         themessage = message.content.lower()
         username = themessage[6:].strip()
         graphs.make_graph(username)
+
         with open("/home/ubuntu/discord_bot/elo_graphs/{}.png".format(username), 'rb') as f:
             picture = discord.File(f)
             await message.channel.send(file=picture)
 
     if message.content.startswith('=elolist'):
+
         themessage = message.content.lower()
         username = themessage[8:].strip()
         elolist = valorant.get_elolist(username)

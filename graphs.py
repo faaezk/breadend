@@ -30,14 +30,15 @@ def make_graph(username):
     for player in players:
         if player[0] == username:
             tagline = player[1]
+            
     valorant.update_elo_history(username, tagline)
     
     file1 = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username), 'r')
 
     y = [x.strip() for x in file1.readlines()]
     y.pop(0)
-
     x = []
+
     for i in range(0, len(y)):
         y[i] = int(y[i])
         x.append(i + 1)
@@ -50,16 +51,18 @@ def make_graph(username):
     
     ticks = []
     i = int(math.floor(ymin / 50.0)) * 50
+
     while i <= int(math.ceil(ymax / 50.0)) * 50:
         ticks.append(i)
         i += 25
 
     axes.set_yticks(ticks)
-
     labely = []
+
     for value in ticks:
         if value % 100 != 0:
             labely.append(str(value))
+
         else:
             labely.append(ranks[value])
     
@@ -71,5 +74,6 @@ def make_graph(username):
     plt.title(username + '\'s elo but the x axis has no meaning cause i cbs')
 
     plt.savefig('/home/ubuntu/discord_bot/elo_graphs/{}.png'.format(username), bbox_inches="tight")
+
     file1.close()
     plt.clf()

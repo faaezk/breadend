@@ -86,11 +86,15 @@ game_names = {"Faaez" : "fakinator", "Hadi" : "8888", "Dhiluka" : "dilka30003",
         "Dylan" : "imabandwagon", "Joseph" : "lmao"}
 
 def get_attribute(value, attribute):
+
     if attribute == "ign":
+
         for player in players:
             if player.name == value:
                 return player.ign
+
     if attribute == "name":
+
         for player in players:
             if player.ign == value:
                 return player.name

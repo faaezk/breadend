@@ -10,6 +10,7 @@ all_data = {}
 def get_all_data():
     global all_data
     all_data = {}
+
     for i in range(0, len(players)):
         url = "https://api.henrikdev.xyz/valorant/v1/live-match/{}/{}".format(players[i][0], players[i][1])
         r = requests.get(url, headers={'Cache-Control': 'no-cache'})
@@ -25,21 +26,28 @@ def get_data(username, tagline):
 def get_status(username):
     data = all_data[username]
     status = ""
+
     if data['status'] == '200':
         state = data['data']['current_state']
+
         if state == 'PREGAME':
             status = "Online and in agent select"
-        if state == 'MENUS':
+
+        elif state == 'MENUS':
             status = "Online and in menu"
-        if state == 'INGAME':
+
+        elif state == 'INGAME':
             map = data['data']['map']
+
             if map == 'Range':
                 status = "Online in the range"
+
             else:
                 game_mode = data['data']['gamemode']
                 score = str(data['data']['score_ally_team']) + '-' + str(data['data']['score_enemy_team'])
                 map = data['data']['map']
                 status = "Online in " + game_mode + " going " + score + " on " + map
+
     else:
         status = "Offline"
     
@@ -47,16 +55,21 @@ def get_status(username):
 
 def get_party(username):
     data = all_data[username]
+
     if data['status'] == "500":
         return
+
     return data['data']['party_id']
 
 def form_partys():
     party_players = []
     j = 0
+
     for i in range(0, len(players)):
         party_id = get_party(players[i][0])
+
         if party_id != None:
+
             party_players.append(players[i].copy())
             party_players[j].append(party_id)
             j += 1
@@ -65,19 +78,24 @@ def form_partys():
 
     count = 0
     parties = []
+
     if party_players != []:
         a_party_id = party_players[0][-1]
 
     while count < len(party_players):
         temp = []
+
         while a_party_id == party_players[count][-1]:
+
             temp.append(names[party_players[count][0]])
             count += 1
+
             if count == len(party_players):
                 break
         
         if count != len(party_players):
             a_party_id = party_players[count][-1]
+
         parties.append(temp)
 
     return parties
@@ -89,6 +107,7 @@ def everything():
     
     for i in range(0, len(players)):
         entry = (names[players[i][0]].ljust(8), get_status(players[i][0]))
+
         if entry[1] != "Offline":
             final.append(entry)
 
