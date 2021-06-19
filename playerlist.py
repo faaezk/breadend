@@ -21,7 +21,7 @@ classyplayers = [
     player("yovivels", "1830", "Viv", False),
     player("therealrobdez", "3333", "Will", False),
     player("bento2", "box", "Ben alt", False),
-    player("hoben222", "9327", "Ben", False),
+    player("hoben222", "9327", "Ben", True),
     player("jokii", "oce", "Henry", False),
     player("lyçhii", "mai", "Bog", False),
     player("lmao", "6548", "Joseph lmao", True),
@@ -35,17 +35,6 @@ classyplayers = [
     player("azatory", "nike", "Alex", False),
     player("quyteriyaki", "oce", "James", False),
     player("talizorahrayya", "3303", "worst child", False),
-    ]
-
-classyonline = [
-    
-    player("silentwhispers", "0000", "Rasindu", True),
-    player("fakinator", "4269", "Faaez", True),
-    player("8888", "nadi", "Hadi", True),
-    player("dilka30003", "0000", "Dhiluka", True),
-    player("slumonaire", "oce", "Chris", True),
-    player("imabandwagon", "oce", "Dylan", True),
-    player("lmao", "6548", "Joseph lmao", True),
     ]
 
 players = [("silentwhispers", "0000"), 
@@ -95,3 +84,13 @@ names = {"fakinator" : "Faaez", "8888" : "Hadi", "dilka30003" : "Dhiluka",
 game_names = {"Faaez" : "fakinator", "Hadi" : "8888", "Dhiluka" : "dilka30003", 
         "Chris" : "slumonaire", "Ben" : "hoben222", "Rasindu" : "silentwhispers",
         "Dylan" : "imabandwagon", "Joseph" : "lmao"}
+
+def get_attribute(value, attribute):
+    if attribute == "ign":
+        for player in players:
+            if player.name == value:
+                return player.ign
+    if attribute == "name":
+        for player in players:
+            if player.ign == value:
+                return player.name

@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import os
-import elo_history
 import playerlist
 import math
 
