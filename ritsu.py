@@ -60,7 +60,7 @@ async def on_message(message):
         themessage = message.content.lower()
         username = themessage[6:].strip()
         
-        if graphs.make_graph(username) == None:
+        if graphs.make_graph(username) == False:
             await message.channel.send("Not even data to plot graph")
         else:
             with open("/home/ubuntu/discord_bot/elo_graphs/{}.png".format(username), 'rb') as f:

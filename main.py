@@ -59,11 +59,13 @@ async def on_message(message):
 
         themessage = message.content.lower()
         username = themessage[6:].strip()
-        graphs.make_graph(username)
 
-        with open("/home/ubuntu/discord_bot/elo_graphs/{}.png".format(username), 'rb') as f:
-            picture = discord.File(f)
-            await message.channel.send(file=picture)
+        if graphs.make_graph(username) == False:
+            await message.channel.send("Not even data to plot graph")
+        else:
+            with open("/home/ubuntu/discord_bot/elo_graphs/{}.png".format(username), 'rb') as f:
+                picture = discord.File(f)
+                await message.channel.send(file=picture)
 
     if message.content.startswith('$elolist'):
 
