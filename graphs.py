@@ -24,7 +24,7 @@ def rounddown(x):
 def make_graph(username):
 
     if os.path.isfile('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username)) == False:
-        return
+        return None
     
     tagline = ""
     for player in players:
@@ -36,6 +36,8 @@ def make_graph(username):
     file1 = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username), 'r')
 
     y = [x.strip() for x in file1.readlines()]
+    if len(y) == 2:
+        return None
     y.pop(0)
     x = []
 
