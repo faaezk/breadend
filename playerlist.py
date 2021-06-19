@@ -35,6 +35,7 @@ classyplayers = [
     player("azatory", "nike", "Alex", False),
     player("quyteriyaki", "oce", "James", False),
     player("talizorahrayya", "3303", "worst child", False),
+    player("quackinator", "2197", "Faaez smurf", False)
     ]
 
 players = [("silentwhispers", "0000"), 
