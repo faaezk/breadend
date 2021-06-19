@@ -50,7 +50,7 @@ def make_graph(username):
     
     ticks = []
     i = int(math.floor(ymin / 50.0)) * 50
-    while i < int(math.ceil(ymax / 50.0)) * 50:
+    while i <= int(math.ceil(ymax / 50.0)) * 50:
         ticks.append(i)
         i += 25
 
