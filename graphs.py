@@ -5,6 +5,21 @@ import playerlist
 import math
 
 players = playerlist.players
+ranks = {
+0 : "Iron 1", 100 : "Iron 2", 200 : "Iron 3",
+300 : "Bronze 1", 400 : "Bronze 2", 500 : "Bronze 3",
+600 : "Silver 1", 700 : "Silver 2", 800 : "Silver 3",
+900 : "Gold 1", 1000 : "Gold 2", 1100 : "Gold 3",
+1200 : "Platinum 1", 1300 : "Platinum 2", 1400 : "Platinum 3",
+1500 : "Diamond 1", 1600 : "Diamond 2", 1700 : "Diamond 3",
+1800 : "Immortal"
+}
+
+def roundup(x):
+    return int(math.ceil(x / 100.0)) * 100
+
+def rounddown(x):
+    return int(math.floor(x / 100.0)) * 100
 
 def make_graph(username):
 
@@ -27,8 +42,8 @@ def make_graph(username):
         y[i] = int(y[i])
         x.append(i + 1)
 
-    ymin = min(y) - 25
-    ymax = max(y) + 25
+    ymin = rounddown(min(y))
+    ymax = roundup(max(y))
 
     axes = plt.gca()
     axes.set_ylim([ymin,ymax])
@@ -40,6 +55,15 @@ def make_graph(username):
         i += 25
 
     axes.set_yticks(ticks)
+
+    labely = []
+    for value in ticks:
+        if value % 100 != 0:
+            labely.append(str(value))
+        else:
+            labely.append(ranks[value])
+    
+    axes.set_yticklabels(labely)
 
     plt.plot(x, y)
     plt.xlabel('your mother')
