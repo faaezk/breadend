@@ -18,8 +18,6 @@ def get_all_data():
         r = requests.get(url, headers={'Cache-Control': 'no-cache'})
         all_data[person.ign] = json.loads(r.text)
 
-
-
 def get_data(username, tagline):
     url = "https://api.henrikdev.xyz/valorant/v1/live-match/{}/{}".format(username, tagline)
     r = requests.get(url)
