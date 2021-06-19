@@ -60,12 +60,13 @@ async def on_message(message):
         themessage = message.content.lower()
         username = themessage[6:].strip()
         flag = graphs.make_graph(username)
+        
         if flag == False:
-            await message.channel.send("Not even data to plot graph")
+            await message.channel.send("Player not found")
 
         elif flag == None:
-            await message.channel.send("Player not found")
-            
+            await message.channel.send("Not enough data to plot graph")
+
         else:
             with open("/home/ubuntu/discord_bot/elo_graphs/{}.png".format(username), 'rb') as f:
                 picture = discord.File(f)
