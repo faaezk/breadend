@@ -2,7 +2,7 @@ import discord
 import os
 import weather
 import valorant
-import valorant_online_beta
+import classyval_online
 import configparser
 import graphs
 
@@ -37,8 +37,8 @@ async def on_message(message):
     if '=online' in message.content.lower():
         
         the_message = await message.channel.send("please wait...")
-        valorant_online_beta.get_all_data()
-        john = valorant_online_beta.everything()
+        classyval_online.get_all_data()
+        john = classyval_online.main()
         msg = ""
 
         for i in range(0, len(john)):

@@ -104,7 +104,7 @@ def form_parties():
 def main():
 
     parties = form_parties()
-    final = [("Players Online", "")]
+    final = []
 
     for i in range(0, online_count):
         status = get_status(players[i].ign)
@@ -112,10 +112,11 @@ def main():
         if status != "Offline":
             final.append(players[i].name.ljust(8), status)
 
-    if len(final) == 1:
+    if final == []:
         final.append(("All players offline", ""))
         return final
     
+    final.append(("Players Online", ""))
     final.append(("Parties:", ""))
 
     for i in range(0, len(parties)):
@@ -141,6 +142,3 @@ def main():
         final.append((("Party " + str(i + 1)), temp))
 
         return final
-
-get_all_data()
-print(main())
