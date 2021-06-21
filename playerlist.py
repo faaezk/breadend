@@ -1,11 +1,19 @@
 import csv
+
+global_path = "playerlist.csv"
+
 class player:
     def __init__(self, player):
         self.ign = player[0]
         self.tag = player[1]
         self.name = player[2]
-        if len(player) == 4:  self.online = player[3]
-        else: self.online = False
+        if len(player) == 4: 
+            self.online = (player[3] == "True")
+        else: 
+            self.online = False
+
+    def __str__(self):
+        return f'{self.ign}, {self.tag}, {self.name}, {self.online}'
 
 def readCSV(path):
     out = []
@@ -15,73 +23,24 @@ def readCSV(path):
             out.append(player(person)) 
     return out
 
-def writeCSV(file, list):
+def writeCSV(file, data):
     with open(file, mode="w", newline="\n") as file:
         writer = csv.writer(file)
-        [writer.writerow([person.ign, person.tag, person.name, person.online]) for person in list]
+        [writer.writerow([person.ign, person.tag, person.name, person.online]) for person in data]
 
-playerlist = readCSV("playerlist.csv")
-writeCSV("playerlist.csv", playerlist)
+players = readCSV(global_path)
+writeCSV(global_path, players)
 
-players = [("silentwhispers", "0000"), 
-    ("fakinator", "4269"), 
-    ("faqinator", "7895"), 
-    ("8888", "nadi"), 
-    ("dilka30003", "0000"),
-    ("slumonaire", "oce"),
-    ("katchampion", "oce"), 
-    ("imabandwagon", "oce"), 
-    ("giroud", "8383"), 
-    ("oshaoshawott", "oce"), 
-    ("yovivels", "1830"), 
-    ("therealrobdez", "3333"),
-    ("bento2", "box"), 
-    ("hoben222", "9327"), 
-    ("jokii", "oce"),
-    ("lyçhii", "mai"),
-    ("lmao", "6548"),
-    ("jack", "ytb"),
-    ("vkj", "4084"),
-    ("tallewok", "6209"),
-    ("fade", "1280"),
-    ("skzcross", "oce"),
-    ("lol", "4529"),
-    ("crossaxis", "mippl"),
-    ("azatory", "nike"),
-    ("quyteriyaki", "oce"), 
-    ("talizorahrayya", "3303"), 
-    ("quackinator", "2197")
-    ]
+online_players = [i for i in players if i.online == True]
 
-online_players = [ 
-    ["fakinator", "4269"],
-    ["8888", "nadi"], 
-    ["dilka30003", "0000"],
-    ["slumonaire", "oce"],
-    ["hoben222", "9327"],
-    ["silentwhispers", "0000"],
-    ["imabandwagon", "oce"],
-    ["lmao", "6548"]
-    ]
+def get_player(key, value):
+    if (key == "name" or key == "ign") == False: 
+        raise KeyError(f'We don\'t take {key} here.')
 
-names = {"fakinator" : "Faaez", "8888" : "Hadi", "dilka30003" : "Dhiluka", 
-        "slumonaire" : "Chris", "hoben222" : "Ben", "silentwhispers" : "Rasindu",
-        "imabandwagon" : "Dylan", "lmao" : "Joseph"}
+    for player in players:
+        if vars(player)[key] == value: 
+            return player
 
-game_names = {"Faaez" : "fakinator", "Hadi" : "8888", "Dhiluka" : "dilka30003", 
-        "Chris" : "slumonaire", "Ben" : "hoben222", "Rasindu" : "silentwhispers",
-        "Dylan" : "imabandwagon", "Joseph" : "lmao"}
+    raise KeyError(f'We can\'t find a {key} for {value}')
 
-def get_attribute(value, attribute):
-
-    if attribute == "ign":
-
-        for player in playerlist:
-            if player.name == value:
-                return player.ign
-
-    if attribute == "name":
-
-        for player in playerlist:
-            if player.ign == value:
-                return player.name
+get_player("name", "Faaez")
