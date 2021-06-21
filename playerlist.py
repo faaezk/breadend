@@ -91,12 +91,12 @@ def get_attribute(value, attribute):
 
     if attribute == "ign":
 
-        for player in players:
+        for player in classyplayers:
             if player.name == value:
                 return player.ign
 
     if attribute == "name":
 
-        for player in players:
+        for player in classyplayers:
             if player.ign == value:
                 return player.name
