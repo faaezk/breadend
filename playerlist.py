@@ -1,42 +1,27 @@
-
+import csv
 class player:
-    def __init__(self, ign, tag, name, online):
-        self.ign = ign
-        self.tag = tag
-        self.name = name
-        self.online = online
+    def __init__(self, player):
+        self.ign = player[0]
+        self.tag = player[1]
+        self.name = player[2]
+        if len(player) == 4:  self.online = player[3]
+        else: self.online = False
 
-classyplayers = [
-    
-    player("silentwhispers", "0000", "Rasindu", True),
-    player("fakinator", "4269", "Faaez", True),
-    player("faqinator", "7895", "Faaez alt", False),
-    player("8888", "nadi", "Hadi", True),
-    player("dilka30003", "0000", "Dhiluka", True),
-    player("slumonaire", "oce", "Chris", True),
-    player("katchampion", "oce", "Albert", False),
-    player("imabandwagon", "oce", "Dylan", True),
-    player("giroud", "8383", "Dylan alt", False),
-    player("oshaoshawott", "oce", "Osha", False),
-    player("yovivels", "1830", "Viv", False),
-    player("therealrobdez", "3333", "Will", False),
-    player("bento2", "box", "Ben alt", False),
-    player("hoben222", "9327", "Ben", True),
-    player("jokii", "oce", "Henry", False),
-    player("lyçhii", "mai", "Bog", False),
-    player("lmao", "6548", "Joseph lmao", True),
-    player("jack", "ytb", "Jack", False),
-    player("vkj", "4084", "Rasindu alt", False),
-    player("tallewok", "6209", "Rasindu alt 2", False),
-    player("fade", "1280", "Rasindu gold smurf", False),
-    player("skzcross", "oce", "Bhairav", False),
-    player("lol", "1280", "Joseph lol", False),
-    player("crossaxis", "mippl", "Josh", False),
-    player("azatory", "nike", "Alex", False),
-    player("quyteriyaki", "oce", "James", False),
-    player("talizorahrayya", "3303", "worst child", False),
-    player("quackinator", "2197", "Faaez smurf", False)
-    ]
+def readCSV(path):
+    out = []
+    with open(path, newline="\n") as file:
+        reader = csv.reader(file)
+        for person in reader:
+            out.append(player(person)) 
+    return out
+
+def writeCSV(file, list):
+    with open(file, mode="w", newline="\n") as file:
+        writer = csv.writer(file)
+        [writer.writerow([person.ign, person.tag, person.name, person.online]) for person in list]
+
+playerlist = readCSV("playerlist.csv")
+writeCSV("playerlist.csv", playerlist)
 
 players = [("silentwhispers", "0000"), 
     ("fakinator", "4269"), 
@@ -91,12 +76,12 @@ def get_attribute(value, attribute):
 
     if attribute == "ign":
 
-        for player in classyplayers:
+        for player in playerlist:
             if player.name == value:
                 return player.ign
 
     if attribute == "name":
 
-        for player in classyplayers:
+        for player in playerlist:
             if player.ign == value:
                 return player.name
