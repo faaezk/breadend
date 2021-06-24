@@ -94,6 +94,8 @@ def form_parties():
         while current_party == inparty[i][1]:
             temp.append(inparty[j][0])
             j += 1
+            if j == len(inparty):
+                break
             current_party == inparty[j][1]
 
         parties.append(temp)
@@ -104,19 +106,18 @@ def form_parties():
 def main():
 
     parties = form_parties()
-    final = []
+    final = [("Players Online", "")]
 
     for i in range(0, online_count):
         status = get_status(players[i].ign)
 
         if status != "Offline":
-            final.append(players[i].name.ljust(8), status)
+            final.append((players[i].name.ljust(8), status))
 
     if final == []:
-        final.append(("All players offline", ""))
+        final = [("All players offline", "")]
         return final
     
-    final.append(("Players Online", ""))
     final.append(("Parties:", ""))
 
     for i in range(0, len(parties)):
