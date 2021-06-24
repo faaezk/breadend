@@ -96,7 +96,7 @@ def form_parties():
             j += 1
             if j == len(inparty):
                 break
-            current_party == inparty[j][1]
+            current_party = inparty[j][1]
 
         parties.append(temp)
         i = j - 1
@@ -142,4 +142,4 @@ def main():
 
         final.append((("Party " + str(i + 1)), temp))
 
-        return final
+    return final
