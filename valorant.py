@@ -147,7 +147,7 @@ def elo_leaderboard():
         bohn.append((data['data'][0]['elo'], players[i][0]))
 
     bohn = sorted(bohn, reverse=True)
-    leaderboard = ""
+    leaderboard = "Player Leaderboard\n"
     
     for i in range(0, len(bohn)):
 

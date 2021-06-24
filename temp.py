@@ -1,56 +1,63 @@
-import matplotlib.pyplot as plt
-import os
-import playerlist
-import math
+from playerlist import player
 
-players = playerlist.players
-
-def roundup(x):
-    return int(math.ceil(x / 50.0)) * 50
-
-def rounddown(x):
-    return int(math.floor(x / 50.0)) * 50
-
-def roundcheck(x):
-
-    while x > 100:
-        x -= 100
-
-    return x
-
-def make_graph(username):
-
-    file1 = open('/Users/faaezkamal/GitKraken Stuff/discord_bot/elo_history/faqinator.txt', 'r')
-    #y = [736, 719, 700, 676, 641, 669, 666, 686]
-    y = [x.strip() for x in file1.readlines()]
-    y.pop(0)
-
-    x = []
-    for i in range(0, len(y)):
-        y[i] = int(y[i]) + 1
-        x.append(i + 1)
-
-    ymin = min(y) - 25
-    ymax = max(y) + 25
-
-    axes = plt.gca()
-    axes.set_ylim([ymin,ymax])
+class Player():
+    def __init__(self, ign, tag, name = None, onlineList = False, online = False):
+        self.ign = ign
+        self.tag = tag
+        self.name = name
+        self.onlineList = onlineList
+        self.online = online
     
-    ticks = []
-    i = rounddown(ymin)
-    while i < roundup(ymax):
-        ticks.append(i)
-        i += 25
-
-    axes.set_yticks(ticks)
+    def isOnline(self) -> bool:
+        return self.isOnline
     
-    plt.plot(x, y)
-    plt.xlabel('your mother')
-    plt.ylabel('mmr')
-    plt.title(username + '\'s elo but the x axis has no meaning cause i cbs')
-    file1.close()
-    plt.show()
+    def getCsv(self) -> str:
+        return f"{self.ign},{self.tag},{self.name},{self.onlineList}\n"
 
-    print(axes.get_yticks())
+    def __str__(self) -> str:
+        return f"{self.ign}#{self.tag}"
 
-make_graph("john")
+    def __eq__(self, o: object) -> bool:
+        return str(self) == str(o)
+
+class PlayerList():
+    def __init__(self, filePath):
+        self.filePath = filePath
+        self.players = []
+    
+    def add(self, player:Player):
+        self.players.append(player)
+    
+    def remove(self, player:Player):
+        self.players.remove(player)
+
+    def save(self):
+        with open(self.filePath, "w+") as f:
+            f.writelines([x.getCsv() for x in self.players])
+
+    def load(self):
+        with open(self.filePath, 'r') as f:
+            for line in f.readlines():
+                playerData = line.split(',')
+                ign = playerData[0]
+                tag = playerData[1]
+                name = playerData[2]
+
+    
+    def getPlayers(self):
+        return self.players
+    
+    def getOnlinePlayers(self):
+        onlinePLayers = []
+        for player in self.players:
+            if player.onlineList:
+                onlinePLayers.append(player)
+        return onlinePLayers
+
+if __name__ == "__main__":
+    playerList = PlayerList("tempPlayerList.csv")
+    playerList.add(Player("dilka30003", "0000", "dhiluka"))
+    playerList.add(Player("dilka40004", "0000", "alsodhiluka"))
+    playerList.add(Player("dilka50005", "0000", "againalsodhiluka"))
+    playerList.add(Player("dilka60006", "0000", "woah!againalsodhiluka"))
+    playerList.save()

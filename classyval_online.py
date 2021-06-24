@@ -81,15 +81,16 @@ def form_parties():
     inparty.sort(key=lambda x: str(x[-1]))
 
     if inparty == []:
-        return
+        return []
     
     current_party = inparty[0][1]
     parties = []
+    i = 0
+    j = 0
 
-    for i in range(0, len(inparty)):
+    while i < len(inparty):
 
         temp = []
-        j = i
 
         while current_party == inparty[i][1]:
             temp.append(inparty[j][0])
@@ -99,7 +100,7 @@ def form_parties():
             current_party = inparty[j][1]
 
         parties.append(temp)
-        i = j - 1
+        i = j
 
     return parties
 
@@ -114,7 +115,7 @@ def main():
         if status != "Offline":
             final.append((players[i].name.ljust(8), status))
 
-    if final == []:
+    if len(final) == 1:
         final = [("All players offline", "")]
         return final
     
