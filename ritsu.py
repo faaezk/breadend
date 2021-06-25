@@ -4,6 +4,7 @@ import valorant
 import classyval_online
 import configparser
 import graphs
+import classier_online
 
 def get_config():
     c = configparser.ConfigParser()
@@ -84,6 +85,25 @@ async def on_message(message):
     if "john" in message.content.lower():
         await message.add_reaction("\u2705")
 
+    if '=betteronline' in message.content.lower():
+        
+        the_message = await message.channel.send("please wait...")
+        classier_online.loadData()
+        john = classier_online.main()
+        msg = ""
+
+        for i in range(0, len(john)):
+
+            if john[i][0] == "no parties" or john[i][0] == "Players Online:" or john[i][0] == "All players offline":
+                msg += john[i][0] + '\n'
+
+            elif john[i][0] == "Parties:":
+                msg += '\n' + john[i][0] + '\n'
+                
+            else:  
+                msg += john[i][0] + ": " + john[i][1] + '\n'
+
+        await the_message.edit(content="```\n" + msg + "\n```")
 
 config = get_config()
 token = config[2]
