@@ -6,7 +6,10 @@ class Player():
     def __init__(self, ign, tag, name = None, onlineList = False, online = False, status = None, partyid = False, partysize = 0):
         self.ign = ign
         self.tag = tag
-        self.name = name
+        if name == None:
+            self.name = ign
+        else:
+            self.name = name
         self.onlineList = onlineList
         self.online = online
 
@@ -26,9 +29,9 @@ class Player():
     def __eq__(self, o: object) -> bool:
         return str(self) == str(o)
 
-    def updatestuff(self):
+    def updateStuff(self):
         url = "https://api.henrikdev.xyz/valorant/v1/live-match/{}/{}".format(self.ign, self.tag)
-        r = requests.get(url, headers={'Cache-Control': 'no-cache'})
+        r = requests.get(url)
         data = json.loads(r.text)
 
         igstatus = ""
@@ -60,7 +63,7 @@ class Player():
                     map = data['data']['map']
                     igstatus = "Online in " + game_mode + " going " + score + " on " + map
         else:
-            igstatus = "Offline"
+            igstatus = False
         
         self.status = igstatus
 
@@ -88,7 +91,8 @@ class PlayerList():
                 ign = playerData[0]
                 tag = playerData[1]
                 name = playerData[2]
-
+                onlineList = playerData[3][:-1]
+                self.players.append(Player(ign, tag, name, onlineList))
     
     def getPlayers(self):
         return self.players
@@ -96,14 +100,18 @@ class PlayerList():
     def getOnlinePlayers(self):
         onlinePLayers = []
         for player in self.players:
-            if player.onlineList:
+            if player.onlineList == 'True':
+                player.updateStuff()
                 onlinePLayers.append(player)
         return onlinePLayers
 
-if __name__ == "__main__":
-    playerList = PlayerList("tempPlayerList.csv")
-    playerList.add(Player("dilka30003", "0000", "dhiluka"))
-    playerList.add(Player("dilka40004", "0000", "alsodhiluka"))
-    playerList.add(Player("dilka50005", "0000", "againalsodhiluka"))
-    playerList.add(Player("dilka60006", "0000", "woah!againalsodhiluka"))
-    playerList.save()
+# if __name__ == "__main__":
+#     playerList = PlayerList("playerlist.csv")
+#     playerList.load()
+
+#     onliners = playerList.getOnlinePlayers()
+
+#     for playerz in onliners:
+#         print(playerz.status)
+#         print(playerz.partyid)
+#         print(playerz.partysize)
