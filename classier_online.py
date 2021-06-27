@@ -98,6 +98,3 @@ def main():
         final.append((("Party " + str(i + 1)), temp))
 
     return final
-
-
-print(main())

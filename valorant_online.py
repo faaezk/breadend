@@ -3,10 +3,9 @@ import json
 import playerlist
 
 players = playerlist.online_players
-
 names = playerlist.names
-
 all_data = {}
+
 def get_all_data():
     global all_data
     all_data = {}
