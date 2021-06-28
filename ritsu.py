@@ -110,11 +110,16 @@ async def on_message(message):
 
         themessage = message.content.lower()
         temp.addPlayer(themessage)
+        the_message = await message.channel.send("Player added")
 
     if message.content.startswith('=remove'):
 
-        themessage = message.content.lower()
-        temp.removePlayer(themessage)
+        if message.author.id == 410771947522359296:
+            themessage = message.content.lower()
+            temp.removePlayer(themessage)
+            await message.channel.send("Player removed")
+        else:
+            await message.channel.send("no.")
 
 config = get_config()
 token = config[2]
