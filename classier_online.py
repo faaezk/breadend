@@ -98,3 +98,7 @@ def main():
         final.append((("Party " + str(i + 1)), temp))
 
     return final
+
+if __name__ == "__main__":
+    loadData()
+    print(main())

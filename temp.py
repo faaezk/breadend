@@ -6,6 +6,7 @@ class Player():
     def __init__(self, ign, tag, name = None, onlineList = False, online = False, status = None, partyid = False, partysize = 0):
         self.ign = ign
         self.tag = tag
+        
         if name == None:
             self.name = ign
         else:
@@ -16,6 +17,22 @@ class Player():
         self.status = status
         self.partyid = partyid
         self.partysize = partysize
+
+    def initFromList(self, theList):
+        self.ign = theList[0]
+        self.tag = theList[1]
+
+        if len(theList) == 3:
+            self.name = theList[2]
+        else:
+            self.name = theList[0]
+
+
+        self.onlineList = False
+        self.online = False
+        self.status = False
+        self.partyid = False
+        self.partysize = 0
 
     def isOnline(self) -> bool:
         return self.isOnline
@@ -36,7 +53,7 @@ class Player():
 
         igstatus = ""
 
-        if data['status'] == '200':
+        if data['status'] == '200' and data['message'] != "Send friend request to user, the player have to accept this friendrequest to track live game data":
             
             self.partyid = data['data']['party_id']
 
@@ -105,13 +122,30 @@ class PlayerList():
                 onlinePLayers.append(player)
         return onlinePLayers
 
-# if __name__ == "__main__":
-#     playerList = PlayerList("playerlist.csv")
-#     playerList.load()
+def addPlayer(msg):
+    playerList = PlayerList("playerlist.csv")
+    playerList.load()
+    inpot = msg.split(' ')
+    ignn, tagg = inpot[1].split('#')
 
-#     onliners = playerList.getOnlinePlayers()
+    if len(inpot) == 3:
+        namee = inpot[2]
+    else:
+        namee = ignn
 
-#     for playerz in onliners:
-#         print(playerz.status)
-#         print(playerz.partyid)
-#         print(playerz.partysize)
+    playerList.add(Player(ignn, tagg, namee))
+    playerList.save()
+
+def removePlayer(msg):
+    playerList = PlayerList("playerlist.csv")
+    playerList.load()
+    inpot = msg.split(' ')
+    ignn, tagg = inpot[1].split('#')
+
+    if len(inpot) == 3:
+        namee = inpot[2]
+    else:
+        namee = ignn
+
+    playerList.remove(Player(ignn, tagg, namee))
+    playerList.save()

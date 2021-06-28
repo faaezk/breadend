@@ -5,6 +5,7 @@ import classyval_online
 import configparser
 import graphs
 import classier_online
+import temp
 
 def get_config():
     c = configparser.ConfigParser()
@@ -104,6 +105,16 @@ async def on_message(message):
                 msg += john[i][0] + ": " + john[i][1] + '\n'
 
         await the_message.edit(content="```\n" + msg + "\n```")
+
+    if message.content.startswith('=add'):
+
+        themessage = message.content.lower()
+        temp.addPlayer(themessage)
+
+    if message.content.startswith('=remove'):
+
+        themessage = message.content.lower()
+        temp.removePlayer(themessage)
 
 config = get_config()
 token = config[2]
