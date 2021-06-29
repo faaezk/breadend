@@ -109,10 +109,24 @@ async def on_message(message):
     if message.content.startswith('=add'):
 
         themessage = message.content.lower()
+        jg = temp.addPlayer(themessage)
 
-        if temp.addPlayer(themessage) == False:
+        if jg == False:
             await message.channel.send("Player does not exist")
+        elif jg == True:
+            await message.channel.send("Player has already been added")
+        else:
+            await message.channel.send("Player added")
 
+    if message.content.startswith('=onlineadd'):
+
+        themessage = message.content.lower()
+        jg = temp.addPlayer(themessage)
+
+        if jg == False:
+            await message.channel.send("Player does not exist")
+        elif jg == True:
+            await message.channel.send("Player has already been added")
         else:
             await message.channel.send("Player added")
 

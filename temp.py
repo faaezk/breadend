@@ -124,12 +124,24 @@ def addPlayer(msg):
         namee = inpot[2]
     else:
         namee = ignn
-    
+
     if valorant.get_elo_history(ignn, tagg) == False:
         return False
     
-    playerList.add(Player(ignn, tagg, namee))
-    playerList.save()
+    if inpot[0] == "=onlineadd":
+        if playerList.inList(Player(ignn, tagg)):
+            playerList.remove(Player(ignn, tagg))
+        
+        playerList.add(Player(ignn, tagg, namee, True))
+        playerList.save()
+    
+    else:
+        if playerList.inList(Player(ignn, tagg)):
+            return True
+        
+
+        playerList.add(Player(ignn, tagg, namee))
+        playerList.save()
 
 def removePlayer(msg):
     playerList = PlayerList("playerlist.csv")
