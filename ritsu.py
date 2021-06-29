@@ -35,7 +35,7 @@ async def on_message(message):
         john = valorant.elo_leaderboard()
         await message.channel.send("```\n" + john + "\n```")
 
-    if '=online' in message.content.lower():
+    if '=online' == message.content.lower():
         
         the_message = await message.channel.send("please wait...")
         classyval_online.get_all_data()
@@ -86,7 +86,7 @@ async def on_message(message):
     if "john" in message.content.lower():
         await message.add_reaction("\u2705")
 
-    if '=betteronline' in message.content.lower():
+    if '=betteronline' == message.content.lower():
         
         the_message = await message.channel.send("please wait...")
         classier_online.loadData()
@@ -106,7 +106,7 @@ async def on_message(message):
 
         await the_message.edit(content="```\n" + msg + "\n```")
 
-    if message.content.startswith('=add'):
+    if message.content.startswith('=add') or message.content.startswith('=onlineadd'):
 
         themessage = message.content.lower()
         jg = temp.addPlayer(themessage)
@@ -118,19 +118,7 @@ async def on_message(message):
         else:
             await message.channel.send("Player added")
 
-    if message.content.startswith('=onlineadd'):
-
-        themessage = message.content.lower()
-        jg = temp.addPlayer(themessage)
-
-        if jg == False:
-            await message.channel.send("Player does not exist")
-        elif jg == True:
-            await message.channel.send("Player has already been added")
-        else:
-            await message.channel.send("Player added")
-
-    if message.content.startswith('=remove'):
+    if message.content.startswith('=remove') or message.content.startswith('=onlineremove'):
 
         if message.author.id == 410771947522359296:
             themessage = message.content.lower()
