@@ -15,7 +15,7 @@ def get_elo_history(username, tagline):
 
     john = json.loads(r.text)
 
-    if john['status'] == '404':
+    if john['status'] == '404' or john['status'] == '500':
         return False
     
     return john

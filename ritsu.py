@@ -109,15 +109,24 @@ async def on_message(message):
     if message.content.startswith('=add'):
 
         themessage = message.content.lower()
-        temp.addPlayer(themessage)
-        the_message = await message.channel.send("Player added")
+
+        if temp.addPlayer(themessage) == False:
+            await message.channel.send("Player does not exist")
+
+        else:
+            await message.channel.send("Player added")
 
     if message.content.startswith('=remove'):
 
         if message.author.id == 410771947522359296:
             themessage = message.content.lower()
-            temp.removePlayer(themessage)
-            await message.channel.send("Player removed")
+
+            if temp.removePlayer(themessage) == False:
+                await message.channel.send("Player not in list")
+
+            else:
+                await message.channel.send("Player removed")
+                
         else:
             await message.channel.send("no.")
 
