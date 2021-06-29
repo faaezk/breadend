@@ -133,15 +133,14 @@ def addPlayer(msg):
             playerList.remove(Player(ignn, tagg))
         
         playerList.add(Player(ignn, tagg, namee, True))
-        playerList.save()
     
     else:
         if playerList.inList(Player(ignn, tagg)):
             return True
         
-
         playerList.add(Player(ignn, tagg, namee))
-        playerList.save()
+        
+    playerList.save()
 
 def removePlayer(msg):
     playerList = PlayerList("playerlist.csv")
@@ -156,7 +155,14 @@ def removePlayer(msg):
 
     if playerList.inList(Player(ignn, tagg)) == False:
         return False
-    playerList.remove(Player(ignn, tagg, namee))
+
+    if inpot[0] == "=onlineremove":
+        playerList.remove(Player(ignn, tagg, namee))
+        playerList.add(Player(ignn, tagg, namee))
+
+    else:
+        playerList.remove(Player(ignn, tagg, namee))
+    
     playerList.save()
 
 if __name__ == '__main__':
