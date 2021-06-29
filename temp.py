@@ -107,7 +107,7 @@ class PlayerList():
                 onlinePLayers.append(player)
         return onlinePLayers
 
-    def inList(self, player: Player):
+    def inList(self, player:Player):
         for i in self.players:
             if i == player:
                 return True
@@ -142,7 +142,7 @@ def removePlayer(msg):
     else:
         namee = ignn
 
-    if playerlist.inList(Player(ignn, tagg)) == False:
+    if playerList.inList(Player(ignn, tagg)) == False:
         return False
     playerList.remove(Player(ignn, tagg, namee))
     playerList.save()
@@ -151,5 +151,5 @@ if __name__ == '__main__':
     playerlist = PlayerList('playerlist.csv')
     playerlist.load()
 
-    faq = Player("fakiator", "4269", "faaaez")
-    print(playerlist.inList(faq))
+    faq = "=remove quackinator#2197"
+    print(addPlayer(faq))
