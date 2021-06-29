@@ -1,6 +1,7 @@
 from playerlist import player
 import requests
 import json
+import valorant
 
 class Player():
     def __init__(self, ign, tag, name = None, onlineList = False, online = False, status = None, partyid = False, partysize = 0):
@@ -17,22 +18,6 @@ class Player():
         self.status = status
         self.partyid = partyid
         self.partysize = partysize
-
-    def initFromList(self, theList):
-        self.ign = theList[0]
-        self.tag = theList[1]
-
-        if len(theList) == 3:
-            self.name = theList[2]
-        else:
-            self.name = theList[0]
-
-
-        self.onlineList = False
-        self.online = False
-        self.status = False
-        self.partyid = False
-        self.partysize = 0
 
     def isOnline(self) -> bool:
         return self.isOnline
@@ -122,6 +107,13 @@ class PlayerList():
                 onlinePLayers.append(player)
         return onlinePLayers
 
+    def inList(self, player: Player):
+        for i in self.players:
+            if i == player:
+                return True
+        
+        return False
+
 def addPlayer(msg):
     playerList = PlayerList("playerlist.csv")
     playerList.load()
@@ -132,7 +124,10 @@ def addPlayer(msg):
         namee = inpot[2]
     else:
         namee = ignn
-
+    
+    if valorant.get_elo_history(ignn, tagg) == False:
+        return False
+    
     playerList.add(Player(ignn, tagg, namee))
     playerList.save()
 
@@ -147,5 +142,14 @@ def removePlayer(msg):
     else:
         namee = ignn
 
+    if playerlist.inList(Player(ignn, tagg)) == False:
+        return False
     playerList.remove(Player(ignn, tagg, namee))
     playerList.save()
+
+if __name__ == '__main__':
+    playerlist = PlayerList('playerlist.csv')
+    playerlist.load()
+
+    faq = Player("fakiator", "4269", "faaaez")
+    print(playerlist.inList(faq))
