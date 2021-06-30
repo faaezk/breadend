@@ -1,5 +1,4 @@
 import discord
-import os
 import weather
 import configparser
 import valorant_online

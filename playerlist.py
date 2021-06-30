@@ -1,4 +1,3 @@
-
 class player:
     def __init__(self, ign, tag, name, online):
         self.ign = ign

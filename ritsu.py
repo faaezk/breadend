@@ -1,7 +1,6 @@
 import discord
 import weather
 import valorant
-import classyval_online
 import configparser
 import graphs
 import classier_online
@@ -34,27 +33,6 @@ async def on_message(message):
     if '$leaderboard' in message.content.lower():
         john = valorant.elo_leaderboard()
         await message.channel.send("```\n" + john + "\n```")
-
-    if '=online' == message.content.lower():
-        
-        the_message = await message.channel.send("please wait...")
-        classyval_online.get_all_data()
-        john = classyval_online.main()
-        msg = ""
-
-        for i in range(0, len(john)):
-
-            if john[i][0] == "no parties" or john[i][0] == "Players Online:" or john[i][0] == "All players offline":
-                msg += john[i][0] + '\n'
-
-            elif john[i][0] == "Parties:":
-                msg += '\n' + john[i][0] + '\n'
-                
-            else:  
-                msg += john[i][0] + ": " + john[i][1] + '\n'
-
-        await the_message.edit(content="```\n" + msg + "\n```")
-
 
     if message.content.lower().startswith('=graph'):
 
