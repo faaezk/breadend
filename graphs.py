@@ -1,10 +1,9 @@
 import matplotlib.pyplot as plt
 import os
 import valorant
-import playerlist
+import temp
 import math
 
-players = playerlist.players
 ranks = {
 0 : "Iron 1", 100 : "Iron 2", 200 : "Iron 3",
 300 : "Bronze 1", 400 : "Bronze 2", 500 : "Bronze 3",
@@ -26,11 +25,15 @@ def make_graph(username):
     if os.path.isfile('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username)) == False:
         return False
     
+    playerlist = temp.PlayerList('playerlist.csv')
+    playerlist.load()
+
     tagline = ""
-    for player in players:
-        if player[0] == username:
-            tagline = player[1]
-            
+    for player in playerlist.players:
+        if player.ign == username:
+            tagline = player.tag
+            break
+
     valorant.update_elo_history(username, tagline)
     
     file1 = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username), 'r')

@@ -1,9 +1,7 @@
 import requests
 import json
 import os
-import playerlist
-
-players = playerlist.players
+import temp
 
 def get_elo_history(username, tagline):
     
@@ -101,25 +99,26 @@ def update_elo_history(username, tagline):
 
 def get_elolist(username):
 
-    tagline = ""
-
-    for player in players:
-        if player[0] == username:
-            tagline = player[1]
-            
-    update_elo_history(username, tagline)
-    player_data = get_elo_history(username, tagline)
-
-    if player_data == False:
-        return 0
-
-    player_file_path = '/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username)
-
-    if os.path.isfile(player_file_path) == False:
+    if os.path.isfile('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username)) == False:
         return "Player not found or hasn't played any comp games recently"
     
-    with open(player_file_path) as f:
-        lines = [line.rstrip() for line in f]
+    playerlist = temp.PlayerList('playerlist.csv')
+    playerlist.load()
+
+    tagline = ""
+    for player in playerlist.players:
+        if player.ign == username:
+            tagline = player.tag
+            break
+
+    update_elo_history(username, tagline)
+    
+    file1 = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username), 'r')
+
+    lines = [x.strip() for x in file1.readlines()]
+    if len(lines) == 2:
+        return None
+    lines.pop(0)
     
     lines = lines[1:]
     elolist = ""
@@ -131,24 +130,27 @@ def get_elolist(username):
 
 def elo_leaderboard():
 
+    playerlist = temp.PlayerList('playerlist.csv')
+    playerlist.load()
+    
     bohn = []
 
-    for i in range(0, len(players)):
-        data = get_elo_history(players[i][0], players[i][1])
+    for player in playerlist.players:
+        data = get_elo_history(player.ign, player.tag)
 
         if data == False:
-            file_elo = get_elo_from_file(players[i][0])
+            file_elo = get_elo_from_file(player.ign)
 
             if file_elo != False:
-                bohn.append((file_elo, players[i][0]))
+                bohn.append((file_elo, player.ign))
 
             continue
 
-        bohn.append((data['data'][0]['elo'], players[i][0]))
+        bohn.append((data['data'][0]['elo'], player.ign))
 
     bohn = sorted(bohn, reverse=True)
     leaderboard = "Player Leaderboard\n"
-    
+
     for i in range(0, len(bohn)):
 
         user = bohn[i][1]

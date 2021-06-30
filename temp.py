@@ -1,7 +1,5 @@
-from playerlist import player
 import requests
 import json
-import valorant
 
 class Player():
     def __init__(self, ign, tag, name = None, onlineList = False, online = False, status = None, partyid = False, partysize = 0):
@@ -125,7 +123,15 @@ def addPlayer(msg):
     else:
         namee = ignn
 
-    if valorant.get_elo_history(ignn, tagg) == False:
+    url = "https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{}/{}".format(ignn, tagg)
+    r = requests.get(url)
+
+    if str(r) == "<Response [204]>":
+        return False
+
+    john = json.loads(r.text)
+
+    if john['status'] == '404' or john['status'] == '500':
         return False
     
     if inpot[0] == "=onlineadd":
