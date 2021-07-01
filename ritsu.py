@@ -5,6 +5,7 @@ import configparser
 import graphs
 import classier_online
 import temp
+import schedule
 
 def get_config():
     c = configparser.ConfigParser()
@@ -109,6 +110,18 @@ async def on_message(message):
                 
         else:
             await message.channel.send("no.")
+
+    if message.content.startswith('=free'):
+
+        themessage = message.content.lower()[5:]
+        jg = schedule.freerTime(themessage, 'testweek')
+        await message.channel.send("Week updated.")
+
+    if message.content.startswith('=times'):
+
+        themessage = message.content.lower()[6:]
+        jg = schedule.bestTimes(themessage)
+        await message.channel.send("```\n" + jg + "\n```")
 
 config = get_config()
 token = config[2]
