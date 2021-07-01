@@ -113,8 +113,8 @@ def freerTime(msg, week):
 
 def bestTimes(week):
     
-    self = Week(f'{week}.csv')
-
+    self = Week('{}.csv'.format(week))
+    self.load()
     top = []
     max = 0
     for i in range(len(self.days)):
