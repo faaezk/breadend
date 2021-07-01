@@ -113,13 +113,13 @@ async def on_message(message):
 
     if message.content.startswith('=free'):
 
-        themessage = message.content.lower()[5:]
+        themessage = message.content.lower()[6:]
         jg = schedule.freerTime(themessage, 'testweek')
         await message.channel.send("Week updated.")
 
     if message.content.startswith('=times'):
 
-        themessage = message.content.lower()[6:]
+        themessage = message.content.lower()[7:]
         jg = schedule.bestTimes(themessage)
         await message.channel.send("```\n" + jg + "\n```")
 
