@@ -151,6 +151,25 @@ async def on_message(message):
         else:
             await message.channel.send("no.")
 
+    if '=help' == message.content.lower():
+    
+        msg = """Commands:\n
+                $leaderboard -> returns an elo leaderboard (slow)\n
+                $graph -> returns a graph of the player's elo over time\n
+                $elolist -> returns the elo values used in the graph\n
+                $online -> returns the player who are online from the list\n
+                $add -> adds the player to the database for leaderboard/graph/elolist\n
+                $addonline -> adds the player to the database for $online\n \n
+                Usage:\n
+                $leaderboard\n
+                $graph username (not username#tag)\n
+                $elolist username (not username#tag)\n
+                $online\n
+                $add username#tag name (name field is optional, if left blank, it'll use your username as the name)\n
+                $addonline username#tag name (name field optional)"""
+
+        await message.channel.send("```\n" + msg + "\n```")
+
 config = get_config()
 token = config[2]
 
