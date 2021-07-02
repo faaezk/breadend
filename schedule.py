@@ -143,80 +143,22 @@ class Week():
             return "No entries found"
         
         final = "Best Times:\n"
+        i = 0
         
-        for timeSlot in top:
-            final += timeSlot[0] + " " + timeSlot[1] + '\n'
+        while i < len(top):
+
+            if i < len(top) - 3 and top[i][0] == top[i + 1][0] == top[i + 2][0] == top[i + 3][0]:
+                final += top[i][0] + '\n'
+                i += 4
+
+            else:
+                final += top[i][0] + " " + top[i][1] + '\n'
+                i += 1
 
         return final
 
 
-def freerTime(msg, week):
-    week = Week(f'{week}.csv')
-    week.load()
-    week.freetime(msg)
-    week.save()
-
-def busyTime(msg, week):
-    week = Week(f'{week}.csv')
-    week.load()
-    week.busy(msg)
-    week.save()
-
-def bestTimes(week):
-    
-    self = Week('{}.csv'.format(week))
-    self.load()
-    top = []
-    max = 1
-    for i in range(len(self.days)):
-        for j in range(len(self.days[i])):
-            jg = int(self.days[i][j])
-            if jg >= max:
-                max = jg
-                top.append([i,j])
-    
-    for time in top:
-        if time[0] == 0:
-            time[0] = 'Monday'
-        elif time[0] == 1:
-            time[0] = 'Tuesday'
-        elif time[0] == 2:
-            time[0] = 'Wednesday'
-        elif time[0] == 3:
-            time[0] = 'Thursday'
-        elif time[0] == 4:
-            time[0] = 'Friday'
-        elif time[0] == 5:
-            time[0] = 'Saturday'
-        elif time[0] == 6:
-            time[0] = 'Sunday'
-
-        if time[1] == 0:
-            time[1] = 'Morning'
-        elif time[1] == 1:
-            time[1] = 'Afternoon'
-        elif time[1] == 2:
-            time[1] = 'Evening'
-        elif time[1] == 3:
-            time[1] = 'Night'
-
-    if top == []:
-        return "No entries found"
-    
-    final = "Best Times:\n"
-    
-    for timeSlot in top:
-        final += timeSlot[0] + " " + timeSlot[1] + '\n'
-
-    return final
-
 if __name__ == '__main__':
-    week = Week("testweek.csv")
-    week.load()
-    week.freetime("tuesday all, monday afternoon, thursday afternoon, sunday morning, friday night")
-    week.save()
-    week.busy("tuesday all, monday afternoon")
-    #print(week.bestTimes())
     
     x = "$free week1 tuesday all, monday afternoon, thursday afternoon, sunday morning, friday night"
 
@@ -226,4 +168,5 @@ if __name__ == '__main__':
     week.load()
     week.freetime(x[6:])
     week.save()
+    print(week.bestTimes())
 
