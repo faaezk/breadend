@@ -121,12 +121,35 @@ async def on_message(message):
         week.save()
         await message.channel.send("Week updated.")
 
+    if message.content.startswith('=busy'):
+
+        themessage = message.content.lower()[6:]
+        jg = themessage[0:5]
+        week = schedule.Week(f'{jg}.csv')
+        week.load()
+        week.busy(themessage[6:])
+        week.save()
+        await message.channel.send("Week updated.")
+
     if message.content.startswith('=times'):
 
         week = schedule.Week(f'{message.content.lower()[7:]}.csv')
         week.load()
         jg = week.bestTimes()
         await message.channel.send("```\n" + jg + "\n```")
+
+    if message.content.startswith('=clear'):
+
+        if message.author.id == 410771947522359296:
+            jg = message.content.lower()[7:]
+            week = schedule.Week(f'{jg}.csv')
+            week.load()
+            week.clearWeek()
+            week.save()
+            await message.channel.send("Week reset.")
+                
+        else:
+            await message.channel.send("no.")
 
 config = get_config()
 token = config[2]
