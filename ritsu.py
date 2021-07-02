@@ -114,13 +114,18 @@ async def on_message(message):
     if message.content.startswith('=free'):
 
         themessage = message.content.lower()[6:]
-        jg = schedule.freerTime(themessage, 'testweek')
+        jg = themessage[0:5]
+        week = schedule.Week(f'{jg}.csv')
+        week.load()
+        week.freetime(themessage[6:])
+        week.save()
         await message.channel.send("Week updated.")
 
     if message.content.startswith('=times'):
 
-        themessage = message.content.lower()[7:]
-        jg = schedule.bestTimes(themessage)
+        week = schedule.Week(f'{message.content.lower()[7:]}.csv')
+        week.load()
+        jg = week.bestTimes()
         await message.channel.send("```\n" + jg + "\n```")
 
 config = get_config()
