@@ -116,7 +116,12 @@ def addPlayer(msg):
     playerList = PlayerList("playerlist.csv")
     playerList.load()
     inpot = msg.split(' ')
-    ignn, tagg = inpot[1].split('#')
+    user = inpot[1].split('#')
+
+    if len(user) != 2:
+        return False
+        
+    ignn, tagg = user
 
     if len(inpot) == 3:
         namee = inpot[2]
@@ -152,7 +157,12 @@ def removePlayer(msg):
     playerList = PlayerList("playerlist.csv")
     playerList.load()
     inpot = msg.split(' ')
-    ignn, tagg = inpot[1].split('#')
+    user = inpot[1].split('#')
+
+    if len(user) != 2:
+        return False
+
+    ignn, tagg = user
 
     if len(inpot) == 3:
         namee = inpot[2]
@@ -175,5 +185,5 @@ if __name__ == '__main__':
     playerlist = PlayerList('playerlist.csv')
     playerlist.load()
 
-    faq = "=remove quackinator#2197"
+    faq = "=add quackinator"
     print(addPlayer(faq))

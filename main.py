@@ -81,7 +81,7 @@ async def on_message(message):
 
         await message.channel.send("```\n" + elolist + "\n```")
 
-    if '$leaderboard' in message.content.lower():
+    if message.content.lower().startswith('$leaderboard'):
         john = valorant.elo_leaderboard()
         await message.channel.send("```\n" + john + "\n```")
     
@@ -130,6 +130,28 @@ async def on_message(message):
                 
         else:
             await message.channel.send("no.")
+
+    if '$help' == message.content.lower():
+    
+        msg = """Commands:
+$leaderboard -> returns an elo leaderboard (slow)
+$graph -> returns a graph of the player's elo over time
+$elolist -> returns the elo values used in the graph
+$online -> returns the player who are online from the list
+$add -> adds the player to the database for leaderboard/graph/elolist
+$addonline -> adds the player to the database for $online\n
+Usage:
+$leaderboard
+$graph username (not username#tag)
+$elolist username (not username#tag)
+$online
+$add username#tag name (name field is optional, if left blank, it'll use your username as the name)
+$addonline username#tag name (name field optional)\n
+Note: Being added to the online requires you to add henrick#API as a friend, after adding yourself
+using $addonline, you will hopefully be send a friend request (don't send the friend request yourself)
+for any further questions, ask faaez"""
+
+        await message.channel.send("```\n" + msg + "\n```")
 
 
 config = get_config()

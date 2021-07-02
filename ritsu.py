@@ -31,7 +31,7 @@ async def on_message(message):
         john = weather.main()
         await message.channel.send("Feels like " + str(john['main']['feels_like']) + " degrees today")
 
-    if '$leaderboard' in message.content.lower():
+    if message.content.lower().startswith('=leaderboard'):
         john = valorant.elo_leaderboard()
         await message.channel.send("```\n" + john + "\n```")
 
@@ -153,20 +153,22 @@ async def on_message(message):
 
     if '=help' == message.content.lower():
     
-        msg = """Commands:\n
-                $leaderboard -> returns an elo leaderboard (slow)\n
-                $graph -> returns a graph of the player's elo over time\n
-                $elolist -> returns the elo values used in the graph\n
-                $online -> returns the player who are online from the list\n
-                $add -> adds the player to the database for leaderboard/graph/elolist\n
-                $addonline -> adds the player to the database for $online\n \n
-                Usage:\n
-                $leaderboard\n
-                $graph username (not username#tag)\n
-                $elolist username (not username#tag)\n
-                $online\n
-                $add username#tag name (name field is optional, if left blank, it'll use your username as the name)\n
-                $addonline username#tag name (name field optional)"""
+        msg = """Commands:
+$leaderboard -> returns an elo leaderboard (slow)
+$graph -> returns a graph of the player's elo over time
+$elolist -> returns the elo values used in the graph
+$online -> returns the player who are online from the list
+$add -> adds the player to the database for leaderboard/graph/elolist
+$addonline -> adds the player to the database for $online\n
+Usage:
+$leaderboard
+$graph username (not username#tag)
+$elolist username (not username#tag)
+$online
+$add username#tag name (name field is optional, if left blank, it'll use your username as the name)
+$addonline username#tag name (name field optional)\n
+Note: Being added to the online requires you to add henrick#API as a friend, after adding yourself
+using $addonline, you will hopefully be send a friend request (don't send the friend request yourself)"""
 
         await message.channel.send("```\n" + msg + "\n```")
 
