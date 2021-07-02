@@ -157,6 +157,15 @@ class Week():
 
         return final
 
+    def showWeek(self):
+
+        grid = "          Morning    Afternoon   Evening   Night\n"
+        weekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        for i in range(len(self.days)):
+            grid += weekDays[i].ljust(9) + str(self.days[i][0]).rjust(5) + str(self.days[i][1]).rjust(13) + str(self.days[i][2]).rjust(10) + str(self.days[i][3]).rjust(9) + '\n'
+
+        return grid
+
 
 if __name__ == '__main__':
     
@@ -168,5 +177,5 @@ if __name__ == '__main__':
     week.load()
     week.freetime(x[6:])
     week.save()
-    print(week.bestTimes())
+    print(week.showWeek())
 

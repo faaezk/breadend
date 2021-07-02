@@ -131,7 +131,7 @@ async def on_message(message):
         else:
             await message.channel.send("no.")
 
-    if '$help' == message.content.lower():
+    if '$valhelp' == message.content.lower():
     
         msg = """Commands:
 $leaderboard -> returns an elo leaderboard (slow)

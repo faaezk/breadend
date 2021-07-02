@@ -11,7 +11,7 @@ def get_config():
     c = configparser.ConfigParser()
     c.read('/home/ubuntu/discord_bot/config.ini')
 
-    return c['openweathermap']['api'], c['openweathermap']['city_id'], c['discord']['token2']
+    return c['discord']['token2']
 
 client = discord.Client()
 
@@ -151,6 +151,13 @@ async def on_message(message):
         else:
             await message.channel.send("no.")
 
+    if message.content.startswith('=show'):
+
+        week = schedule.Week(f'{message.content.lower()[6:]}.csv')
+        week.load()
+        jg = week.showWeek()
+        await message.channel.send("```\n" + jg + "\n```")
+
     if '=help' == message.content.lower():
     
         msg = """Commands:
@@ -172,7 +179,6 @@ using $addonline, you will hopefully be send a friend request (don't send the fr
 
         await message.channel.send("```\n" + msg + "\n```")
 
-config = get_config()
-token = config[2]
+token = get_config()
 
 client.run(token)
