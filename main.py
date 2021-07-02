@@ -4,6 +4,8 @@ import configparser
 import valorant_online
 import graphs
 import valorant
+import classier_online
+import temp
 
 def get_config():
     c = configparser.ConfigParser()
@@ -78,6 +80,57 @@ async def on_message(message):
         elolist = valorant.get_elolist(username)
 
         await message.channel.send("```\n" + elolist + "\n```")
+
+    if '$leaderboard' in message.content.lower():
+        john = valorant.elo_leaderboard()
+        await message.channel.send("```\n" + john + "\n```")
+    
+    if '$betteronline' == message.content.lower():
+        
+        the_message = await message.channel.send("please wait...")
+        classier_online.loadData()
+        john = classier_online.main()
+        msg = ""
+
+        for i in range(0, len(john)):
+
+            if john[i][0] == "no parties" or john[i][0] == "Players Online:" or john[i][0] == "All players offline":
+                msg += john[i][0] + '\n'
+
+            elif john[i][0] == "Parties:":
+                msg += '\n' + john[i][0] + '\n'
+                
+            else:  
+                msg += john[i][0] + ": " + john[i][1] + '\n'
+
+        await the_message.edit(content="```\n" + msg + "\n```")
+
+    if message.content.startswith('$add') or message.content.startswith('$onlineadd'):
+
+        themessage = message.content.lower()
+        jg = temp.addPlayer(themessage)
+
+        if jg == False:
+            await message.channel.send("Player does not exist")
+        elif jg == True:
+            await message.channel.send("Player has already been added")
+        else:
+            await message.channel.send("Player added")
+
+    if message.content.startswith('$remove') or message.content.startswith('$onlineremove'):
+
+        if message.author.id == 410771947522359296:
+            themessage = message.content.lower()
+
+            if temp.removePlayer(themessage) == False:
+                await message.channel.send("Player not in list")
+
+            else:
+                await message.channel.send("Player removed")
+                
+        else:
+            await message.channel.send("no.")
+
 
 config = get_config()
 token = config[2]

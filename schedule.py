@@ -217,13 +217,13 @@ if __name__ == '__main__':
     week.save()
     week.busy("tuesday all, monday afternoon")
     #print(week.bestTimes())
+    
+    x = "$free week1 tuesday all, monday afternoon, thursday afternoon, sunday morning, friday night"
 
-x = "$free week1 tuesday all, monday afternoon, thursday afternoon, sunday morning, friday night"
-
-x = x[6:]
-jg = x[0:5]
-week = Week(f'{jg}.csv')
-week.load()
-week.freetime(x[6:])
-week.save()
+    x = x[6:]
+    jg = x[0:5]
+    week = Week(f'{jg}.csv')
+    week.load()
+    week.freetime(x[6:])
+    week.save()
 
