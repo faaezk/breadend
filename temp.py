@@ -35,8 +35,16 @@ class Player():
         data = json.loads(r.text)
 
         igstatus = ""
+        complicated = False
 
-        if data['status'] == '200' and data['message'] != "Send friend request to user, the player have to accept this friendrequest to track live game data":
+        if data['status'] == '200':
+            complicated = True
+
+        if data['status'] == '200' and 'message' in data.keys():
+            if data['message'] != "Send friend request to user, the player have to accept this friendrequest to track live game data":
+                complicated = True
+
+        if complicated == True:
             
             self.partyid = data['data']['party_id']
 
