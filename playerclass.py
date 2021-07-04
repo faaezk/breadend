@@ -110,7 +110,8 @@ class PlayerList():
         for player in self.players:
             if player.onlineList == 'True':
                 player.updateStuff()
-                onlinePLayers.append(player)
+                if player.status != False:
+                    onlinePLayers.append(player)
         return onlinePLayers
 
     def inList(self, player:Player):
@@ -147,7 +148,7 @@ def addPlayer(msg):
     if john['status'] == '404' or john['status'] == '500':
         return False
     
-    if inpot[0] == "=onlineadd":
+    if inpot[0] == "$addonline" or inpot[0] == "=addonline":
         if playerList.inList(Player(ignn, tagg)):
             playerList.remove(Player(ignn, tagg))
         
@@ -180,7 +181,7 @@ def removePlayer(msg):
     if playerList.inList(Player(ignn, tagg)) == False:
         return False
 
-    if inpot[0] == "=onlineremove":
+    if inpot[0] == "$removeonline" or inpot[0] == "=removeonline":
         playerList.remove(Player(ignn, tagg, namee))
         playerList.add(Player(ignn, tagg, namee))
 
@@ -190,8 +191,14 @@ def removePlayer(msg):
     playerList.save()
 
 if __name__ == '__main__':
+
+    faq = "$removeonline quackinator#2197"
+
+    print(removePlayer(faq))
+
     playerlist = PlayerList('playerlist.csv')
     playerlist.load()
 
-    faq = "=add quackinator"
-    print(addPlayer(faq))
+    x = playerlist.getOnlinePlayers()
+    for player in x:
+        print(player.name)
