@@ -85,7 +85,7 @@ async def on_message(message):
 
         await the_message.edit(content="```\n" + msg + "\n```")
 
-    if message.content.startswith('$add') or message.content.startswith('$onlineadd'):
+    if message.content.startswith('$add') or message.content.startswith('$addonline'):
 
         themessage = message.content.lower()
         jg = playerclass.addPlayer(themessage)
