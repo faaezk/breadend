@@ -1,7 +1,7 @@
 import requests
 import json
 import os
-import temp
+import playerclass
 
 def get_elo_history(username, tagline):
     
@@ -102,7 +102,7 @@ def get_elolist(username):
     if os.path.isfile('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username)) == False:
         return "Player not found or hasn't played any comp games recently"
     
-    playerlist = temp.PlayerList('playerlist.csv')
+    playerlist = playerclass.PlayerList('playerlist.csv')
     playerlist.load()
 
     tagline = ""
@@ -130,7 +130,7 @@ def get_elolist(username):
 
 def elo_leaderboard():
 
-    playerlist = temp.PlayerList('playerlist.csv')
+    playerlist = playerclass.PlayerList('playerlist.csv')
     playerlist.load()
     
     bohn = []

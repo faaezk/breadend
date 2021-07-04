@@ -1,10 +1,10 @@
 import valorant
 from datetime import datetime
-import temp
+import playerclass
 
 def update_all_elo_history():
     
-    playerList = temp.PlayerList('playerlist.csv')
+    playerList = playerclass.PlayerList('playerlist.csv')
     playerList.load()
 
     update_count = 0
