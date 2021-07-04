@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import os
 import valorant
-import temp
+import playerclass
 import math
 
 ranks = {
@@ -25,7 +25,7 @@ def make_graph(username):
     if os.path.isfile('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username)) == False:
         return False
     
-    playerlist = temp.PlayerList('playerlist.csv')
+    playerlist = playerclass.PlayerList('playerlist.csv')
     playerlist.load()
 
     tagline = ""

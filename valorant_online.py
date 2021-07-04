@@ -1,4 +1,4 @@
-import temp
+import playerclass
 
 playerList = []
 onlinerz = []
@@ -7,7 +7,7 @@ def loadData():
 
     global playerList
     global onlinerz
-    playerList = temp.PlayerList("playerlist.csv")
+    playerList = playerclass.PlayerList("playerlist.csv")
     playerList.load()
     onlinerz = playerList.getOnlinePlayers()
 
@@ -44,16 +44,16 @@ def form_parties():
 
     while i < len(inparty):
 
-        temp = []
+        playerclass = []
 
         while current_party == inparty[i][1]:
-            temp.append(inparty[j][0])
+            playerclass.append(inparty[j][0])
             j += 1
             if j == len(inparty):
                 break
             current_party = inparty[j][1]
 
-        parties.append(temp)
+        parties.append(playerclass)
         i = j
 
     return parties
@@ -84,18 +84,18 @@ def main():
         if leader.partysize > 0:
             randos = leader.partysize - party_size
 
-        temp = ""
+        playerclass = ""
         for player in parties[i]:
-            temp = temp + player + ", "
+            playerclass = playerclass + player + ", "
 
-        temp = temp[:-2]
+        playerclass = playerclass[:-2]
 
         if randos == 1:
-            temp += " (with " + str(randos) + " other person)"
+            playerclass += " (with " + str(randos) + " other person)"
         if randos > 1:
-            temp += " (with " + str(randos) + " other people)"
+            playerclass += " (with " + str(randos) + " other people)"
 
-        final.append((("Party " + str(i + 1)), temp))
+        final.append((("Party " + str(i + 1)), playerclass))
 
     return final
 

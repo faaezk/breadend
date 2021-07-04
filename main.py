@@ -4,7 +4,7 @@ import configparser
 import valorant_online
 import graphs
 import valorant
-import temp
+import playerclass
 
 def get_config():
     c = configparser.ConfigParser()
@@ -88,7 +88,7 @@ async def on_message(message):
     if message.content.startswith('$add') or message.content.startswith('$onlineadd'):
 
         themessage = message.content.lower()
-        jg = temp.addPlayer(themessage)
+        jg = playerclass.addPlayer(themessage)
 
         if jg == False:
             await message.channel.send("Player does not exist")
@@ -102,7 +102,7 @@ async def on_message(message):
         if message.author.id == 410771947522359296:
             themessage = message.content.lower()
 
-            if temp.removePlayer(themessage) == False:
+            if playerclass.removePlayer(themessage) == False:
                 await message.channel.send("Player not in list")
 
             else:
