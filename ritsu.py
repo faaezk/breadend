@@ -1,4 +1,5 @@
 import discord
+from discord import colour
 import weather
 import valorant
 import configparser
@@ -15,6 +16,16 @@ def get_config():
 
 client = discord.Client()
 
+@client.command()
+async def displayembed():
+    embed = discord.Embed(
+        title = 'Title',
+        description = 'this is a description',
+        colour = discord.Colour.blue()
+    )
+
+    embed.set_footer(text='this is a footer')
+
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
@@ -26,6 +37,7 @@ async def on_message(message):
 
     if message.content.startswith('=hello'):
         await message.channel.send('Hello!')
+        displayembed()
 
     if '=weather' in message.content.lower():
         john = weather.main()
@@ -178,6 +190,8 @@ Note: Being added to the online requires you to add henrick#API as a friend, aft
 using $addonline, you will hopefully be send a friend request (don't send the friend request yourself)"""
 
         await message.channel.send("```\n" + msg + "\n```")
+
+
 
 token = get_config()
 
