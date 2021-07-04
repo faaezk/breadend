@@ -10,7 +10,7 @@ def get_config():
     c = configparser.ConfigParser()
     c.read('/home/ubuntu/discord_bot/config.ini')
 
-    return c['openweathermap']['api'], c['openweathermap']['city_id'], c['discord']['token']
+    return c['discord']['token']
 
 client = discord.Client()
 
@@ -134,7 +134,5 @@ for any further questions, ask faaez"""
         await message.channel.send("```\n" + msg + "\n```")
 
 
-config = get_config()
-token = config[2]
-
+token = get_config()
 client.run(token)
