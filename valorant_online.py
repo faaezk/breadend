@@ -1,132 +1,104 @@
-import requests
-import json
-import playerlist
+import temp
 
-players = playerlist.online_players
-names = playerlist.names
-all_data = {}
+playerList = []
+onlinerz = []
 
-def get_all_data():
-    global all_data
-    all_data = {}
+def loadData():
 
-    for i in range(0, len(players)):
-        url = "https://api.henrikdev.xyz/valorant/v1/live-match/{}/{}".format(players[i][0], players[i][1])
-        r = requests.get(url, headers={'Cache-Control': 'no-cache'})
-        all_data[players[i][0]] = json.loads(r.text)
+    global playerList
+    global onlinerz
+    playerList = temp.PlayerList("playerlist.csv")
+    playerList.load()
+    onlinerz = playerList.getOnlinePlayers()
 
+    return
 
-
-def get_data(username, tagline):
-    url = "https://api.henrikdev.xyz/valorant/v1/live-match/{}/{}".format(username, tagline)
-    r = requests.get(url)
-    return json.loads(r.text)
-
-def get_status(username):
-    data = all_data[username]
-    status = ""
-
-    if data['status'] == '200':
-        state = data['data']['current_state']
-
-        if state == 'PREGAME':
-            status = "Online and in agent select"
-
-        elif state == 'MENUS':
-            status = "Online and in menu"
-
-        elif state == 'INGAME':
-            map = data['data']['map']
-
-            if map == 'Range':
-                status = "Online in the range"
-
-            else:
-                game_mode = data['data']['gamemode']
-                score = str(data['data']['score_ally_team']) + '-' + str(data['data']['score_enemy_team'])
-                map = data['data']['map']
-                status = "Online in " + game_mode + " going " + score + " on " + map
-
-    else:
-        status = "Offline"
+def getPlayer(name):
+    for onliner in onlinerz:
+        if onliner.name == name:
+            return onliner
     
-    return status
+    return
 
-def get_party(username):
-    data = all_data[username]
+def form_parties():
 
-    if data['status'] == "500":
-        return
+    global onlinerz
+    inparty = []
 
-    return data['data']['party_id']
+    for player in onlinerz:
 
-def form_partys():
-    party_players = []
+        if player.partyid == False:
+            continue
+
+        inparty.append([player.name, player.partyid])
+    
+    inparty.sort(key=lambda x: str(x[-1]))
+
+    if inparty == []:
+        return []
+    
+    current_party = inparty[0][1]
+    parties = []
+    i = 0
     j = 0
 
-    for i in range(0, len(players)):
-        party_id = get_party(players[i][0])
+    while i < len(inparty):
 
-        if party_id != None:
-
-            party_players.append(players[i].copy())
-            party_players[j].append(party_id)
-            j += 1
-    
-    party_players.sort(key=lambda x: str(x[-1]))
-
-    count = 0
-    parties = []
-
-    if party_players != []:
-        a_party_id = party_players[0][-1]
-
-    while count < len(party_players):
         temp = []
 
-        while a_party_id == party_players[count][-1]:
-
-            temp.append(names[party_players[count][0]])
-            count += 1
-
-            if count == len(party_players):
+        while current_party == inparty[i][1]:
+            temp.append(inparty[j][0])
+            j += 1
+            if j == len(inparty):
                 break
-        
-        if count != len(party_players):
-            a_party_id = party_players[count][-1]
+            current_party = inparty[j][1]
 
         parties.append(temp)
+        i = j
 
     return parties
 
-def everything():
 
-    parties = form_partys()
-    final = [("Players Online:", "")]
-    
-    for i in range(0, len(players)):
-        entry = (names[players[i][0]].ljust(8), get_status(players[i][0]))
+def main():
 
-        if entry[1] != "Offline":
-            final.append(entry)
+    parties = form_parties()
+    final = [("Players Online", "")]
+
+    for player in onlinerz:
+
+        if player.status:
+            final.append((player.name.ljust(8), player.status))
 
     if len(final) == 1:
-        final.append(("All players offline", ""))
-        
-    final.append(("Parties:", ""))
-
-    if len(parties) == 0:
-        final.append(("no parties", ""))
+        final = [("All players offline", "")]
         return final
+    
+    final.append(("Parties:", ""))
 
     for i in range(0, len(parties)):
 
-        a_party = ""
-        for player in parties[i]:
-            a_party = a_party + player + ", "
-        a_party = a_party[:-2]
+        randos = 0
+        leader = getPlayer(parties[i][0])
+        party_size = len(parties[i])
+        
+        if leader.partysize > 0:
+            randos = leader.partysize - party_size
 
-        final.append((("Party " + str(i + 1)), a_party))
+        temp = ""
+        for player in parties[i]:
+            temp = temp + player + ", "
+
+        temp = temp[:-2]
+
+        if randos == 1:
+            temp += " (with " + str(randos) + " other person)"
+        if randos > 1:
+            temp += " (with " + str(randos) + " other people)"
+
+        final.append((("Party " + str(i + 1)), temp))
 
     return final
 
+if __name__ == "__main__":
+    loadData()
+    print(main())

@@ -4,7 +4,6 @@ import configparser
 import valorant_online
 import graphs
 import valorant
-import classier_online
 import temp
 
 def get_config():
@@ -36,25 +35,6 @@ async def on_message(message):
 
     if "wow" in message.content.lower() and message.author.id == 203311457666990082:
         await message.add_reaction("<:stevens:785800069957943306>")
-    
-    if message.content.lower().startswith('$online'):
-        
-        the_message = await message.channel.send("please wait...")
-        valorant_online.get_all_data()
-        john = valorant_online.everything()
-        msg = ""
-
-        for i in range(0, len(john)):
-            if john[i][0] == "no parties" or john[i][0] == "Players Online:" or john[i][0] == "All players offline":
-                msg += john[i][0] + '\n'
-                
-            elif john[i][0] == "Parties:":
-                msg += '\n' + john[i][0] + '\n'
-
-            else:  
-                msg += john[i][0] + ": " + john[i][1] + '\n'
-
-        await the_message.edit(content="```\n" + msg + "\n```")
 
     if message.content.lower().startswith('$graph'):
 
@@ -85,11 +65,11 @@ async def on_message(message):
         john = valorant.elo_leaderboard()
         await message.channel.send("```\n" + john + "\n```")
     
-    if '$betteronline' == message.content.lower():
+    if '$online' == message.content.lower():
         
         the_message = await message.channel.send("please wait...")
-        classier_online.loadData()
-        john = classier_online.main()
+        valorant_online.loadData()
+        john = valorant_online.main()
         msg = ""
 
         for i in range(0, len(john)):

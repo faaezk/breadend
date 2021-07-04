@@ -3,7 +3,7 @@ import weather
 import valorant
 import configparser
 import graphs
-import classier_online
+import valorant_online
 import temp
 import schedule
 
@@ -65,11 +65,11 @@ async def on_message(message):
     if "john" in message.content.lower():
         await message.add_reaction("\u2705")
 
-    if '=betteronline' == message.content.lower():
+    if '=online' == message.content.lower():
         
         the_message = await message.channel.send("please wait...")
-        classier_online.loadData()
-        john = classier_online.main()
+        valorant_online.loadData()
+        john = valorant_online.main()
         msg = ""
 
         for i in range(0, len(john)):
