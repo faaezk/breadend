@@ -67,6 +67,8 @@ class Player():
 
                 else:
                     game_mode = data['data']['gamemode']
+                    if game_mode == '':
+                        game_mode = 'custom'
                     score = str(data['data']['score_ally_team']) + '-' + str(data['data']['score_enemy_team'])
                     map = data['data']['map']
                     igstatus = "Online in " + game_mode + " going " + score + " on " + map
