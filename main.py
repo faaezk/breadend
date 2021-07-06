@@ -97,7 +97,7 @@ async def on_message(message):
         else:
             await message.channel.send("Player added")
 
-    if message.content.startswith('$remove') or message.content.startswith('$onlineremove'):
+    if message.content.startswith('$remove') or message.content.startswith('$removeonline'):
 
         if message.author.id == 410771947522359296:
             themessage = message.content.lower()
