@@ -1,11 +1,9 @@
 import discord
-from discord import colour
-import weather
+from discord.ext import commands
 import valorant
 import configparser
 import graphs
 import valorant_online
-import playerclass
 import schedule
 
 def get_config():
@@ -15,16 +13,6 @@ def get_config():
     return c['discord']['token2']
 
 client = discord.Client()
-
-@client.command()
-async def displayembed():
-    embed = discord.Embed(
-        title = 'Title',
-        description = 'this is a description',
-        colour = discord.Colour.blue()
-    )
-
-    embed.set_footer(text='this is a footer')
 
 @client.event
 async def on_ready():
@@ -37,11 +25,6 @@ async def on_message(message):
 
     if message.content.startswith('=hello'):
         await message.channel.send('Hello!')
-        displayembed()
-
-    if '=weather' in message.content.lower():
-        john = weather.main()
-        await message.channel.send("Feels like " + str(john['main']['feels_like']) + " degrees today")
 
     if message.content.lower().startswith('=leaderboard'):
         john = valorant.elo_leaderboard()
@@ -63,19 +46,6 @@ async def on_message(message):
             with open("/home/ubuntu/discord_bot/elo_graphs/{}.png".format(username), 'rb') as f:
                 picture = discord.File(f)
                 await message.channel.send(file=picture)
-
-    if message.content.startswith('=elolist'):
-
-        themessage = message.content.lower()
-        username = themessage[8:].strip()
-        elolist = valorant.get_elolist(username)
-        await message.channel.send("```\n" + elolist + "\n```")
-
-    if message.content.lower().startswith('good evening'):
-        await message.channel.send(file=discord.File('good_evening.mp4'))
-
-    if "john" in message.content.lower():
-        await message.add_reaction("\u2705")
 
     if '=online' == message.content.lower():
         
@@ -100,7 +70,7 @@ async def on_message(message):
     if message.content.startswith('=add') or message.content.startswith('=onlineadd'):
 
         themessage = message.content.lower()
-        jg = playerclass.addPlayer(themessage)
+        jg = valorant_online.addPlayer(themessage)
 
         if jg == False:
             await message.channel.send("Player does not exist")
@@ -114,7 +84,7 @@ async def on_message(message):
         if message.author.id == 410771947522359296:
             themessage = message.content.lower()
 
-            if playerclass.removePlayer(themessage) == False:
+            if valorant_online.removePlayer(themessage) == False:
                 await message.channel.send("Player not in list")
 
             else:

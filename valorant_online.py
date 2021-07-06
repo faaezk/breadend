@@ -1,4 +1,6 @@
 import playerclass
+import json
+import requests
 
 playerList = []
 onlinerz = []
@@ -99,6 +101,85 @@ def main():
 
     return final
 
+def addPlayer(msg):
+    playerList = playerclass.PlayerList("playerlist.csv")
+    playerList.load()
+    inpot = msg.split(' ')
+    user = inpot[1].split('#')
+
+    if len(user) != 2:
+        return False
+        
+    ignn, tagg = user
+
+    if len(inpot) == 3:
+        namee = inpot[2]
+    else:
+        namee = ignn
+
+    url = "https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{}/{}".format(ignn, tagg)
+    r = requests.get(url)
+
+    if str(r) == "<Response [204]>":
+        return False
+
+    john = json.loads(r.text)
+
+    if john['status'] == '404' or john['status'] == '500':
+        return False
+    
+    if inpot[0] == "$addonline" or inpot[0] == "=addonline":
+        if playerList.inList(playerclass.Player(ignn, tagg)):
+            playerList.remove(playerclass.Player(ignn, tagg))
+        
+        playerList.add(playerclass.Player(ignn, tagg, namee, True))
+    
+    else:
+        if playerList.inList(playerclass.Player(ignn, tagg)):
+            return True
+        
+        playerList.add(playerclass.Player(ignn, tagg, namee))
+        
+    playerList.save()
+
+def removePlayer(msg):
+    playerList = playerclass.PlayerList("playerlist.csv")
+    playerList.load()
+    inpot = msg.split(' ')
+    user = inpot[1].split('#')
+
+    if len(user) != 2:
+        return False
+
+    ignn, tagg = user
+
+    if len(inpot) == 3:
+        namee = inpot[2]
+    else:
+        namee = ignn
+
+    if playerList.inList(playerclass.Player(ignn, tagg)) == False:
+        return False
+
+    if inpot[0] == "$removeonline" or inpot[0] == "=removeonline":
+        playerList.remove(playerclass.Player(ignn, tagg, namee))
+        playerList.add(playerclass.Player(ignn, tagg, namee))
+
+    else:
+        playerList.remove(playerclass.Player(ignn, tagg, namee))
+    
+    playerList.save()
+
+
+
 if __name__ == "__main__":
-    loadData()
-    print(main())
+    faq = "$removeonline quackinator#2197"
+
+    print(removePlayer(faq))
+
+    playerlist = playerclass.PlayerList('playerlist.csv')
+    playerlist.load()
+
+    x = playerlist.getOnlinePlayers()
+    for player in x:
+        print(player.name)
