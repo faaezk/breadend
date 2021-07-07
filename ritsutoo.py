@@ -1,11 +1,11 @@
 import discord
 from discord.ext import commands
 import configparser
-import random
+import valorant
 
 def get_config():
     c = configparser.ConfigParser()
-    c.read('/home/ubuntu/discord_bot/config.ini')
+    c.read('config.ini')
 
     return c['discord']['token2']
 
@@ -21,9 +21,11 @@ async def on_ready():
 async def ping(ctx):
     await ctx.send(f'bong {round(client.latency * 1000)} ms')
 
-@client.command(aliases = ['8ball', 'balls'])
-async def _8ball(ctx, *, question):
-    responses = ['no', 'your mother', 'no', 'balls']
-    await ctx.send(f'question: {question}\nAns: {random.choice(responses)}')
+@client.command()
+async def elolist(ctx, *, username):
+
+    username = username.lower()
+    elolist = valorant.get_elolist(username)
+    await ctx.send("```\n" + elolist + "\n```")
 
 client.run(token)
