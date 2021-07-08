@@ -173,13 +173,16 @@ def removePlayer(msg):
 
 
 if __name__ == "__main__":
-    faq = "$removeonline quackinator#2197"
+    # faq = "$removeonline quackinator#2197"
 
-    print(removePlayer(faq))
+    # print(removePlayer(faq))
 
-    playerlist = playerclass.PlayerList('playerlist.csv')
-    playerlist.load()
+    # playerlist = playerclass.PlayerList('playerlist.csv')
+    # playerlist.load()
 
-    x = playerlist.getOnlinePlayers()
-    for player in x:
-        print(player.name)
+    # x = playerlist.getOnlinePlayers()
+    # for player in x:
+    #     print(player.name)
+
+    loadData()
+    print(main())
