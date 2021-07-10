@@ -31,10 +31,10 @@ async def elolist(ctx, *, username):
     elolist = valorant.get_elolist(username)
     await ctx.send("```\n" + elolist + "\n```")
 
-@client.command()
-async def weather(ctx):
-    john = weather.main()
-    await ctx.send("Feels like " + str(john['main']['feels_like']) + " degrees today")
+# @client.command()
+# async def weather(ctx):
+#     john = weather.main()
+#     await ctx.send("Feels like " + str(john['main']['feels_like']) + " degrees today")
 
 @client.event
 async def on_message(message):
@@ -43,6 +43,11 @@ async def on_message(message):
 
     if message.content.lower().startswith('good evening'):
         await message.channel.send(file=discord.File('good_evening.mp4'))
+
+@client.command()
+async def weather(ctx):
+    john = weather.main()
+    await ctx.send("Feels like " + str(john['main']['feels_like']) + " degrees today")
 
 
 client.run(token)
