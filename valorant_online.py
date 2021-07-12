@@ -170,6 +170,74 @@ def removePlayer(msg):
     
     playerList.save()
 
+def BetteraddPlayer(msg, onliner):
+    playerList = playerclass.PlayerList("playerlist.csv")
+    playerList.load()
+    inpot = msg.split(' ')
+    user = inpot[0].split('#')
+
+    if len(user) != 2:
+        return False
+        
+    ignn, tagg = user
+
+    if len(inpot) == 3:
+        namee = inpot[1]
+    else:
+        namee = ignn
+
+    url = "https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{}/{}".format(ignn, tagg)
+    r = requests.get(url)
+
+    if str(r) == "<Response [204]>":
+        return False
+
+    john = json.loads(r.text)
+
+    if john['status'] == '404' or john['status'] == '500':
+        return False
+    
+    if onliner == True:
+        if playerList.inList(playerclass.Player(ignn, tagg)):
+            playerList.remove(playerclass.Player(ignn, tagg))
+        
+        playerList.add(playerclass.Player(ignn, tagg, namee, True))
+    
+    else:
+        if playerList.inList(playerclass.Player(ignn, tagg)):
+            return True
+        
+        playerList.add(playerclass.Player(ignn, tagg, namee))
+        
+    playerList.save()
+
+def BetterremovePlayer(msg, onliner):
+    playerList = playerclass.PlayerList("playerlist.csv")
+    playerList.load()
+    inpot = msg.split(' ')
+    user = inpot[0].split('#')
+
+    if len(user) != 2:
+        return False
+
+    ignn, tagg = user
+
+    if len(inpot) == 3:
+        namee = inpot[1]
+    else:
+        namee = ignn
+
+    if playerList.inList(playerclass.Player(ignn, tagg)) == False:
+        return False
+
+    if onliner == True:
+        playerList.remove(playerclass.Player(ignn, tagg, namee))
+        playerList.add(playerclass.Player(ignn, tagg, namee))
+
+    else:
+        playerList.remove(playerclass.Player(ignn, tagg, namee))
+    
+    playerList.save()
 
 
 if __name__ == "__main__":
