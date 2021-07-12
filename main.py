@@ -1,4 +1,5 @@
 import discord
+from discord.ext import commands
 import weather
 import configparser
 import valorant_online
@@ -11,108 +12,129 @@ def get_config():
 
     return c['discord']['token']
 
-client = discord.Client()
+token = get_config()
+
+client = commands.Bot(command_prefix='$')
 
 @client.event
 async def on_ready():
-    print('We have logged in as {0.user}'.format(client))
+    print("it started working")
 
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
+@client.command()
+async def weather(ctx):
+    john = weather.main()
+    await ctx.send("Feels like " + str(john['main']['feels_like']) + " degrees today")
 
-    if message.content.startswith('$heello'):
-        await message.channel.send('Hello!')
+@client.command()
+async def graph(ctx, *, username):
 
-    if '$weather' in message.content.lower():
-        john = weather.main()
-        await message.channel.send("Feels like " + str(john['main']['feels_like']) + " degrees today")
-
-    if message.content.lower().startswith('good evening'):
-        await message.channel.send(file=discord.File('good_evening.mp4'))
-
-    if "wow" in message.content.lower() and message.author.id == 203311457666990082:
-        await message.add_reaction("<:stevens:785800069957943306>")
-
-    if message.content.lower().startswith('$graph'):
-
-        themessage = message.content.lower()
-        username = themessage[6:].strip()
-        flag = graphs.make_graph(username)
-        
-        if flag == False:
-            await message.channel.send("Player not found")
-
-        elif flag == None:
-            await message.channel.send("Not enough data to plot graph")
-
-        else:
-            with open("/home/ubuntu/discord_bot/elo_graphs/{}.png".format(username), 'rb') as f:
-                picture = discord.File(f)
-                await message.channel.send(file=picture)
-
-    if message.content.startswith('$elolist'):
-
-        themessage = message.content.lower()
-        username = themessage[8:].strip()
-        elolist = valorant.get_elolist(username)
-
-        await message.channel.send("```\n" + elolist + "\n```")
-
-    if message.content.lower().startswith('$leaderboard'):
-        john = valorant.elo_leaderboard()
-        await message.channel.send("```\n" + john + "\n```")
+    username = username.lower()
+    flag = graphs.make_graph(username)
     
-    if '$online' == message.content.lower():
-        
-        the_message = await message.channel.send("please wait...")
-        valorant_online.loadData()
-        john = valorant_online.main()
-        msg = ""
+    if flag == False:
+        await ctx.send("Player not found")
 
-        for i in range(0, len(john)):
+    elif flag == None:
+        await ctx.send("Not enough data to plot graph")
 
-            if john[i][0] == "no parties" or john[i][0] == "Players Online:" or john[i][0] == "All players offline":
-                msg += john[i][0] + '\n'
+    else:
+        with open("/home/ubuntu/discord_bot/elo_graphs/{}.png".format(username), 'rb') as f:
+            picture = discord.File(f)
+            await ctx.send(file=picture)
 
-            elif john[i][0] == "Parties:":
-                msg += '\n' + john[i][0] + '\n'
-                
-            else:  
-                msg += john[i][0] + ": " + john[i][1] + '\n'
+@client.command()
+async def elolist(ctx, *, username):
 
-        await the_message.edit(content="```\n" + msg + "\n```")
+    username = username.lower()
+    elolist = valorant.get_elolist(username)
+    await ctx.send("```\n" + elolist + "\n```")
 
-    if message.content.startswith('$add') or message.content.startswith('$addonline'):
+@client.command()
+async def leaderboard(ctx):
+    the_message = await ctx.send("this is gonna take a while...")
+    john = valorant.elo_leaderboard()
+    await the_message.edit(content="```\n" + john + "\n```")
 
-        themessage = message.content.lower()
-        jg = valorant_online.addPlayer(themessage)
-
-        if jg == False:
-            await message.channel.send("Player does not exist")
-        elif jg == True:
-            await message.channel.send("Player has already been added")
-        else:
-            await message.channel.send("Player added")
-
-    if message.content.startswith('$remove') or message.content.startswith('$removeonline'):
-
-        if message.author.id == 410771947522359296:
-            themessage = message.content.lower()
-
-            if valorant_online.removePlayer(themessage) == False:
-                await message.channel.send("Player not in list")
-
-            else:
-                await message.channel.send("Player removed")
-                
-        else:
-            await message.channel.send("no.")
-
-    if '$valhelp' == message.content.lower():
+@client.command()
+async def online(ctx):
     
-        msg = """Commands:
+    the_message = await ctx.send("please wait...")
+    valorant_online.loadData()
+    john = valorant_online.main()
+    msg = ""
+
+    for i in range(0, len(john)):
+
+        if john[i][0] == "no parties" or john[i][0] == "Players Online:" or john[i][0] == "All players offline":
+            msg += john[i][0] + '\n'
+
+        elif john[i][0] == "Parties:":
+            msg += '\n' + john[i][0] + '\n'
+            
+        else:  
+            msg += john[i][0] + ": " + john[i][1] + '\n'
+
+    await the_message.edit(content="```\n" + msg + "\n```")
+
+@client.command()
+async def add(ctx, *, username):
+
+    username = username.lower()
+    jg = valorant_online.addPlayer(username, False)
+
+    if jg == False:
+        await ctx.send("Player does not exist")
+    elif jg == True:
+        await ctx.send("Player has already been added")
+    else:
+        await ctx.send("Player added")
+
+@client.command()
+async def addonline(ctx, *, username):
+
+    username = username.lower()
+    jg = valorant_online.addPlayer(username, True)
+
+    if jg == False:
+        await ctx.send("Player does not exist")
+    elif jg == True:
+        await ctx.send("Player has already been added")
+    else:
+        await ctx.send("Player added")
+
+@client.command()
+async def remove(ctx, *, username):
+
+    if ctx.author.id == 410771947522359296:
+        username = username.lower()
+
+        if valorant_online.removePlayer(username, False) == False:
+            await ctx.send("Player not in list")
+
+        else:
+            await ctx.send("Player removed")
+            
+    else:
+        await ctx.send("no.")
+
+@client.command()
+async def removeonline(ctx, *, username):
+
+    if ctx.author.id == 410771947522359296:
+        username = username.lower()
+
+        if valorant_online.removePlayer(username, True) == False:
+            await ctx.send("Player not in list")
+
+        else:
+            await ctx.send("Player removed")
+            
+    else:
+        await ctx.send("no.")
+
+@client.command()
+async def valhelp(ctx):
+    msg = """Commands:
 $leaderboard -> returns an elo leaderboard (slow)
 $graph -> returns a graph of the player's elo over time
 $elolist -> returns the elo values used in the graph
@@ -126,12 +148,25 @@ $elolist username (not username#tag)
 $online
 $add username#tag name (name field is optional, if left blank, it'll use your username as the name)
 $addonline username#tag name (name field optional)\n
-Note: Being added to the online requires you to add henrick#API as a friend, after adding yourself
+Note: Being added to the online requires you to add valorant#API as a friend, after adding yourself
 using $addonline, you will hopefully be send a friend request (don't send the friend request yourself)
-for any further questions, ask faaez"""
+for any further questions, ask faaez
+oh and if the thingo unexpectedly starts sending you a friend request and you can't accept it, idk what's up with that"""
 
-        await message.channel.send("```\n" + msg + "\n```")
+    await ctx.send("```\n" + msg + "\n```")
+
+@client.event
+async def on_message(message):
+    if message.author == client.user:
+        return
+
+    if message.content.lower().startswith('good evening'):
+        await message.channel.send(file=discord.File('good_evening.mp4'))
+    
+    if "wow" in message.content.lower() and message.author.id == 203311457666990082:
+        await message.add_reaction("<:stevens:785800069957943306>")
+    
+    await client.process_commands(message)
 
 
-token = get_config()
 client.run(token)
