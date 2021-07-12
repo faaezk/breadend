@@ -21,7 +21,7 @@ async def on_ready():
     print("it started working")
 
 @client.command()
-async def ping(ctx):
+async def bing(ctx):
     await ctx.send(f'bong {round(client.latency * 1000)} ms')
 
 @client.command()
@@ -55,8 +55,9 @@ async def elolist(ctx, *, username):
 
 @client.command()
 async def leaderboard(ctx):
+    the_message = await ctx.send("this is gonna take a while...")
     john = valorant.elo_leaderboard()
-    await ctx.send("```\n" + john + "\n```")
+    await the_message.edit(content="```\n" + john + "\n```")
 
 @client.command()
 async def online(ctx):
@@ -151,9 +152,10 @@ $elolist username (not username#tag)
 $online
 $add username#tag name (name field is optional, if left blank, it'll use your username as the name)
 $addonline username#tag name (name field optional)\n
-Note: Being added to the online requires you to add henrick#API as a friend, after adding yourself
+Note: Being added to the online requires you to add valorant#API as a friend, after adding yourself
 using $addonline, you will hopefully be send a friend request (don't send the friend request yourself)
-for any further questions, ask faaez"""
+for any further questions, ask faaez
+oh and if the thingo unexpectedly starts sending you a friend request and you can't accept it, idk what's up with that"""
 
     await ctx.send("```\n" + msg + "\n```")
 
