@@ -21,7 +21,7 @@ async def on_ready():
     print("it started working")
 
 @client.command()
-async def weather(ctx):
+async def weatherz(ctx):
     john = weather.main()
     await ctx.send("Feels like " + str(john['main']['feels_like']) + " degrees today")
 

@@ -74,9 +74,9 @@ def make_graph(username):
     axes.set_yticklabels(labely)
 
     plt.plot(x, y)
-    plt.xlabel('your mother')
-    plt.ylabel('mmr')
-    plt.title(username + '\'s elo but the x axis has no meaning cause i cbs')
+    plt.xlabel('Games played')
+    plt.ylabel('MMR')
+    plt.title(username + '\'s MMR over time')
 
     plt.savefig('/home/ubuntu/discord_bot/elo_graphs/{}.png'.format(username), bbox_inches="tight")
 
