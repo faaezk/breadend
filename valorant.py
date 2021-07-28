@@ -98,9 +98,6 @@ def update_elo_history(username, tagline):
     return len(correctly_sorted_new_elo_list)
 
 def get_elolist(username):
-
-    if os.path.isfile('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username)) == False:
-        return "Player not found or hasn't played any comp games recently"
     
     playerlist = playerclass.PlayerList('playerlist.csv')
     playerlist.load()
@@ -110,8 +107,11 @@ def get_elolist(username):
         if player.ign == username:
             tagline = player.tag
             break
-
+    
     update_elo_history(username, tagline)
+
+    if os.path.isfile('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username)) == False:
+        return "Player not found or hasn't played any comp games recently"
     
     file1 = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username), 'r')
 
