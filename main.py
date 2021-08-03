@@ -50,21 +50,21 @@ async def elolist(ctx, *, username):
     await ctx.send("```\n" + elolist + "\n```")
 
 @client.command()
-async def leaderboard(ctx):
-    the_message = await ctx.send("this is gonna take a while...")
-    john = valorant.elo_leaderboard()
-    await the_message.edit(content="```\n" + john + "\n```")
+async def leaderboard(ctx, *, command="john"):
 
-@client.command()
-async def fastleaderboard(ctx):
+    if command.lower() == 'update':
+        the_message = await ctx.send("this is gonna take a while...")
+        john = valorant.elo_leaderboard()
+        await the_message.edit(content="```\n" + john + "\n```")
+         
+    else:
+        john = "this is like, potentially up to 13 minutes old\n"
+        f = open("leaderboard.txt", "r")
+        for x in f:
+            john += x
+        f.close()
 
-    john = "this is like, up to 13 minutes old (maybe)\n"
-    f = open("leaderboard.txt", "r")
-    for x in f:
-        john += x
-    f.close()
-
-    await ctx.send("```\n" + john + "\n```")
+        await ctx.send("```\n" + john + "\n```")
 
 @client.command()
 async def online(ctx):
