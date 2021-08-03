@@ -159,6 +159,10 @@ def elo_leaderboard():
         rank = i + 1
         leaderboard += str(str(rank) + '.').ljust(3) + str(user).ljust(14) + str(elo).rjust(5) + '\n'
 
+    f = open("leaderboard.txt", "w")
+    f.write(leaderboard)
+    f.close()
+
     return leaderboard
 
 if __name__ == "__main__":
@@ -167,3 +171,4 @@ if __name__ == "__main__":
     f = open("leaderboard.txt", "w")
     f.write(leaderboard)
     f.close()
+    print("leaderboard updated")

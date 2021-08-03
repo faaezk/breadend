@@ -58,7 +58,7 @@ async def leaderboard(ctx):
 @client.command()
 async def fastleaderboard(ctx):
 
-    john = "this is like, up to 15 minutes old (maybe)\n"
+    john = "this is like, up to 13 minutes old (maybe)\n"
     f = open("leaderboard.txt", "r")
     for x in f:
         john += x
