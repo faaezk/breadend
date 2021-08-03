@@ -56,6 +56,17 @@ async def leaderboard(ctx):
     await the_message.edit(content="```\n" + john + "\n```")
 
 @client.command()
+async def fastleaderboard(ctx):
+
+    john = "this is like, up to 15 minutes old (maybe)\n"
+    f = open("leaderboard.txt", "r")
+    for x in f:
+        john += x
+    f.close()
+
+    await ctx.send("```\n" + john + "\n```")
+
+@client.command()
 async def online(ctx):
     
     the_message = await ctx.send("please wait...")

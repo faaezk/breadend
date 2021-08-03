@@ -3,6 +3,7 @@ import json
 import os
 import playerclass
 
+
 def get_elo_history(username, tagline):
     
     url = "https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{}/{}".format(username, tagline)
@@ -159,3 +160,10 @@ def elo_leaderboard():
         leaderboard += str(str(rank) + '.').ljust(3) + str(user).ljust(14) + str(elo).rjust(5) + '\n'
 
     return leaderboard
+
+if __name__ == "__main__":
+    leaderboard = elo_leaderboard()
+
+    f = open("leaderboard.txt", "w")
+    f.write(leaderboard)
+    f.close()
