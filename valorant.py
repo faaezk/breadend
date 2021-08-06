@@ -171,4 +171,4 @@ if __name__ == "__main__":
     f = open("leaderboard.txt", "w")
     f.write(leaderboard)
     f.close()
-    print("leaderboard updated")
+    #print("leaderboard updated")
