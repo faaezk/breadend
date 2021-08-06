@@ -1,5 +1,5 @@
 Player Leaderboard
-1. oshawott       1260
+1. oshawott       1329
 2. jack           1097
 3. vkj             937
 4. lyçhii          923
@@ -14,14 +14,14 @@ Player Leaderboard
 13.silentwhispers  681
 14.giroud          680
 15.bento2          665
-16.hoben222        663
-17.azatory         626
-18.lol             625
-19.lmao            604
+16.hoben222        656
+17.azatory         645
+18.lmao            633
+19.lol             625
 20.therealrobdez   477
 21.rustybeef       464
-22.yovivels        424
-23.quackinator     410
+22.yovivels        400
+23.quackinator     379
 24.slumonaire      346
 25.katchampion     345
 26.crossaxis       119

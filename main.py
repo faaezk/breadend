@@ -68,7 +68,8 @@ async def leaderboard(ctx, *, command="john"):
 
 @client.command()
 async def online(ctx):
-    
+    await ctx.send("```\nUnfortunately, the API is being weird so this command does not work at the moment.\n```")
+    '''
     the_message = await ctx.send("please wait...")
     valorant_online.loadData()
     john = valorant_online.main()
@@ -86,6 +87,7 @@ async def online(ctx):
             msg += john[i][0] + ": " + john[i][1] + '\n'
 
     await the_message.edit(content="```\n" + msg + "\n```")
+    '''
 
 @client.command()
 async def add(ctx, *, username):
@@ -146,17 +148,16 @@ async def removeonline(ctx, *, username):
 @client.command()
 async def valhelp(ctx):
     msg = """Commands:
-$leaderboard -> returns an elo leaderboard (slow)
+$leaderboard -> returns an elo leaderboard (up to 13 minutes old)
+$leaderboard update -> returns the most recently updated elo leaderboard (slow)
 $graph -> returns a graph of the player's elo over time
 $elolist -> returns the elo values used in the graph
 $online -> returns the player who are online from the list
 $add -> adds the player to the database for leaderboard/graph/elolist
 $addonline -> adds the player to the database for $online\n
 Usage:
-$leaderboard
 $graph username (not username#tag)
 $elolist username (not username#tag)
-$online
 $add username#tag name (name field is optional, if left blank, it'll use your username as the name)
 $addonline username#tag name (name field optional)\n
 Note: Being added to the online requires you to add valorant#API as a friend, after adding yourself
