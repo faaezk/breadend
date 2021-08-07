@@ -28,7 +28,7 @@ async def weatherz(ctx):
 @client.command()
 async def graph(ctx, *, username):
 
-    username = username.lower()
+    username = username.split('#')[0].lower()
     flag = graphs.make_graph(username)
     
     if flag == False:
@@ -45,7 +45,7 @@ async def graph(ctx, *, username):
 @client.command()
 async def elolist(ctx, *, username):
 
-    username = username.lower()
+    username = username.split('#')[0].lower()
     elolist = valorant.get_elolist(username)
     await ctx.send("```\n" + elolist + "\n```")
 
