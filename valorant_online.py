@@ -117,7 +117,7 @@ def addPlayer(msg, onliner):
     else:
         namee = ignn
 
-    url = "https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{}/{}".format(ignn, tagg)
+    url = f'https://api.henrikdev.xyz/valorant/v1/account/{ignn}/{tagg}'
     r = requests.get(url)
 
     if str(r) == "<Response [204]>":
