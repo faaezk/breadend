@@ -78,7 +78,34 @@ def make_graph(username):
         else:
             labely.append(ranks[value])
 
+    tickx = []  
+    i = 0
+    j = 0
+
+    if len(x) <= 15:
+        j = 1
+    elif len(x) > 15 and len(x) < 30:
+        j = 2
+    elif len(x) >= 30 and len(x) < 70:
+        j = 5
+    elif len(x) >= 70 and len(x) < 150:
+        j = 10
+
+    if len(x) < 150:
+        while i <= len(x):
+            tickx.append(i)
+            i += j
+    
+        if x[-1] not in tickx:
+            if (x[-1] - tickx[-1]) < 4:
+                tickx[-1] = x[-1]
+            else:
+                tickx.append(x[-1])
+
+        axes.set_xticks(tickx)
+
     axes.set_yticklabels(labely)
+    
 
     plt.plot(x, y)
     plt.xlabel('Games played')
@@ -91,3 +118,6 @@ def make_graph(username):
     plt.clf()
 
     return True
+
+if __name__ == "__main__":
+    make_graph('8888')
