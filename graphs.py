@@ -57,9 +57,16 @@ def make_graph(username):
     ticks = []
     i = int(math.floor(ymin / 50.0)) * 50
 
+    ranger = int((ymax-ymin)/100)
+
     while i <= int(math.ceil(ymax / 50.0)) * 50:
         ticks.append(i)
-        i += 25
+        if ranger == 1:
+            i += 20
+        elif ranger > 4:
+            i += 50
+        else:
+            i += 25
 
     axes.set_yticks(ticks)
     labely = []
@@ -70,7 +77,7 @@ def make_graph(username):
 
         else:
             labely.append(ranks[value])
-    
+
     axes.set_yticklabels(labely)
 
     plt.plot(x, y)
