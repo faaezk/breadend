@@ -43,6 +43,27 @@ async def graph(ctx, *, username):
             await ctx.send(file=picture)
 
 @client.command()
+async def multigraph(ctx, *, players):
+
+    players = players.replace(" ", "").split(',')
+
+    for i in range(0, len(players)):
+        players[i] = players[i].lower()
+
+    flag = graphs.double_graph(players)
+    
+    if flag == False:
+        await ctx.send("Player not found")
+
+    elif flag == None:
+        await ctx.send("Not enough data to plot graph")
+
+    else:
+        with open("/home/ubuntu/discord_bot/elo_graphs/multigraph.png", 'rb') as f:
+            picture = discord.File(f)
+            await ctx.send(file=picture)
+
+@client.command()
 async def elolist(ctx, *, username):
 
     username = username.split('#')[0].lower()
