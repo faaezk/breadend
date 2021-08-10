@@ -70,17 +70,15 @@ def double_graph(user1, user2):
         y2[i] = int(y2[i])
         x2.append(i + 1)
 
-
     if roundup(max(y1)) > roundup(max(y2)):
         ymax = roundup(max(y1))
     else:
         ymax = roundup(max(y2))
     
-    if roundup(min(y1)) < roundup(min(y2)):
-        ymin = roundup(min(y1))
+    if rounddown(min(y1)) < rounddown(min(y2)):
+        ymin = rounddown(min(y1))
     else:
-        ymin = roundup(min(y2))
-
+        ymin = rounddown(min(y2))
 
     axes = plt.gca()
     axes.set_ylim([ymin,ymax])
@@ -117,6 +115,7 @@ def double_graph(user1, user2):
     plt.xlabel('Games played')
     plt.ylabel('MMR')
     plt.title(f'{user1}\'s and {user2}\'s MMR over time')
+    plt.legend()
 
     plt.savefig(f'/home/ubuntu/discord_bot/double_graphs/{user1}_{user2}.png', bbox_inches="tight")
 
@@ -125,5 +124,102 @@ def double_graph(user1, user2):
 
     return True
 
+
+def make_graph(players):
+
+    ymin = 10000
+    ymax = 0
+    mostGames = 0
+    yvalues = []
+    xvalues = []
+
+    for username in players:
+        if os.path.isfile(f'/home/ubuntu/discord_bot/elo_history/{username}.txt') == False:
+            return False
+        
+        playerlist = playerclass.PlayerList('playerlist.csv')
+        playerlist.load()
+
+        tagline = ""
+        for player in playerlist.players:
+            if player.ign == username:
+                tagline = player.tag
+                break
+
+        valorant.update_elo_history(username, tagline)
+        
+        file1 = open(f'/home/ubuntu/discord_bot/elo_history/{username}.txt', 'r')
+
+        y = [x.strip() for x in file1.readlines()]
+        if len(y) == 2:
+            return None
+        y.pop(0)
+        
+        x = []
+        for i in range(0, len(y)):
+            y[i] = int(y[i])
+            x.append(i + 1)
+
+        xvalues.append(x)
+        yvalues.append(y)
+
+        if (rounddown(min(y)) < ymin):
+            ymin = rounddown(min(y))
+        
+        if (roundup(max(y)) > ymax):
+            ymax = roundup(max(y))
+
+        if (len(y) > mostGames) and mostGames != 0:
+            mostGames = len(y)
+
+        file1.close()
+
+
+    axes = plt.gca()
+    axes.set_ylim([ymin,ymax])
+    
+    ticks = []
+    i = int(math.floor(ymin / 50.0)) * 50
+
+    ranger = int((ymax-ymin)/100)
+
+    while i <= int(math.ceil(ymax / 50.0)) * 50:
+        ticks.append(i)
+        if ranger == 1:
+            i += 20
+        elif ranger > 4:
+            i += 50
+        else:
+            i += 25
+
+    axes.set_yticks(ticks)
+    labely = []
+
+    for value in ticks:
+        if value % 100 != 0:
+            labely.append(str(value))
+
+        else:
+            labely.append(ranks[value])
+
+    axes.set_yticklabels(labely)
+
+    for i in range(0, len(players)):
+        plt.plot(xvalues[i], yvalues[i], label=players[i])
+
+    plt.xlabel("Games played")
+    plt.ylabel("MMR")
+    plt.title("change in MMR over time")
+    plt.legend()
+
+    plt.savefig(f'/home/ubuntu/discord_bot/double_graphs/multigraph.png', bbox_inches="tight")
+
+    file1.close()
+    plt.clf()
+
+    return True
+
+
+
 if __name__ == "__main__":
-    double_graph('faqinator', 'fakinator')
+    make_graph(['slumonaire', 'fakinator', '8888', 'dilka30003'])
