@@ -1,19 +1,24 @@
-import valorant
-from datetime import datetime
-import playerclass
+import matplotlib.pyplot as plt
 
-def update_all_elo_history():
+def double_graph(user1, user2):
+    x1 = [10,20,30]
+    y1 = [20,40,10]
+
+    plt.plot(x1, y1, label = "line 1")
+
+    x2 = [10,20,30]
+    y2 = [40,10,30]
+
+    plt.plot(x2, y2, label = "line 2")
     
-    playerList = playerclass.PlayerList('playerlist.csv')
-    playerList.load()
+    plt.xlabel('Games played')
+    plt.ylabel('MMR')
 
-    update_count = 0
-    
-    for i in range(0, len(playerList.players)):
-        update_count += valorant.update_elo_history(playerList.players[i].ign, playerList.players[i].tag)
-        #print("completed " + str(i + 1) + "/" + str(len(playerList.players)))
+    plt.title(f'{user1}\'s and {user2}\'s MMR over time')
 
-    return str(update_count) + " updates"
+    plt.legend()
 
-if __name__ == "__main__":
-    print("johnjohn")
+    plt.savefig('/Users/faaezkamal/GitKraken Stuff/discord_bot/tester.png', bbox_inches="tight")
+    plt.clf()
+
+double_graph("john", "flohn")
