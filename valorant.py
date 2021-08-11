@@ -181,7 +181,7 @@ def stats(ign, tag):
     data =  john['data']['by_season']
 
     keys = data.keys()
-    final = f' {ign}\'s Competitive statistics:\n'
+    final = f'{ign}\'s Competitive statistics:\n'
 
     for key in keys:
         if 'error' in data[key].keys():
