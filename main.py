@@ -71,6 +71,13 @@ async def elolist(ctx, *, username):
     await ctx.send("```\n" + elolist + "\n```")
 
 @client.command()
+async def stats(ctx, *, username):
+
+    ign, tag = username.split('#').lower()
+    stats = valorant.stats(ign, tag)
+    await ctx.send("```\n" + stats + "\n```")
+
+@client.command()
 async def leaderboard(ctx, *, command="john"):
 
     if command.lower() == 'update':
@@ -169,22 +176,23 @@ async def removeonline(ctx, *, username):
 @client.command()
 async def valhelp(ctx):
     msg = """Commands:
-$leaderboard -> returns an elo leaderboard (up to 13 minutes old)
+$leaderboard -> returns an elo leaderboard (updates every 13 minutes)
 $leaderboard update -> returns the most recently updated elo leaderboard (slow)
 $graph -> returns a graph of the player's elo over time
+$multigraph -> returns a graph with multiple player's elo over time
 $elolist -> returns the elo values used in the graph
+$stats -> returns some comp statistics from each Act
 $online -> returns the player who are online from the list
 $add -> adds the player to the database for leaderboard/graph/elolist
 $addonline -> adds the player to the database for $online\n
 Usage:
 $graph username (not username#tag)
+$multigraph player1, player2, etc (list of players seperated by a comma)
 $elolist username (not username#tag)
-$add username#tag name (name field is optional, if left blank, it'll use your username as the name)
+$add username#tag name (name field is optional)
 $addonline username#tag name (name field optional)\n
-Note: Being added to the online requires you to add valorant#API as a friend, after adding yourself
-using $addonline, you will hopefully be send a friend request (don't send the friend request yourself)
-for any further questions, ask faaez
-oh and if the thingo unexpectedly starts sending you a friend request and you can't accept it, idk what's up with that"""
+Note: Being added to the online requires you to add valorant#API as a friend, after adding yourself,
+you will hopefully be send a friend request (don't send the friend request yourself)"""
 
     await ctx.send("```\n" + msg + "\n```")
 
