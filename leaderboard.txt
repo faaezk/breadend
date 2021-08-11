@@ -11,8 +11,8 @@ Player Leaderboard
 10.fade            746
 11.giroud          737
 12.dilka30003      733
-13.azatory         723
-14.silentwhispers  720
+13.silentwhispers  720
+14.azatory         715
 15.fakinator       710
 16.bento2          665
 17.hoben222        641

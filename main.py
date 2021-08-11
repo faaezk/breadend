@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-import weather
 import configparser
 import valorant_online
 import graphs
@@ -14,18 +13,16 @@ def get_config():
 
 token = get_config()
 
-client = commands.Bot(command_prefix='$')
+help_command = commands.DefaultHelpCommand(no_category = 'Commands')
+client = commands.Bot(command_prefix='$',help_command = help_command)
 
 @client.event
 async def on_ready():
     print("it started working")
 
-@client.command()
-async def weatherz(ctx):
-    john = weather.main()
-    await ctx.send("Feels like " + str(john['main']['feels_like']) + " degrees today")
-
-@client.command()
+@client.command(
+    help="Syntax: $graph username or $graph username#tag", 
+    brief="Returns a graph of the player's elo over time")
 async def graph(ctx, *, username):
 
     username = username.split('#')[0].lower()
@@ -42,7 +39,9 @@ async def graph(ctx, *, username):
             picture = discord.File(f)
             await ctx.send(file=picture)
 
-@client.command()
+@client.command(
+    help="Where players is a list of username's (not username#tag) seperated by commas.\nSyntax: $multigraph username1, username2, username3", 
+    brief="Returns a graph with multiple player's elo over time")
 async def multigraph(ctx, *, players):
 
     players = players.replace(" ", "").split(',')
@@ -63,23 +62,36 @@ async def multigraph(ctx, *, players):
             picture = discord.File(f)
             await ctx.send(file=picture)
 
-@client.command()
+@client.command(
+    help="Syntax: $elolist username or $elolist username#tag", 
+    brief="Returns the elo values used in the graph")
 async def elolist(ctx, *, username):
 
     username = username.split('#')[0].lower()
     elolist = valorant.get_elolist(username)
     await ctx.send("```\n" + elolist + "\n```")
 
-@client.command()
+@client.command(
+    help="Syntax: $stats username#tag", 
+    brief="Returns some comp statistics from each Act")
 async def stats(ctx, *, username):
 
     username = username.split('#')
     if len(username) == 2:
-        await ctx.send("```\n" + valorant.stats(username[0].lower(), username[1].lower()) + "\n```")
+        fields = valorant.stats(username[0].lower(), username[1].lower())
+        embed=discord.Embed(title = f'{username[0]}\'s Competitive Statistics', url = "https://youtu.be/MtN1YnoL46Q", description="", color=0x00f900)
+        for field in fields:
+            embed.add_field(name = field[0], value = field[1], inline = True)
+
+        embed.set_footer(text = "unlucky")
+        await ctx.send(embed = embed)
+
     else:
         await ctx.send("```\n" + "Player not found, check syntax: (username#tag)" + "\n```")
 
-@client.command()
+@client.command(
+    help="Optional argument to update leaderboard with newest data: 'update'\nSyntax: $leaderboard or $leaderboard update", 
+    brief="Returns a MMR leaderboard (updates every 13 minutes)")
 async def leaderboard(ctx, *, command="john"):
 
     if command.lower() == 'update':
@@ -96,30 +108,33 @@ async def leaderboard(ctx, *, command="john"):
 
         await ctx.send("```\n" + john + "\n```")
 
-@client.command()
+@client.command(
+    help="See $addonline to be added to the list", 
+    brief="Returns the player who are online from the list")
 async def online(ctx):
     await ctx.send("```\nUnfortunately, the API is being weird so this command does not work at the moment.\n```")
-    '''
-    the_message = await ctx.send("please wait...")
-    valorant_online.loadData()
-    john = valorant_online.main()
-    msg = ""
 
-    for i in range(0, len(john)):
+    # the_message = await ctx.send("please wait...")
+    # valorant_online.loadData()
+    # john = valorant_online.main()
+    # msg = ""
 
-        if john[i][0] == "no parties" or john[i][0] == "Players Online:" or john[i][0] == "All players offline":
-            msg += john[i][0] + '\n'
+    # for i in range(0, len(john)):
 
-        elif john[i][0] == "Parties:":
-            msg += '\n' + john[i][0] + '\n'
+    #     if john[i][0] == "no parties" or john[i][0] == "Players Online:" or john[i][0] == "All players offline":
+    #         msg += john[i][0] + '\n'
+
+    #     elif john[i][0] == "Parties:":
+    #         msg += '\n' + john[i][0] + '\n'
             
-        else:  
-            msg += john[i][0] + ": " + john[i][1] + '\n'
+    #     else:  
+    #         msg += john[i][0] + ": " + john[i][1] + '\n'
 
-    await the_message.edit(content="```\n" + msg + "\n```")
-    '''
+    # await the_message.edit(content="```\n" + msg + "\n```")
 
-@client.command()
+@client.command(
+    help="Syntax: $add username#tag name (name field is optional)", 
+    brief="Adds the player to the database for leaderboard/graph/elolist")
 async def add(ctx, *, username):
 
     username = username.lower()
@@ -132,7 +147,11 @@ async def add(ctx, *, username):
     else:
         await ctx.send("Player added")
 
-@client.command()
+@client.command(
+    help="""Syntax: $addonline username#tag name (name field optional)
+Note: Being added to the online requires you to add valorant#API as a friend, after adding yourself,
+you will hopefully be send a friend request. (don't send the friend request yourself)""", 
+    brief="Adds the player to the list for $online")
 async def addonline(ctx, *, username):
 
     username = username.lower()
@@ -145,7 +164,9 @@ async def addonline(ctx, *, username):
     else:
         await ctx.send("Player added")
 
-@client.command()
+@client.command(
+    help="ask Faaez (Fakinator) if you wanna be removed", 
+    brief="Removes the player from the database")
 async def remove(ctx, *, username):
 
     if ctx.author.id == 410771947522359296:
@@ -160,7 +181,9 @@ async def remove(ctx, *, username):
     else:
         await ctx.send("no.")
 
-@client.command()
+@client.command(
+    help="ask Faaez (Fakinator) if you wanna be removed", 
+    brief="Removes the player from the online list")
 async def removeonline(ctx, *, username):
 
     if ctx.author.id == 410771947522359296:
@@ -174,29 +197,20 @@ async def removeonline(ctx, *, username):
             
     else:
         await ctx.send("no.")
-
+    
 @client.command()
 async def valhelp(ctx):
-    msg = """Commands:
-$leaderboard -> returns an elo leaderboard (updates every 13 minutes)
-$leaderboard update -> returns the most recently updated elo leaderboard (slow)
-$graph -> returns a graph of the player's elo over time
-$multigraph -> returns a graph with multiple player's elo over time
-$elolist -> returns the elo values used in the graph
-$stats -> returns some comp statistics from each Act
-$online -> returns the player who are online from the list
-$add -> adds the player to the database for leaderboard/graph/elolist
-$addonline -> adds the player to the database for $online\n
-Usage:
-$graph username (not username#tag)
-$multigraph player1, player2, etc (list of players seperated by a comma)
-$elolist username (not username#tag)
-$add username#tag name (name field is optional)
-$addonline username#tag name (name field optional)\n
-Note: Being added to the online requires you to add valorant#API as a friend, after adding yourself,
-you will hopefully be send a friend request (don't send the friend request yourself)"""
+    embed=discord.Embed(title = "List of Commands", url = "https://youtu.be/MtN1YnoL46Q", description="", color=0x00f900)
+    
+    embed.add_field(name = "add", value = "Adds the player to the database for leaderboard/graph/elolist\nSyntax: $add username#tag name (name field is optional)", inline = False)
+    embed.add_field(name = "elolist", value = "Returns the elo values used in the graph\nSyntax: $elolist username or $elolist username#tag", inline = False)
+    embed.add_field(name = "graph", value = "Returns a graph of the player's elo over time\nSyntax: $graph username or $graph username#tag", inline = False)
+    embed.add_field(name = "leaderboard", value = "Returns a MMR leaderboard (updates every 13 minutes)\nOptional argument: update", inline = False)
+    embed.add_field(name = "multigraph", value = "Returns a graph with multiple player's elo over time\nSyntax: $multigraph username1, username2, username3\n (not username#tag)", inline = False)
+    embed.add_field(name = "stats", value = "Returns some comp statistics from each Act\nSyntax: $stats username#tag", inline = False)
 
-    await ctx.send("```\n" + msg + "\n```")
+    embed.set_footer(text = "unlucky")
+    await ctx.send(embed = embed)
 
 @client.event
 async def on_message(message):
