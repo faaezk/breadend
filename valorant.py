@@ -165,6 +165,36 @@ def elo_leaderboard():
 
     return leaderboard
 
+def stats(ign, tag):
+
+    url = f'https://api.henrikdev.xyz/valorant/v2/mmr/ap/{ign}/{tag}'
+    r = requests.get(url)
+
+    if str(r) == "<Response [204]>":
+        return "Player not found"
+
+    john = json.loads(r.text)
+
+    if john['status'] == '404' or john['status'] == '500':
+        return "Player not found, check syntax: (username#tag)"
+    
+    data =  john['data']['by_season']
+
+    keys = data.keys()
+    final = f' {ign}\'s Competitive statistics:\n'
+
+    for key in keys:
+        if 'error' in data[key].keys():
+            final += f'Episode {key[1]} Act {key[3]}: No data Available\n'
+        else:
+            wins = data[key]['wins']
+            games = data[key]['number_of_games']
+            rank = data[key]['final_rank_patched']
+            final += f'Episode {key[1]} Act {key[3]}: {rank}, Games Played: {games}, Winrate: {round((wins/games) * 100, 2)}%\n'
+    
+    return final
+
+
 if __name__ == "__main__":
     leaderboard = elo_leaderboard()
 
