@@ -73,9 +73,11 @@ async def elolist(ctx, *, username):
 @client.command()
 async def stats(ctx, *, username):
 
-    ign, tag = username.split('#').lower()
-    stats = valorant.stats(ign, tag)
-    await ctx.send("```\n" + stats + "\n```")
+    username = username.split('#')
+    if len(username) == 2:
+        await ctx.send("```\n" + valorant.stats(username[0].lower(), username[1].lower()) + "\n```")
+    else:
+        await ctx.send("```\n" + "Player not found, check syntax: (username#tag)" + "\n```")
 
 @client.command()
 async def leaderboard(ctx, *, command="john"):
