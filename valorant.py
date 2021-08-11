@@ -181,16 +181,16 @@ def stats(ign, tag):
     data =  john['data']['by_season']
 
     keys = data.keys()
-    final = f'{ign}\'s Competitive statistics:\n'
+    final = []
 
     for key in keys:
         if 'error' in data[key].keys():
-            final += f'Episode {key[1]} Act {key[3]}: No data Available\n'
+            final.append([f'Episode {key[1]} Act {key[3]}', "No data Available\n"])
         else:
             wins = data[key]['wins']
             games = data[key]['number_of_games']
             rank = data[key]['final_rank_patched']
-            final += f'Episode {key[1]} Act {key[3]}: {rank}, Games Played: {games}, Winrate: {round((wins/games) * 100, 2)}%\n'
+            final.append([f'Episode {key[1]} Act {key[3]}:', f'{rank}\nGames Played: {games}\nWinrate: {round((wins/games) * 100, 2)}%'])
     
     return final
 
