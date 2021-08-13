@@ -127,6 +127,7 @@ def double_graph(players):
     mostGames = 0
     yvalues = []
     xvalues = []
+    colours = ["blue", "orange", "green", "red", "purple", "brown", "black", "pink"]
 
     for username in players:
         if os.path.isfile(f'/home/ubuntu/discord_bot/elo_history/{username}.txt') == False:
@@ -200,7 +201,9 @@ def double_graph(players):
     axes.set_yticklabels(labely)
 
     for i in range(0, len(players)):
-        plt.plot(xvalues[i], yvalues[i], label=players[i])
+        p = plt.plot(xvalues[i], yvalues[i], label=players[i])
+        colour = p[0].get_color()
+        plt.axhline(y=yvalues[i][-1], color=colour, linestyle='--')
 
     plt.xlabel("Games played")
     plt.ylabel("MMR")
@@ -215,4 +218,6 @@ def double_graph(players):
     return True
 
 if __name__ == "__main__":
-    make_graph('8888')
+    #double_graph(['8888','azatory','bento2','crossaxis','fade','fakinator', 'giroud', 'grovyle', 'imabandwagon', 'jokii', 'katchampion',
+    # 'yovivels', 'dilka30003', 'slumonaire', 'silentwhispers', 'lmao', 'jack', 'thesugarman', 'hoben222', 'quackinator'])
+    double_graph(['8888', 'yovivels', 'dilka30003', 'slumonaire'])
