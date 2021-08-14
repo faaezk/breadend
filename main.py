@@ -11,7 +11,7 @@ def get_config():
     c = configparser.ConfigParser()
     c.read('/home/ubuntu/discord_bot/config.ini')
 
-    return c['discord']['token'], c['cat']['api']
+    return c['discord']['token'], c['cat']['api'], c['NASA']['api']
 
 token = get_config()[0]
 
@@ -37,6 +37,25 @@ async def cat(ctx):
 
     embed = discord.Embed(title="cat")
     embed.set_image(url=json.loads(response.text)[0]['url'])
+
+    await ctx.send(embed=embed)
+
+@client.command()
+async def nasa(ctx):
+    url = "https://api.nasa.gov/planetary/apod"
+
+    payload={}
+    files={}
+    headers = {
+    'Content-Type': 'application/json',
+    'x-api-key': get_config()[2]
+    }
+
+    response = requests.request("GET", url, headers=headers, data=payload, files=files)
+    loaded = json.loads(response.text)
+    embed = discord.Embed(title="Astronomy Photo of The Day", description=loaded['title'])
+    embed.set_image(url=loaded['url'])
+    embed.set_footer(text = "Copyright: {}, {}".format(loaded['copyright'], loaded['date']))
 
     await ctx.send(embed=embed)
 
