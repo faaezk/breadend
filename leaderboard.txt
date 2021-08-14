@@ -5,20 +5,20 @@ Player Leaderboard
 4. lyçhii          923
 5. thesugarman     864
 6. grovyle         805
-7. 8888            785
-8. faqinator       770
-9. dilka30003      768
-10.fade            746
-11.giroud          737
-12.fakinator       736
-13.imabandwagon    729
-14.azatory         710
-15.silentwhispers  704
+7. faqinator       770
+8. 8888            764
+9. fade            746
+10.giroud          737
+11.fakinator       736
+12.dilka30003      734
+13.azatory         724
+14.imabandwagon    706
+15.silentwhispers  700
 16.bento2          665
 17.hoben222        641
-18.lmao            633
-19.lol             625
-20.yovivels        611
+18.lol             625
+19.lmao            607
+20.yovivels        581
 21.slumonaire      565
 22.rustybeef       523
 23.therealrobdez   477
