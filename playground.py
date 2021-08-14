@@ -1,16 +1,13 @@
-import requests
-import json
+from jikanpy import Jikan
 
+def animestuff(name):
+	jikan = Jikan()
+	search_result = jikan.search('anime', name)
+	id = search_result['results'][0]['mal_id']
+	anime = jikan.anime(id)
+	url = anime['url']
+	image = anime['image_url']
+	OP = anime['opening_themes']
+	return [url, image, OP]
 
-url = "https://api.nasa.gov/planetary/apod"
-
-payload={}
-files={}
-headers = {
-'Content-Type': 'application/json',
-'x-api-key': "oTVGiGXsY9BBZnvkTcBctUlXM8s61CMiCPfI8pVe"
-}
-
-response = requests.request("GET", url, headers=headers, data=payload, files=files)
-
-print(json.loads(response.text))
+print(animestuff("yuru camp"))

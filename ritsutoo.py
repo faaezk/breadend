@@ -1,39 +1,36 @@
 import discord
 from discord.ext import commands
 import configparser
-import requests
-import json
+from jikanpy import jikan
 
 def get_config():
     c = configparser.ConfigParser()
     c.read('/home/ubuntu/discord_bot/config.ini')
 
-    return c['discord']['token'], c['cat']['api']
+    return c['discord']['token']
 
-token = get_config()[0]
+token = get_config()
 
-help_command = commands.DefaultHelpCommand(no_category = 'Commands')
-client = commands.Bot(command_prefix='!',help_command = help_command)
+client = commands.Bot(command_prefix='!')
 
 @client.event
 async def on_ready():
     print("it started working")
 
 @client.command()
-async def cat(ctx):
-    url = "https://api.thecatapi.com/v1/images/search?format=json"
+async def anime(ctx, *, title):
+    search_result = jikan.search('anime', title)
+    id = search_result['results'][0]['mal_id']
 
-    payload={}
-    files={}
-    headers = {
-    'Content-Type': 'application/json',
-    'x-api-key': get_config()[1]
-    }
+    anime = jikan.anime(id)
 
-    response = requests.request("GET", url, headers=headers, data=payload, files=files)
+    url2 = anime['url']
+    image = anime['image_url']
+    OP = anime['opening_themes']
 
-    embed = discord.Embed(title="cat")
-    embed.set_image(url=json.loads(response.text)[0]['url'])
+    embed = discord.Embed(title=anime['title'], url=url2)
+    embed.add_field(name="Opening Theme", value=OP)
+    embed.set_image(url=image)
 
     await ctx.send(embed=embed)
 
