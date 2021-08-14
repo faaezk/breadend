@@ -6,18 +6,18 @@ Player Leaderboard
 5. thesugarman     864
 6. grovyle         805
 7. faqinator       770
-8. 8888            764
-9. fade            746
-10.giroud          737
-11.fakinator       736
-12.dilka30003      734
-13.azatory         724
-14.imabandwagon    706
-15.silentwhispers  700
+8. 8888            768
+9. dilka30003      747
+10.fade            746
+11.giroud          737
+12.fakinator       736
+13.imabandwagon    726
+14.azatory         724
+15.silentwhispers  683
 16.bento2          665
 17.hoben222        641
-18.lol             625
-19.lmao            607
+18.lmao            640
+19.lol             625
 20.yovivels        581
 21.slumonaire      565
 22.rustybeef       523

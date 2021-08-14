@@ -34,4 +34,4 @@ def animestuff(name):
 
 	return [title, source, ep_count, dates, score, OP, ending_themes, sequel, genres]
 
-print(animestuff("erased"))
+print(animestuff("hunter hunter 2011"))
