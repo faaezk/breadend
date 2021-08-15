@@ -261,6 +261,11 @@ async def anime(ctx, *, title):
 
     anime = jikan.anime(id)
 
+    if anime['episodes'] == None:
+        ep_count = '?'
+    else:
+        ep_count = str(anime['episodes'])
+
     opening_themes = ""
     ending_themes = ""
 
@@ -320,7 +325,7 @@ async def anime(ctx, *, title):
 
 
     embed = discord.Embed(title="{} ({})".format(anime['title_english'], anime['title_japanese']), url=anime['url'], 
-                        description="Source: {}, Type: {}, Score: {}, Episodes: {}".format(anime['source'], anime['type'], anime['score'], anime['episodes']))
+                        description="Source: {}, Type: {}, Score: {}, Episodes: {}".format(anime['source'], anime['type'], anime['score'], ep_count))
     
     embed.set_image(url=anime['image_url'])
     embed.add_field(name="Airing Dates:", value=anime['aired']['string'])
@@ -329,7 +334,6 @@ async def anime(ctx, *, title):
     embed.add_field(name="Opening Theme", value=opening_themes, inline=False)
     embed.add_field(name="Ending Theme", value=ending_themes, inline=False)
     embed.set_footer(text="Studios: {}, Licensors: {}".format(studios, licensors))
-
     await ctx.send(embed=embed)
 
 @client.event
