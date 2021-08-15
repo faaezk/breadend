@@ -30,8 +30,12 @@ async def anime(ctx, *, title):
     ep_count = anime['episodes']
     dates = anime['aired']['string']
 
-    opening_themes = anime['opening_themes']
-    ending_themes = anime['ending_themes']
+    opening_themes = ""
+    ending_themes = ""
+    for theme in anime['opening_themes']:
+        opening_themes += theme + '\n'
+    for theme in anime['ending_themes']:
+        ending_themes += theme + '\n'
 
     sequel = ""
     if 'Sequel' in anime['related'].keys():
