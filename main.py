@@ -6,7 +6,6 @@ import graphs
 import valorant
 import requests
 import json
-from jikanpy import Jikan
 
 def get_config():
     c = configparser.ConfigParser()
@@ -255,11 +254,12 @@ async def valhelp(ctx):
 @client.command()
 async def anime(ctx, *, title):
     await ctx.send("Getting info for " + title)
-    jikan = Jikan()
-    search_result = jikan.search(search_type='anime', query=title, page=1)
-    id = search_result['results'][0]['mal_id']
+    
+    response = requests.get(f'https://api.jikan.moe/v3/search/anime?q={title}&page=1', timeout=5)
+    id = json.loads(response.text)['results'][0]['mal_id']
 
-    anime = jikan.anime(id)
+    response = requests.get(f'https://api.jikan.moe/v3/anime/{id}', timeout=5)
+    anime = json.loads(response.text)
 
     if anime['episodes'] == None:
         ep_count = '?'
