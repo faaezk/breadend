@@ -253,8 +253,9 @@ async def valhelp(ctx):
 
 
 @client.command()
-async def anime(ctx, *, user):
-    await ctx.send(f'{user}\'s tag: {valorant.get_tag(user)}')
+async def gettag(ctx, *, user):
+    user = user.lower()
+    await ctx.send(f'{user}#{valorant.get_tag(user)}')
 
 @client.command()
 async def anime(ctx, *, title):
