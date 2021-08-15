@@ -1,7 +1,8 @@
 import discord
 from discord.ext import commands
 import configparser
-from jikanpy import Jikan
+import requests
+import json
 
 def get_config():
     c = configparser.ConfigParser()
@@ -19,12 +20,19 @@ async def on_ready():
 
 @client.command()
 async def anime(ctx, *, title):
-    await ctx.send("Getting info for " + title)
-    jikan = Jikan()
-    search_result = jikan.search(search_type='anime', query=title, page=1)
-    id = search_result['results'][0]['mal_id']
 
-    anime = jikan.anime(id)
+    await ctx.send("Getting info for " + title)
+
+    response = requests.get(f'https://api.jikan.moe/v3/search/anime?q={title}&page=1', timeout=5)
+    id = json.loads(response.text)['results'][0]['mal_id']
+
+    response = requests.get(f'https://api.jikan.moe/v3/anime/{id}', timeout=5)
+    anime = json.loads(response.text)
+
+    if anime['episodes'] == None:
+        ep_count = '?'
+    else:
+        ep_count = str(anime['episodes'])
 
     opening_themes = ""
     ending_themes = ""
@@ -83,8 +91,9 @@ async def anime(ctx, *, title):
     if licensors == "":
         licensors = "None"
 
+
     embed = discord.Embed(title="{} ({})".format(anime['title_english'], anime['title_japanese']), url=anime['url'], 
-                        description="Source: {}, Type: {}, Score: {}, Episodes: {}".format(anime['source'], anime['type'], anime['score'], anime['episodes']))
+                        description="Source: {}, Type: {}, Score: {}, Episodes: {}".format(anime['source'], anime['type'], anime['score'], ep_count))
     
     embed.set_image(url=anime['image_url'])
     embed.add_field(name="Airing Dates:", value=anime['aired']['string'])
@@ -93,7 +102,6 @@ async def anime(ctx, *, title):
     embed.add_field(name="Opening Theme", value=opening_themes, inline=False)
     embed.add_field(name="Ending Theme", value=ending_themes, inline=False)
     embed.set_footer(text="Studios: {}, Licensors: {}".format(studios, licensors))
-
     await ctx.send(embed=embed)
 
 
