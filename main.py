@@ -251,6 +251,11 @@ async def valhelp(ctx):
     embed.set_footer(text = "unlucky")
     await ctx.send(embed = embed)
 
+
+@client.command()
+async def anime(ctx, *, user):
+    await ctx.send(f'{user}\'s tag: {valorant.get_tag(user)}')
+
 @client.command()
 async def anime(ctx, *, title):
     await ctx.send("Getting info for " + title)

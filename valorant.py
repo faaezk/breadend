@@ -3,6 +3,18 @@ import json
 import os
 import playerclass
 
+def get_tag(username):
+    
+    playerlist = playerclass.PlayerList('playerlist.csv')
+    playerlist.load()
+
+    tagline = "Player not found."
+    for player in playerlist.players:
+        if player.ign == username:
+            tagline = player.tag
+            break
+    
+    return tagline
 
 def get_elo_history(username, tagline):
     
