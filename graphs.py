@@ -107,7 +107,9 @@ def make_graph(username):
     axes.set_yticklabels(labely)
     
 
-    plt.plot(x, y)
+    p = plt.plot(x, y)
+    colour = p[0].get_color()
+    plt.axhline(y=y[-1], color=colour, linestyle='--')
     plt.xlabel('Games played')
     plt.ylabel('MMR')
     plt.title(username + '\'s MMR over time')
@@ -127,7 +129,6 @@ def double_graph(players):
     mostGames = 0
     yvalues = []
     xvalues = []
-    colours = ["blue", "orange", "green", "red", "purple", "brown", "black", "pink"]
 
     for username in players:
         if os.path.isfile(f'/home/ubuntu/discord_bot/elo_history/{username}.txt') == False:
