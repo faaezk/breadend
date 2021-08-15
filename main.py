@@ -255,7 +255,10 @@ async def valhelp(ctx):
 @client.command()
 async def gettag(ctx, *, user):
     user = user.lower()
-    await ctx.send(f'{user}#{valorant.get_tag(user)}')
+    if valorant.get_tag(user) == "Player not found.":
+        await ctx.send("Player not in database. add using $add")
+    else:
+        await ctx.send(f'{user}#{valorant.get_tag(user)}')
 
 @client.command()
 async def anime(ctx, *, title):

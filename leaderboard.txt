@@ -12,7 +12,7 @@ Player Leaderboard
 11.giroud          737
 12.fakinator       736
 13.imabandwagon    726
-14.azatory         724
+14.azatory         719
 15.silentwhispers  683
 16.bento2          665
 17.hoben222        641
