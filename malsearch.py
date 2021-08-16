@@ -70,7 +70,51 @@ def animeSearch(title):
     if licensors == "":
         licensors = "None"
     
-    return {"episode count" : ep_count, "sequel" : sequel, "genres" : genres, "Airing Dates" : anime['aired']['string'],
+    return {"ep_count" : ep_count, "sequel" : sequel, "genres" : genres, "Airing_Dates" : anime['aired']['string'],
             "source" : anime['source'], "type" : anime['type'], "score" : anime['score'], "url" : anime['url'],
-            "eng_title" : anime['title_english'], "jap_title" : anime['title_japanese'], "image url" : anime['image_url'],
-            "studios" : studios, "licensors" : licensors,"opening themes": opening_themes, "ending themes" : ending_themes}
+            "eng_title" : anime['title_english'], "jap_title" : anime['title_japanese'], "image_url" : anime['image_url'],
+            "studios" : studios, "licensors" : licensors,"opening_themes": opening_themes, "ending_themes" : ending_themes}
+
+
+
+def characterSearch(name):
+    
+    response = requests.get(f'https://api.jikan.moe/v3/search/character?q={name}&page=1', timeout=5)
+    id = json.loads(response.text)['results'][0]['mal_id']
+
+    response = requests.get(f'https://api.jikan.moe/v3/character/{id}', timeout=5)
+    character = json.loads(response.text)
+
+    info = character['about']
+
+    anime = ""
+    for show in character['animeography']:
+        anime += show['name'] + '\n'
+
+    manga = ""
+    for book in character['mangaography']:
+        manga += book['name'] + '\n'
+
+    voice_actors = ""
+    for va in character['voice_actors']:
+        voice_actors += va['language'] + ': ' + va['name'] + '\n'
+
+    if len(info) > 970:
+        info = info[0:970]
+        info += "...\n\nMore at MyAnimeList (link in title)"
+
+    if len(anime) > 970:
+        anime = anime[0:970]
+        anime += "...\n\nMore at MyAnimeList (link in title)"
+
+    if len(manga) > 970:
+        manga = manga[0:970]
+        manga += "...\n\nMore at MyAnimeList (link in title)"
+
+    if len(voice_actors) > 970:
+        voice_actors = voice_actors[0:970]
+        voice_actors += "...\n\nMore at MyAnimeList (link in title)"
+
+    return {"url" : character['url'], "image_url" : character['image_url'], "name" : character['name'],
+            "voice_actors" : voice_actors, "anime" : anime, "manga" : manga, "description" : info,
+            "member_favourites" : character["member_favorites"]}
