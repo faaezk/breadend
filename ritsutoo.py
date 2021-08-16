@@ -36,31 +36,45 @@ async def anime(ctx, *, title = "", character = ""):
         await ctx.send("Getting info for " + title)
         anime = malsearch.animeSearch(title)
 
-        embed = discord.Embed(title="{} ({})".format(anime['eng_title'], anime['jap_title']), url=anime['url'], 
-                            description="Source: {}, Type: {}, Score: {}, Episodes: {}".format(anime['source'], anime['type'], anime['score'], anime["ep_count"]))
+        if anime == False:
+            await ctx.send("dumb dumb api failed, try again.")
+        
+        elif anime == None:
+            await ctx.send("Character not found.")
 
-        embed.set_image(url=anime['image_url'])
-        embed.add_field(name="Airing Dates:", value=anime["Airing_Dates"])
-        embed.add_field(name="Genres:", value=anime["genres"])
-        embed.add_field(name="Sequel", value=anime["sequel"])
-        embed.add_field(name="Opening Theme", value=anime["opening_themes"], inline=False)
-        embed.add_field(name="Ending Theme", value=anime["ending_themes"], inline=False)
-        embed.set_footer(text="Studios: {}, Licensors: {}".format(anime["studios"], anime["licensors"]))
-        await ctx.send(embed=embed)
+        else:
+            embed = discord.Embed(title="{} ({})".format(anime['eng_title'], anime['jap_title']), url=anime['url'], 
+            description="Source: {}, Type: {}, Score: {}, Episodes: {}".format(anime['source'], anime['type'], anime['score'], anime["ep_count"]))
+
+            embed.set_image(url=anime['image_url'])
+            embed.add_field(name="Airing Dates:", value=anime["Airing_Dates"])
+            embed.add_field(name="Genres:", value=anime["genres"])
+            embed.add_field(name="Sequel", value=anime["sequel"])
+            embed.add_field(name="Opening Theme", value=anime["opening_themes"], inline=False)
+            embed.add_field(name="Ending Theme", value=anime["ending_themes"], inline=False)
+            embed.set_footer(text="Studios: {}, Licensors: {}".format(anime["studios"], anime["licensors"]))
+            await ctx.send(embed=embed)
 
     elif character != "":
         await ctx.send("Getting info for " + character)
         character = malsearch.characterSearch(character)
 
-        embed = discord.Embed(title=character['name'], url=character['url'],
-                                description="Member favourites: " + str(character['member_favourites']))
-
-        embed.set_image(url=character['image_url'])
-        embed.add_field(name="Anime:", value=character["anime"])
-        embed.add_field(name="Manga:", value=character["manga"])
-        embed.add_field(name="Voice Actors:", value=character["voice_actors"])
-        embed.add_field(name="Description", value=character["description"], inline=False)
+        if character == False:
+            await ctx.send("dumb dumb api failed, try again.")
         
-        await ctx.send(embed=embed)
+        elif character == None:
+            await ctx.send("Character not found.")
+
+        else:
+            embed = discord.Embed(title=character['name'], url=character['url'],
+                                    description="Member favourites: " + str(character['member_favourites']))
+
+            embed.set_image(url=character['image_url'])
+            embed.add_field(name="Description", value=character["description"], inline=False)
+            embed.add_field(name="Anime:", value=character["anime"], inline=False)
+            embed.add_field(name="Manga:", value=character["manga"], inline=False)
+            embed.add_field(name="Voice Actors:", value=character["voice_actors"], inline=False)
+            
+            await ctx.send(embed=embed)
 
 client.run(token)
