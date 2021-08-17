@@ -3,9 +3,7 @@ from discord.ext import commands
 import configparser
 from discord_slash import SlashCommand
 from discord_slash.utils.manage_commands import create_option, create_choice
-from discord_slash.utils import manage_components
-from discord_slash.model import ButtonStyle
-import Match
+import matchClass
 
 def get_config():
     c = configparser.ConfigParser()
@@ -30,44 +28,41 @@ async def on_ready():
 @slash.slash(description="Information on last 5 games",
              guild_ids=guild_ids,
              options = [create_option(name="username", description="Enter Username (username#tag)", option_type=3, required=True),
-             create_option(name="Game", description="Select game to get info on", option_type=3, required=True),
-             create_option(name="Type", description="Select type of information", option_type=3, required=True,
-              choices=[
-                  create_choice(name="Overview",value="Overview"),
-                  create_choice(name="Round-by-round",value="rounds")])])
-async def games(ctx, *, game = "", Type = ""):
+             create_option(name="game", description="Select game to get info on", option_type=3, required=True, 
+                choices=[create_choice(name="1",value="1"), create_choice(name="2",value="2"),
+                         create_choice(name="3",value="3"),create_choice(name="4",value="4"), create_choice(name="5",value="5")]),
+
+             create_option(name="type", description="Select type of information", option_type=3, required=True,
+                choices=[create_choice(name="Overview",value="Overview"), create_choice(name="Round-by-round",value="rounds")])])
+async def games(ctx, username, game, type):
+
+    if len(username.split('#')) != 2:
+        await ctx.send("invalid player name")
     
+    else:
+        ign, tag = username.split('#')
+        data = matchClass.get_data(ign.lower(), tag.lower(), game)
 
-    if game == "":
+        if data == "invalid game index":
+            await ctx.send("invalid game index")
 
-        data = Match.get_data('fakinator', '4269')
-        game = Game(data['metadata']['map'], data['metadata']['mode'])
+        elif data == False:
+            await ctx.send("Player not found")
 
-        game.addPlayers(data['players']['red'], 'red')
-        game.addPlayers(data['players']['blue'], 'blue')
+        else:
+            match = matchClass.Match(data['metadata']['map'], data['metadata']['mode'])
 
-        for round in data['rounds']:
-            tempRound = Round(round['winning_team'], round['end_type'], 
-                        round['bomb_planted'], round['bomb_defused'])
+            match.addPlayers(data['players']['red'], 'red')
+            match.addPlayers(data['players']['blue'], 'blue')
 
-            tempRound.addEvents(round['player_stats'])
-            game.addRound(tempRound)
+            for round in data['rounds']:
+                tempRound = matchClass.Round(round['winning_team'], round['end_type'], 
+                            round['bomb_planted'], round['bomb_defused'])
 
-
-@client.command()
-async def cbutton(ctx):
-    buttons = [
-            manage_components.create_button(
-                style=ButtonStyle.green,
-                label="A Green Button", custom_id="hello"
-            ),
-          ]
-    action_row = manage_components.create_actionrow(*buttons)
-    await ctx.send("My Message", components=[action_row])
-
-@slash.component_callback()
-async def hello(ctx):
-    await ctx.send(content="You pressed a button!")
+                tempRound.addEvents(round['player_stats'])
+                match.addRound(tempRound)
+            
+            await ctx.send("yo it works!")
 
 
 client.run(token)
