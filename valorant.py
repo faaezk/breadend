@@ -206,7 +206,7 @@ def stats(ign, tag):
     
     return final
 
-
+#Don't remove as this is how the leaderboard is being refreshed
 if __name__ == "__main__":
     leaderboard = elo_leaderboard()
 

@@ -113,8 +113,11 @@ class Game():
     def addPlayer(self, player:Player):
         self.players.append(player)
 
-def get_data(ign, tag):
+def get_data(ign, tag, game):
     
+    if game not in ['1','2','3','4','5']:
+        return "invalid game index"
+
     url = "https://api.henrikdev.xyz/valorant/v3/matches/ap/{}/{}".format(ign, tag)
     r = requests.get(url)
 
@@ -126,7 +129,7 @@ def get_data(ign, tag):
     if john['status'] == '404' or john['status'] == '500':
         return False
     
-    return john['data'][0]
+    return john['data'][int(game) - 1]
 
 if __name__ == '__main__':
 
