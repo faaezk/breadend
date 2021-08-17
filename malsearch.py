@@ -1,14 +1,14 @@
-from discord.channel import VocalGuildChannel
+import matplotlib.pyplot as plt
 import requests
 import json
 
 def animeSearch(title):
 
     try:
-        response = requests.get(f'https://api.jikan.moe/v3/search/anime?q={title}&page=1&limit=1', timeout=3)
+        response = requests.get(f'https://api.jikan.moe/v3/search/anime?q={title}&page=1', timeout=5)
     except:
         try:
-            response = requests.get(f'https://api.jikan.moe/v3/search/anime?q={title}&page=1&limit=1', timeout=3)
+            response = requests.get(f'https://api.jikan.moe/v3/search/anime?q={title}&page=1', timeout=5)
         except:
             return False
 
@@ -19,10 +19,10 @@ def animeSearch(title):
         return None
     
     try:
-        response = requests.get(f'https://api.jikan.moe/v3/anime/{id}', timeout=4)
+        response = requests.get(f'https://api.jikan.moe/v3/anime/{id}', timeout=5)
     except:
         try:
-            response = requests.get(f'https://api.jikan.moe/v3/anime/{id}', timeout=4)
+            response = requests.get(f'https://api.jikan.moe/v3/anime/{id}', timeout=5)
         except:
             return False
 
@@ -99,10 +99,10 @@ def animeSearch(title):
 def characterSearch(name):
     
     try:
-        response = requests.get(f'https://api.jikan.moe/v3/search/character?q={name}&page=1&limit=1', timeout=3)
+        response = requests.get(f'https://api.jikan.moe/v3/search/character?q={name}&page=1', timeout=5)
     except:
         try:
-            response = requests.get(f'https://api.jikan.moe/v3/search/character?q={name}&page=1&limit=1', timeout=3)
+            response = requests.get(f'https://api.jikan.moe/v3/search/character?q={name}&page=1', timeout=5)
         except:
             return False
     
@@ -175,15 +175,17 @@ def characterSearch(name):
             "member_favourites" : character["member_favorites"]}
 
 
-import matplotlib.pyplot as plt
+def addlabels(x,y):
+    for i in range(len(x)):
+        plt.text(i, y[i], y[i], ha = 'center')
 
 def animeStats(title):
     
     try:
-        response = requests.get(f'https://api.jikan.moe/v3/search/anime?q={title}&page=1&limit=1', timeout=3)
+        response = requests.get(f'https://api.jikan.moe/v3/search/anime?q={title}&page=1', timeout=5)
     except:
         try:
-            response = requests.get(f'https://api.jikan.moe/v3/search/anime?q={title}&page=1&limit=1', timeout=3)
+            response = requests.get(f'https://api.jikan.moe/v3/search/anime?q={title}&page=1', timeout=5)
         except:
             return False
 
@@ -193,6 +195,9 @@ def animeStats(title):
     else:
         return None
     
+    name = id['title']
+    url = id['url']
+
     try:
         response = requests.get(f'https://api.jikan.moe/v3/anime/{id}/stats', timeout=4)
     except:
@@ -205,21 +210,33 @@ def animeStats(title):
 
     x = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
     y = []
+    y.append(anime['scores']['1']['votes'])
+    y.append(anime['scores']['2']['votes'])
+    y.append(anime['scores']['3']['votes'])
+    y.append(anime['scores']['4']['votes'])
+    y.append(anime['scores']['5']['votes'])
+    y.append(anime['scores']['6']['votes'])
+    y.append(anime['scores']['7']['votes'])
+    y.append(anime['scores']['8']['votes'])
+    y.append(anime['scores']['9']['votes'])
+    y.append(anime['scores']['10']['votes'])
 
-    for score in anime['scores']:
-        y.append(score['votes'])
-
-    fig = plt.figure()
-    ax = fig.add_axes([0,0,1,1])
-    x = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
-    ax.bar(x, y)
-    plt.plot(x, y)
-    plt.xlabel('Games played')
-    plt.ylabel('MMR')
-    plt.title(title + '\'s votes')
-
-    plt.savefig('/home/ubuntu/discord_bot/bargraph.png', bbox_inches="tight")
+    plt.bar(x, y, color = (0.5,0.1,0.5,0.6))
+    
+    plt.title('Vote distribution')
+    plt.xlabel('Scores')
+    plt.ylabel('Votes')
+    
+    # Create names on the x axis
+    plt.xticks(x)
+    plt.yticks()
+    addlabels(x, y)
+    plt.savefig('/home/ubuntu/discord_bot/bargraph.png', bbox_inches='tight')
     plt.clf()
+
+    return {"watching":anime["watching"],"completed":anime["completed"],"on_hold":anime["on_hold"],
+        "dropped":anime["dropped"],"plan_to_watch":anime["plan_to_watch"],"total":anime["total"],
+        "title" : name, "url" : url}
 
 if __name__ == '__main__':
     animeStats('erased')

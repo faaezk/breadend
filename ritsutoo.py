@@ -29,8 +29,9 @@ async def pong(ctx):
 @slash.slash(description="search MAL database",
              guild_ids=guild_ids,
              options = [create_option(name="title", description="Enter an anime to search for", option_type=3, required=False),
-             create_option(name="character", description="Enter an character to search for", option_type=3, required=False)])
-async def anime(ctx, *, title = "", character = ""):
+             create_option(name="character", description="Enter an character to search for", option_type=3, required=False),
+             create_option(name="stats", description="Enter an anime to get stats for", option_type=3, required=False)])
+async def anime(ctx, *, title = "", character = "", stats = ""):
     
     if title != "":
         await ctx.send("Getting info for " + title)
@@ -74,6 +75,28 @@ async def anime(ctx, *, title = "", character = ""):
             embed.add_field(name="Anime:", value=character["anime"], inline=False)
             embed.add_field(name="Manga:", value=character["manga"], inline=False)
             embed.add_field(name="Voice Actors:", value=character["voice_actors"], inline=False)
+            
+            await ctx.send(embed=embed)
+
+    elif stats != "":
+        await ctx.send("Getting info for " + stats)
+        anime = malsearch.animeStats(stats)
+
+        if anime == False:
+            await ctx.send("dumb dumb api failed, try again.")
+        
+        elif anime == None:
+            await ctx.send("Character not found.")
+
+        else:
+            embed = discord.Embed(title=anime['name'], url=anime['url'])
+
+            embed.set_image(file='bargraph.png')
+            embed.add_field(name="Other stats:", 
+            value="Completed: {}\nWatching: {}\nPlan to watch: {}\nDropped: {}\nOn Hold: {}\nTotal: {}".format(
+                anime["completed"], anime["watching"], anime["plan_to_watch"], anime["dropped"],
+                anime["on_hold"], anime["total"]),
+            inline=False)
             
             await ctx.send(embed=embed)
 
