@@ -96,7 +96,6 @@ def animeSearch(title):
             "studios" : studios, "licensors" : licensors,"opening_themes": opening_themes, "ending_themes" : ending_themes}
 
 
-
 def characterSearch(name):
     
     try:
@@ -175,3 +174,52 @@ def characterSearch(name):
             "voice_actors" : voice_actors, "anime" : anime, "manga" : manga, "description" : info,
             "member_favourites" : character["member_favorites"]}
 
+
+import matplotlib.pyplot as plt
+
+def animeStats(title):
+    
+    try:
+        response = requests.get(f'https://api.jikan.moe/v3/search/anime?q={title}&page=1&limit=1', timeout=3)
+    except:
+        try:
+            response = requests.get(f'https://api.jikan.moe/v3/search/anime?q={title}&page=1&limit=1', timeout=3)
+        except:
+            return False
+
+    id = json.loads(response.text)
+    if 'results' in id.keys():
+        id = id['results'][0]['mal_id']
+    else:
+        return None
+    
+    try:
+        response = requests.get(f'https://api.jikan.moe/v3/anime/{id}/stats', timeout=4)
+    except:
+        try:
+            response = requests.get(f'https://api.jikan.moe/v3/anime/{id}/stats', timeout=4)
+        except:
+            return False
+
+    anime = json.loads(response.text)
+
+    x = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+    y = []
+
+    for score in anime['scores']:
+        y.append(score['votes'])
+
+    fig = plt.figure()
+    ax = fig.add_axes([0,0,1,1])
+    x = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+    ax.bar(x, y)
+    plt.plot(x, y)
+    plt.xlabel('Games played')
+    plt.ylabel('MMR')
+    plt.title(title + '\'s votes')
+
+    plt.savefig('/home/ubuntu/discord_bot/bargraph.png', bbox_inches="tight")
+    plt.clf()
+
+if __name__ == '__main__':
+    animeStats('erased')
