@@ -89,7 +89,7 @@ class Round():
         self.lastRound = round
 
 
-class Game():
+class Match():
     def __init__(self, map, mode):
         self.map = map
         self.mode = mode
@@ -110,8 +110,11 @@ class Game():
     def addRound(self, round:Round):
         self.rounds.append(round)
 
-    def addPlayer(self, player:Player):
-        self.players.append(player)
+    def addPlayer(self, player:Player, team):
+        if team == 'blue':
+            self.blueTeam.append(player)
+        if team == 'red':
+            self.redTeam.append(player)
 
 def get_data(ign, tag, game):
     
@@ -134,17 +137,17 @@ def get_data(ign, tag, game):
 if __name__ == '__main__':
 
     data = get_data('fakinator', '4269')
-    game = Game(data['metadata']['map'], data['metadata']['mode'])
+    match = Match(data['metadata']['map'], data['metadata']['mode'])
 
-    game.addPlayers(data['players']['red'], 'red')
-    game.addPlayers(data['players']['blue'], 'blue')
+    match.addPlayers(data['players']['red'], 'red')
+    match.addPlayers(data['players']['blue'], 'blue')
 
     for round in data['rounds']:
         tempRound = Round(round['winning_team'], round['end_type'], 
                     round['bomb_planted'], round['bomb_defused'])
 
         tempRound.addEvents(round['player_stats'])
-        game.addRound(tempRound)
+        match.addRound(tempRound)
 
 
 
