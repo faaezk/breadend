@@ -6,6 +6,9 @@ import graphs
 import valorant
 import requests
 import json
+import malsearch
+from discord_slash import SlashCommand
+from discord_slash.utils.manage_commands import create_option
 
 def get_config():
     c = configparser.ConfigParser()
@@ -17,6 +20,8 @@ token = get_config()[0]
 
 help_command = commands.DefaultHelpCommand(no_category = 'Commands')
 client = commands.Bot(command_prefix='$',help_command = help_command)
+slash = SlashCommand(client, sync_commands=True)
+guild_ids = [509314650265878530]
 
 @client.event
 async def on_ready():
@@ -260,90 +265,82 @@ async def gettag(ctx, *, user):
     else:
         await ctx.send(f'{user}#{valorant.get_tag(user)}')
 
-@client.command()
-async def anime(ctx, *, title):
-    await ctx.send("Getting info for " + title)
+@slash.slash(description="search MAL database",
+             guild_ids=guild_ids,
+             options = [create_option(name="title", description="Enter an anime to search for", option_type=3, required=False),
+             create_option(name="character", description="Enter an character to search for", option_type=3, required=False),
+             create_option(name="stats", description="Enter an anime to get stats for", option_type=3, required=False)])
+async def anime(ctx, *, title = "", character = "", stats = ""):
     
-    response = requests.get(f'https://api.jikan.moe/v3/search/anime?q={title}&page=1', timeout=5)
-    id = json.loads(response.text)['results'][0]['mal_id']
+    if title != "":
+        await ctx.send("Getting info for " + title)
+        anime = malsearch.animeSearch(title)
 
-    response = requests.get(f'https://api.jikan.moe/v3/anime/{id}', timeout=5)
-    anime = json.loads(response.text)
+        if anime == False:
+            await ctx.send("dumb dumb api failed, try again.")
+        
+        elif anime == None:
+            await ctx.send("Character not found.")
 
-    if anime['episodes'] == None:
-        ep_count = '?'
-    else:
-        ep_count = str(anime['episodes'])
+        else:
+            embed = discord.Embed(title="{} ({})".format(anime['eng_title'], anime['jap_title']), url=anime['url'], 
+            description="Source: {}, Type: {}, Score: {}, Episodes: {}".format(anime['source'], anime['type'], anime['score'], anime["ep_count"]))
 
-    opening_themes = ""
-    ending_themes = ""
+            embed.set_image(url=anime['image_url'])
+            embed.add_field(name="Airing Dates:", value=anime["Airing_Dates"])
+            embed.add_field(name="Genres:", value=anime["genres"])
+            embed.add_field(name="Sequel", value=anime["sequel"])
+            embed.add_field(name="Opening Theme", value=anime["opening_themes"], inline=False)
+            embed.add_field(name="Ending Theme", value=anime["ending_themes"], inline=False)
+            embed.set_footer(text="Studios: {}, Licensors: {}".format(anime["studios"], anime["licensors"]))
+            await ctx.send(embed=embed)
 
-    for theme in anime['opening_themes']:
-        if len(opening_themes) > 989:
-            opening_themes = opening_themes[:-(len(last) + 1)]
-            opening_themes += "more at MyAnimeList (link in title)"
-            break
-        opening_themes += theme + '\n'
-        last = theme
-    
-    for theme in anime['ending_themes']:
-        if len(ending_themes) > 989:
-            ending_themes = ending_themes[:-(len(last) + 1)]
-            ending_themes += "more at MyAnimeList (link in title)"
-            break
-        ending_themes += theme + '\n'
-        last = theme
+    elif character != "":
+        await ctx.send("Getting info for " + character)
+        character = malsearch.characterSearch(character)
 
-    sequel = ""
-    if 'Sequel' in anime['related'].keys():
-        for i in range(0, len(anime['related']['Sequel'])):
-            if len(anime['related']['Sequel']) == 1:
-                sequel = anime['related']['Sequel'][i]['name'] + '\n'
-            else:
-                sequel += str(i + 1) + '. ' + anime['related']['Sequel'][i]['name'] + '\n'
+        if character == False:
+            await ctx.send("dumb dumb api failed, try again.")
+        
+        elif character == None:
+            await ctx.send("Character not found.")
 
-        sequel = sequel[:-1]
+        else:
+            embed = discord.Embed(title=character['name'], url=character['url'],
+                                    description="Member favourites: " + str(character['member_favourites']))
 
-    genres = ""
-    for genre in anime['genres']:
-        genres += genre['name'] + ', '
-    genres = genres[:-2]
+            embed.set_image(url=character['image_url'])
+            embed.add_field(name="Description", value=character["description"], inline=False)
+            embed.add_field(name="Anime:", value=character["anime"], inline=False)
+            embed.add_field(name="Manga:", value=character["manga"], inline=False)
+            embed.add_field(name="Voice Actors:", value=character["voice_actors"], inline=False)
+            
+            await ctx.send(embed=embed)
 
-    studios = ""
-    for studio in anime['studios']:
-        studios += studio['name'] + ', '
-    studios = studios[:-2]
+    elif stats != "":
+        await ctx.send("Getting stats for " + stats)
+        anime = malsearch.animeStats(stats)
 
-    licensors = ""
-    for licensor in anime['licensors']:
-        licensors += licensor['name'] + ', '
-    licensors = licensors[:-2]
+        if anime == False:
+            await ctx.send("dumb dumb api failed, try again.")
+        
+        elif anime == None:
+            await ctx.send("Character not found.")
 
-    if opening_themes == "":
-        opening_themes = "None"
-    if ending_themes == "":
-        ending_themes = "None"
-    if sequel == "":
-        sequel = "None"
-    if genres == "":
-        genres = "None"
-    if studios == "":
-        studios = "None"
-    if licensors == "":
-        licensors = "None"
+        else:
+            file=discord.File(fp="/home/ubuntu/discord_bot/image.png", filename='image.png')
+            embed = discord.Embed(title=anime['title'], url=anime['url'])
 
+            embed.set_image(url="attachment://image.png")
 
-    embed = discord.Embed(title="{} ({})".format(anime['title_english'], anime['title_japanese']), url=anime['url'], 
-                        description="Source: {}, Type: {}, Score: {}, Episodes: {}".format(anime['source'], anime['type'], anime['score'], ep_count))
-    
-    embed.set_image(url=anime['image_url'])
-    embed.add_field(name="Airing Dates:", value=anime['aired']['string'])
-    embed.add_field(name="Genres:", value=genres)
-    embed.add_field(name="Sequel", value=sequel)
-    embed.add_field(name="Opening Theme", value=opening_themes, inline=False)
-    embed.add_field(name="Ending Theme", value=ending_themes, inline=False)
-    embed.set_footer(text="Studios: {}, Licensors: {}".format(studios, licensors))
-    await ctx.send(embed=embed)
+            embed.add_field(name="Other stats:", 
+            value="Completed: {}\nWatching: {}\nPlan to watch: {}\nDropped: {}\nOn Hold: {}\nTotal: {}".format(
+                anime["completed"], anime["watching"], anime["plan_to_watch"], anime["dropped"],
+                anime["on_hold"], anime["total"]),
+            inline=False)
+            
+            await ctx.send(file=file, embed=embed)
+
 
 @client.event
 async def on_message(message):
