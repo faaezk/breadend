@@ -190,13 +190,15 @@ def animeStats(title):
             return False
 
     id = json.loads(response.text)
+
+    name = id['results'][0]['title']
+    url = id['results'][0]['url']
+
     if 'results' in id.keys():
         id = id['results'][0]['mal_id']
     else:
         return None
-    
-    name = id['title']
-    url = id['url']
+
 
     try:
         response = requests.get(f'https://api.jikan.moe/v3/anime/{id}/stats', timeout=4)
@@ -209,6 +211,7 @@ def animeStats(title):
     anime = json.loads(response.text)
 
     x = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+
     y = []
     y.append(anime['scores']['1']['votes'])
     y.append(anime['scores']['2']['votes'])
@@ -221,9 +224,10 @@ def animeStats(title):
     y.append(anime['scores']['9']['votes'])
     y.append(anime['scores']['10']['votes'])
 
-    plt.bar(x, y, color = (0.5,0.1,0.5,0.6))
+    plt.figure(figsize=(9, 6))
+    plt.bar(x, y)
     
-    plt.title('Vote distribution')
+    plt.title(f'{name} Vote distribution')
     plt.xlabel('Scores')
     plt.ylabel('Votes')
     
@@ -231,7 +235,7 @@ def animeStats(title):
     plt.xticks(x)
     plt.yticks()
     addlabels(x, y)
-    plt.savefig('/home/ubuntu/discord_bot/bargraph.png', bbox_inches='tight')
+    plt.savefig('/home/ubuntu/discord_bot/image.png', bbox_inches='tight')
     plt.clf()
 
     return {"watching":anime["watching"],"completed":anime["completed"],"on_hold":anime["on_hold"],
@@ -239,4 +243,4 @@ def animeStats(title):
         "title" : name, "url" : url}
 
 if __name__ == '__main__':
-    animeStats('erased')
+    animeStats('bunny girl senpai')

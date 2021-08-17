@@ -3,7 +3,7 @@ from discord.ext import commands
 import configparser
 import malsearch
 from discord_slash import SlashCommand
-from discord_slash.utils.manage_commands import create_option, create_choice
+from discord_slash.utils.manage_commands import create_option
 
 def get_config():
     c = configparser.ConfigParser()
@@ -20,10 +20,6 @@ guild_ids = [731539222141468673]
 @client.event
 async def on_ready():
     print("it started working")
-
-@slash.slash(description="pong ping.")
-async def pong(ctx):
-    await ctx.send("ping")
 
 
 @slash.slash(description="search MAL database",
@@ -79,7 +75,7 @@ async def anime(ctx, *, title = "", character = "", stats = ""):
             await ctx.send(embed=embed)
 
     elif stats != "":
-        await ctx.send("Getting info for " + stats)
+        await ctx.send("Getting stats for " + stats)
         anime = malsearch.animeStats(stats)
 
         if anime == False:
@@ -89,15 +85,17 @@ async def anime(ctx, *, title = "", character = "", stats = ""):
             await ctx.send("Character not found.")
 
         else:
-            embed = discord.Embed(title=anime['name'], url=anime['url'])
+            file=discord.File(fp="/home/ubuntu/discord_bot/image.png", filename='image.png')
+            embed = discord.Embed(title=anime['title'], url=anime['url'])
 
-            embed.set_image(file='bargraph.png')
+            embed.set_image(url="attachment://image.png")
+
             embed.add_field(name="Other stats:", 
             value="Completed: {}\nWatching: {}\nPlan to watch: {}\nDropped: {}\nOn Hold: {}\nTotal: {}".format(
                 anime["completed"], anime["watching"], anime["plan_to_watch"], anime["dropped"],
                 anime["on_hold"], anime["total"]),
             inline=False)
             
-            await ctx.send(embed=embed)
+            await ctx.send(file=file, embed=embed)
 
 client.run(token)
