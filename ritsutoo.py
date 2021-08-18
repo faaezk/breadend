@@ -5,6 +5,7 @@ from discord_slash import SlashCommand
 from discord_slash.utils.manage_commands import create_option, create_choice
 import matchClass
 from discord_components import *
+import random
 
 def get_config():
     c = configparser.ConfigParser()
@@ -25,14 +26,26 @@ async def on_ready():
     print("it started working")
 
 @client.command()
-async def button(ctx):
-    await ctx.send(type=InteractionType.ChannelMessageWithSource, content="Message Here", 
-    components=[Button(style=ButtonStyle.URL, label="Example Invite Button", url="https://google.com"), 
-    Button(style=ButtonStyle.blue, label="Default Button", custom_id="xbutton")])
+async def open(ctx):
+    blue = ["Possibly", "No"]
+    blueresult = random.choice(blue)
+    em = discord.Embed(title= f"Congratulations!",description =f"The result is **{blueresult}**!",color = discord.Color.blue())
 
-@button.command()
-async def xbutton(ctx):
-    await ctx.send("it worked")
+    yes = Button(style=ButtonStyle.green, label="Yes")
+    no = Button(style=ButtonStyle.red, label="No")
+    m = await ctx.send(embed = em,components=[[no,yes]])
+
+    def check(res):
+        return ctx.author == res.user and res.channel == ctx.channel and m == res.message
+
+    res = await client.wait_for("button_click", check=check)
+    player = res.component.label
+
+    if player=="Yes":
+        await m.edit(embed=em,components=[[no,yes]])
+    elif player=="No":
+        await m.edit(embed=em,components=[])
+
 
 @client.command()
 async def lower(ctx, *, word):
