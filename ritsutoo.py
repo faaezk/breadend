@@ -70,11 +70,24 @@ async def games(ctx, username, game, type):
         
         if type == 'overview':
             embed=discord.Embed(title = "Match Overview", 
-            description=f'Time: {match.time}, Type: {match.mode}, Map: {match.map}', color=0x00f900)
+            description=f'Time: {match.time}', color=0x00f900)
             embed.add_field(name = "Statistics:", 
-            value = f'Winner: {match.winner}\nScore: {match.getScore()}', inline = False)
+            value = f'Type: {match.mode}\nMap: {match.map}\nWinner: {match.winner}\nScore: {match.getScore()}', inline = False)
 
-            embed.set_footer(text = "unlucky")
+            stats = match.getRedTeamStats()
+            msg = ""
+            for player in stats:
+                msg += f'{player[0]} / {player[1]}: '.ljust(5) + f'ACS: {player[2]}   KDA: {player[3]}'.rjust(5) + ' \n'
+            embed.add_field(name = "Red Team:", 
+            value = msg, inline = False)
+
+            stats = match.getBlueTeamStats()
+            msg = ""
+            for player in stats:
+                msg += f'{player[0]} / {player[1]},   ACS: {player[2]}   KDA: {player[3]} \n'
+            embed.add_field(name = "Blue Team:", 
+            value = msg, inline = False)
+
             await the_message.edit(embed = embed)
 
 

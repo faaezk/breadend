@@ -26,18 +26,25 @@ weapons = {
 }
 
 class Player():
-    def __init__(self, ign, tag, team, character, rank, stats, damage_done, damage_taken):
+    def __init__(self, ign, tag, team, character, rank, stats, ability_use, damage_done, damage_taken):
         self.ign = ign.lower()
         self.tag = tag.lower()
         self.team = team.lower()
         self.agent = character
         self.rank = rank
         self.kda = stats
+        self.ability_use = ability_use
         self.damage_done = damage_done
         self.damage_taken = damage_taken
     
     def getName(self):
         return f'{self.ign}#{self.tag}'
+    
+    def getKDA(self) -> str:
+        return "{}/{}/{}".format(self.kda['kills'], self.kda['deaths'], self.kda['assists'])
+    
+    def getScore(self) -> int:
+        return self.kda['score']
 
 
 
@@ -108,7 +115,7 @@ class Match():
         for player in players:
             temp = Player(player['name'], player['tag'], player['team'],
                 player['character'], player['currenttier_patched'], 
-                player['stats'], player['damage_made'], player['damage_received'])
+                player['stats'], player['ability_casts'], player['damage_made'], player['damage_received'])
             if team == 'blue':
                 self.blueTeam.append(temp)
             if team == 'red':
@@ -145,6 +152,27 @@ class Match():
     def getScore(self):
         return f'{self.score[0]} - {self.score[1]}'
 
+    def getRedTeamStats(self):
+        stats = []
+        rounds = self.score[0] + self.score[1]
+        
+        self.redTeam.sort(key=lambda x: x.getScore(), reverse=True)
+        for player in self.redTeam:
+            acs = player.getScore()/rounds
+            stats.append([player.getName(), player.agent, acs, player.getKDA()])
+        
+        return stats
+        
+    def getBlueTeamStats(self):
+        stats = []
+        rounds = self.score[0] + self.score[1]
+        
+        self.blueTeam.sort(key=lambda x: x.getScore(), reverse=True)
+        for player in self.blueTeam:
+            acs = player.getScore()/rounds
+            stats.append([player.getName(), player.agent, acs, player.getKDA()])
+        
+        return stats
 
 def get_data(ign, tag, game):
     
