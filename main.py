@@ -8,7 +8,7 @@ import requests
 import json
 import malsearch
 from discord_slash import SlashCommand
-from discord_slash.utils.manage_commands import create_option
+from discord_slash.utils.manage_commands import create_option, create_choice
 import random
 
 def get_config():
@@ -28,9 +28,37 @@ guild_ids = [509314650265878530]
 async def on_ready():
     print("it started working")
 
-@client.command()
-async def smurfs(ctx):
-    await ctx.send(random.choice(['yes', 'yes', 'yes', 'yes', 'no', 'no', 'no', 'no', 'no', 'no']))
+@slash.slash(description="Choices for Valorant",
+             guild_ids=guild_ids,
+             options = [
+             create_option(name="randomise", description="gives account to play on", option_type=3, required=True, 
+                        choices=[create_choice(name="account",value="account"), create_choice(name="gamemode",value="gamemode"),
+                        create_choice(name="weapon",value="weapon"), create_choice(name="agent",value="agent"),
+                        create_choice(name="map",value="map")])])
+async def choice(ctx, randomise):
+    
+    if randomise == "account":
+        await ctx.send(random.choice(['Smurfs', 'Smurfs', 'Smurfs', 'Smurfs', 'Mains', 'Mains', 'Mains', 'Mains', 'Mains', 'Mains']))
+    
+    if randomise == "gamemode":
+        await ctx.send(random.choice(['Unrated', 'Competitive']))
+
+    if randomise == "weapon":
+        sidearm = ["Classic", "Shorty", "Frenzy", "Ghost", "Sheriff"]
+        SMG = ["Stinger", "Spectre"]
+        Shotgun = ["Bucky"]
+        Rifle = ["Bulldog", "Guardian", "Phantom", "Vandal"]
+        Sniper = ["Marshal", "Operator"]
+        MG = ["Ares", "Odin"]
+        selected = random.choice([sidearm, SMG, Shotgun, Rifle, Sniper, MG])
+        await ctx.send(random.choice(selected))
+    
+    if randomise == "agent":
+        await ctx.send(random.choice(["Astra", "Breach", "Brimstone", "Cypher", "Jett", "Killjoy", "Kay/O"
+                                     "Omen", "Phoenix", "Raze", "Reyna", "Sage", "Skye", "Sova", "Viper", "Yoru"]))
+
+    if randomise == "map":
+        await ctx.send(random.choice(["Bind", "Haven", "Split", "Ascent", "Icebox", "Breeze"]))
 
 @client.command()
 async def cat(ctx):
