@@ -20,6 +20,8 @@ weapons = {
 "4ade7faa-4cf1-8376-95ef-39884480959b" : "guardian",
 "44d4e95c-4157-0037-81b2-17841bf2e8e3" : "frenzy",
 "f7e1b454-4ad4-1063-ec0a-159e56b58941" : "stinger",
+"Ultimate" : "Ultimate", "Ability1" : "Ability 1",
+"Ability2" : "Ability 2", "Ability3" : "Ability 3", "Ability4" : "Ability 4"
 }
 
 class Player():
@@ -67,7 +69,7 @@ class Round():
             for event in player['kill_events']:
 
                 killer = event['killer_display_name']
-
+                killer_location = None
                 for person in event['player_locations_on_kill']:
                     if person['player_display_name'] == killer:
                         killer_location = person['location']

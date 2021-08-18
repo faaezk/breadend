@@ -25,6 +25,12 @@ async def on_ready():
 
     print("it started working")
 
+@client.command()
+async def lower(ctx, *, word):
+    
+    word = word.lower()
+    await ctx.send(word)
+
 @slash.slash(description="Information on last 5 games",
              guild_ids=guild_ids,
              options = [create_option(name="username", description="Enter Username (username#tag)", option_type=3, required=True),
@@ -33,7 +39,7 @@ async def on_ready():
                          create_choice(name="3",value="3"),create_choice(name="4",value="4"), create_choice(name="5",value="5")]),
 
              create_option(name="type", description="Select type of information", option_type=3, required=True,
-                choices=[create_choice(name="Overview",value="Overview"), create_choice(name="Round-by-round",value="rounds")])])
+                choices=[create_choice(name="overview",value="overview"), create_choice(name="round-by-round",value="rounds")])])
 async def games(ctx, username, game, type):
 
     if len(username.split('#')) != 2:
@@ -62,7 +68,7 @@ async def games(ctx, username, game, type):
                 tempRound.addEvents(round['player_stats'])
                 match.addRound(tempRound)
             
-            await ctx.send("yo it works!")
+            await ctx.send("please work")
 
 
 client.run(token)
