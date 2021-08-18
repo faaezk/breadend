@@ -158,7 +158,8 @@ class Match():
         
         self.redTeam.sort(key=lambda x: x.getScore(), reverse=True)
         for player in self.redTeam:
-            acs = player.getScore()/rounds
+            acs = round(player.getScore()/rounds, 0)
+            acs = str(acs)[:-2]
             stats.append([player.getName(), player.agent, acs, player.getKDA()])
         
         return stats
@@ -169,7 +170,8 @@ class Match():
         
         self.blueTeam.sort(key=lambda x: x.getScore(), reverse=True)
         for player in self.blueTeam:
-            acs = player.getScore()/rounds
+            acs = round(player.getScore()/rounds, 0)
+            acs = str(acs)[:-2]
             stats.append([player.getName(), player.agent, acs, player.getKDA()])
         
         return stats
