@@ -9,6 +9,7 @@ import json
 import malsearch
 from discord_slash import SlashCommand
 from discord_slash.utils.manage_commands import create_option
+import random
 
 def get_config():
     c = configparser.ConfigParser()
@@ -26,6 +27,10 @@ guild_ids = [509314650265878530]
 @client.event
 async def on_ready():
     print("it started working")
+
+@client.command()
+async def smurfs(ctx):
+    await ctx.send(random.choice(['yes', 'yes', 'yes', 'yes', 'no', 'no', 'no', 'no', 'no', 'no']))
 
 @client.command()
 async def cat(ctx):

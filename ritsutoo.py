@@ -4,6 +4,7 @@ import configparser
 from discord_slash import SlashCommand
 from discord_slash.utils.manage_commands import create_option, create_choice
 import matchClass
+from discord_components import *
 
 def get_config():
     c = configparser.ConfigParser()
@@ -20,7 +21,18 @@ guild_ids = [731539222141468673]
 
 @client.event
 async def on_ready():
+    DiscordComponents(client, change_discord_methods=True)
     print("it started working")
+
+@client.command()
+async def button(ctx):
+    await ctx.send(type=InteractionType.ChannelMessageWithSource, content="Message Here", 
+    components=[Button(style=ButtonStyle.URL, label="Example Invite Button", url="https://google.com"), 
+    Button(style=ButtonStyle.blue, label="Default Button", custom_id="xbutton")])
+
+@button.command()
+async def xbutton(ctx):
+    await ctx.send("it worked")
 
 @client.command()
 async def lower(ctx, *, word):
