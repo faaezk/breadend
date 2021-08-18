@@ -1,8 +1,8 @@
 Player Leaderboard
 1. oshawott       1321
 2. jack           1097
-3. vkj             937
-4. lyçhii          923
+3. lyçhii         1000
+4. vkj             937
 5. thesugarman     864
 6. 8888            815
 7. grovyle         805
