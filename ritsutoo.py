@@ -18,11 +18,8 @@ slash = SlashCommand(client, sync_commands=True)
 
 guild_ids = [731539222141468673]
 
-
-
 @client.event
 async def on_ready():
-
     print("it started working")
 
 @client.command()
@@ -46,18 +43,21 @@ async def games(ctx, username, game, type):
         await ctx.send("invalid player name")
     
     else:
+        the_message = await ctx.send("please wait...")
         ign, tag = username.split('#')
         data = matchClass.get_data(ign.lower(), tag.lower(), game)
 
         if data == "invalid game index":
-            await ctx.send("invalid game index")
+            await the_message.edit(content="invalid game index")
 
         elif data == False:
-            await ctx.send("Player not found")
+            await the_message.edit(content="Player not found")
 
         else:
-            match = matchClass.Match(data['metadata']['map'], data['metadata']['mode'])
+            match = matchClass.Match(data['metadata']['map'], data['metadata']['mode'], 
+                                     data['metadata']['matchid'], data['metadata']['game_start'])
 
+            match.setScore(username, data['teams'])
             match.addPlayers(data['players']['red'], 'red')
             match.addPlayers(data['players']['blue'], 'blue')
 
@@ -67,8 +67,15 @@ async def games(ctx, username, game, type):
 
                 tempRound.addEvents(round['player_stats'])
                 match.addRound(tempRound)
-            
-            await ctx.send("please work")
+        
+        if type == 'overview':
+            embed=discord.Embed(title = "Match Overview", 
+            description=f'Time: {match.time}, Type: {match.mode}, Map: {match.map}', color=0x00f900)
+            embed.add_field(name = "Statistics:", 
+            value = f'Winner: {match.winner}\nScore: {match.getScore()}', inline = False)
+
+            embed.set_footer(text = "unlucky")
+            await the_message.edit(embed = embed)
 
 
 client.run(token)

@@ -1,5 +1,6 @@
 import requests
 import json
+import datetime
 
 weapons = {
 "2f59173c-4bed-b6c3-2191-dea9b58be9c7" : "knife",
@@ -26,9 +27,9 @@ weapons = {
 
 class Player():
     def __init__(self, ign, tag, team, character, rank, stats, damage_done, damage_taken):
-        self.ign = ign
-        self.tag = tag
-        self.team = team
+        self.ign = ign.lower()
+        self.tag = tag.lower()
+        self.team = team.lower()
         self.agent = character
         self.rank = rank
         self.kda = stats
@@ -92,13 +93,17 @@ class Round():
 
 
 class Match():
-    def __init__(self, map, mode):
+    def __init__(self, map, mode, matchid, time):
         self.map = map
         self.mode = mode
+        self.matchid = matchid
+        self.time = datetime.datetime.fromtimestamp(time/1000.0 + 36000).strftime('%H:%M %p %d/%m/%y')
         self.redTeam = []
         self.blueTeam = []
         self.rounds = []
-    
+        self.score = []
+        self.winner = ""
+
     def addPlayers(self, players:list, team):
         for player in players:
             temp = Player(player['name'], player['tag'], player['team'],
@@ -117,6 +122,29 @@ class Match():
             self.blueTeam.append(player)
         if team == 'red':
             self.redTeam.append(player)
+
+    def setScore(self, name:str, teams:dict):
+        team = ""
+        for player in self.redTeam:
+            if player.getName() == name.lower():
+                team = player.team()
+                break
+        if team == "":
+            team = "blue"
+        
+        self.score = [teams[team]['rounds_won'], teams[team]['rounds_lost']]
+        
+        if teams[team]['has_won'] == True:
+            self.winner = team
+        else:
+            if team == 'blue':
+                self.winner = 'red'
+            else:
+                self.winner = 'blue'
+
+    def getScore(self):
+        return f'{self.score[0]} - {self.score[1]}'
+
 
 def get_data(ign, tag, game):
     
@@ -138,19 +166,17 @@ def get_data(ign, tag, game):
 
 if __name__ == '__main__':
 
-    data = get_data('fakinator', '4269')
-    match = Match(data['metadata']['map'], data['metadata']['mode'])
+    data = get_data('quackinator', '2197', '1')
+    if data != False:
+        match = Match(data['metadata']['map'], data['metadata']['mode'], 
+                    data['metadata']['matchid'], data['metadata']['game_start'])
 
-    match.addPlayers(data['players']['red'], 'red')
-    match.addPlayers(data['players']['blue'], 'blue')
+        match.addPlayers(data['players']['red'], 'red')
+        match.addPlayers(data['players']['blue'], 'blue')
 
-    for round in data['rounds']:
-        tempRound = Round(round['winning_team'], round['end_type'], 
-                    round['bomb_planted'], round['bomb_defused'])
+        for round in data['rounds']:
+            tempRound = Round(round['winning_team'], round['end_type'], 
+                        round['bomb_planted'], round['bomb_defused'])
 
-        tempRound.addEvents(round['player_stats'])
-        match.addRound(tempRound)
-
-
-
-
+            tempRound.addEvents(round['player_stats'])
+            match.addRound(tempRound)

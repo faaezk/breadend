@@ -8,8 +8,8 @@ Player Leaderboard
 7. grovyle         805
 8. dilka30003      785
 9. faqinator       770
-10.imabandwagon    754
-11.azatory         751
+10.azatory         755
+11.imabandwagon    754
 12.fade            746
 13.giroud          737
 14.fakinator       736
