@@ -62,6 +62,11 @@ def animeSearch(title):
 
         sequel = sequel[:-1]
 
+    info = anime['synopsis']
+    if len(info) > 980:
+        info = info[0:980]
+        info += "...\nMore at MyAnimeList (link in title)"
+
     genres = ""
     for genre in anime['genres']:
         genres += genre['name'] + ', '
@@ -91,7 +96,7 @@ def animeSearch(title):
         licensors = "None"
     
     return {"ep_count" : ep_count, "sequel" : sequel, "genres" : genres, "Airing_Dates" : anime['aired']['string'],
-            "source" : anime['source'], "type" : anime['type'], "score" : anime['score'], "url" : anime['url'],
+            "source" : anime['source'], "type" : anime['type'], "score" : anime['score'], "url" : anime['url'], "synopsis" : info,
             "eng_title" : anime['title_english'], "jap_title" : anime['title_japanese'], "image_url" : anime['image_url'],
             "studios" : studios, "licensors" : licensors,"opening_themes": opening_themes, "ending_themes" : ending_themes}
 
@@ -242,6 +247,7 @@ def animeStats(title):
         "dropped":anime["dropped"],"plan_to_watch":anime["plan_to_watch"],"total":anime["total"],
         "title" : name, "url" : url}
 
+
 def mangaSearch(title):
 
     try:
@@ -278,7 +284,6 @@ def mangaSearch(title):
     else:
         chap_count = str(manga['chapters'])
 
-
     genres = ""
     for genre in manga['genres']:
         genres += genre['name'] + ', '
@@ -290,9 +295,14 @@ def mangaSearch(title):
     studios = authors[:-1]
 
     serializations = ""
-    for serialization in manga['licensors']:
+    for serialization in manga['serializations']:
         serializations += serialization['name'] + ', '
     licensors = serializations[:-2]
+
+    info = manga['synopsis']
+    if len(info) > 980:
+        info = info[0:980]
+        info += "...\nMore at MyAnimeList (link in title)"
 
     if genres == "":
         genres = "None"
@@ -302,10 +312,73 @@ def mangaSearch(title):
         licensors = "None"
     
     return {"vol_count" : vol_count, "chap_count" : chap_count, "genres" : genres, "publishing" : manga['published']['string'],
-            "score" : manga['source'], "type" : manga['type'], "rank" : manga['rank'], "url" : manga['url'],
+            "score" : manga['score'], "type" : manga['type'], "rank" : manga['rank'], "url" : manga['url'],
             "eng_title" : manga['title_english'], "jap_title" : manga['title_japanese'], "image_url" : manga['image_url'],
-            "authors" : authors, "serialisations" : serializations}
+            "authors" : authors, "serialisations" : serializations, "synopsis" : info}
 
+
+def mangaStats(title):
+    
+    try:
+        response = requests.get(f'https://api.jikan.moe/v3/search/manga?q={title}&page=1', timeout=5)
+    except:
+        try:
+            response = requests.get(f'https://api.jikan.moe/v3/search/manga?q={title}&page=1', timeout=5)
+        except:
+            return False
+
+    id = json.loads(response.text)
+
+    name = id['results'][0]['title']
+    url = id['results'][0]['url']
+
+    if 'results' in id.keys():
+        id = id['results'][0]['mal_id']
+    else:
+        return None
+
+
+    try:
+        response = requests.get(f'https://api.jikan.moe/v3/manga/{id}/stats', timeout=4)
+    except:
+        try:
+            response = requests.get(f'https://api.jikan.moe/v3/manga/{id}/stats', timeout=4)
+        except:
+            return False
+
+    manga = json.loads(response.text)
+
+    x = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+
+    y = []
+    y.append(manga['scores']['1']['votes'])
+    y.append(manga['scores']['2']['votes'])
+    y.append(manga['scores']['3']['votes'])
+    y.append(manga['scores']['4']['votes'])
+    y.append(manga['scores']['5']['votes'])
+    y.append(manga['scores']['6']['votes'])
+    y.append(manga['scores']['7']['votes'])
+    y.append(manga['scores']['8']['votes'])
+    y.append(manga['scores']['9']['votes'])
+    y.append(manga['scores']['10']['votes'])
+
+    plt.figure(figsize=(9, 6))
+    plt.bar(x, y)
+    
+    plt.title(f'{name} Vote distribution')
+    plt.xlabel('Scores')
+    plt.ylabel('Votes')
+    
+    # Create names on the x axis
+    plt.xticks(x)
+    plt.yticks()
+    addlabels(x, y)
+    plt.savefig('/home/ubuntu/discord_bot/image.png', bbox_inches='tight')
+    plt.clf()
+
+    return {"reading":manga["reading"],"completed":manga["completed"],"on_hold":manga["on_hold"],
+        "dropped":manga["dropped"],"plan_to_read":manga["plan_to_read"],"total":manga["total"],
+        "title" : name, "url" : url}
 
 if __name__ == '__main__':
-    animeStats('bunny girl senpai')
+    animeSearch('bunny girl senpai')
