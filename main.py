@@ -308,10 +308,10 @@ async def gettag(ctx, *, user):
     else:
         await ctx.send(f'{user}#{valorant.get_tag(user)}')
 
-@slash.slash(description="search MAL database",
+@slash.slash(description="search MAL anime database",
              guild_ids=guild_ids,
              options = [create_option(name="title", description="Enter an anime to search for", option_type=3, required=False),
-             create_option(name="character", description="Enter an character to search for", option_type=3, required=False),
+             create_option(name="character", description="Enter a character to search for", option_type=3, required=False),
              create_option(name="stats", description="Enter an anime to get stats for", option_type=3, required=False)])
 async def anime(ctx, *, title = "", character = "", stats = ""):
     
@@ -323,7 +323,7 @@ async def anime(ctx, *, title = "", character = "", stats = ""):
             await ctx.send("dumb dumb api failed, try again.")
         
         elif anime == None:
-            await ctx.send("Character not found.")
+            await ctx.send("Anime not found.")
 
         else:
             embed = discord.Embed(title="{} ({})".format(anime['eng_title'], anime['jap_title']), url=anime['url'], 

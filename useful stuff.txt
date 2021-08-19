@@ -103,3 +103,51 @@ async def buttoner(ctx):
     await ctx.send(jg)
 
 @button.click()
+
+{"request_hash":"request:manga:f505af9ef06d41a874365a355f4fe9932bfcfcf5",
+"request_cached":true,"request_cache_expiry":48262,
+"mal_id":642,
+"url":"https:\/\/myanimelist.net\/manga\/642\/Vinland_Saga",
+"title":"Vinland Saga",
+"title_english":"Vinland Saga",
+"title_synonyms":[],
+"title_japanese":"\u30f4\u30a3\u30f3\u30e9\u30f3\u30c9\u30fb\u30b5\u30ac",
+"status":"Publishing",
+"image_url":"https:\/\/cdn.myanimelist.net\/images\/manga\/2\/188925.jpg",
+"type":"Manga",
+"volumes":null,
+"chapters":null,
+"publishing":true,
+"published":
+{"from":"2005-04-13T00:00:00+00:00","to":null,"prop":{"from":{"day":13,"month":4,"year":2005},"to":{"day":null,"month":null,"year":null}},"string":"Apr  13, 2005 to ?"},
+"rank":11,
+"score":8.96,
+"scored_by":73582,
+"popularity":23,
+"members":184017,
+"favorites":19187,
+"synopsis":"Thorfinn, son of one of the Vikings' greatest warriors, is among the finest fighters in the merry band of mercenaries run by the cunning Askeladd, 
+an impressive feat for a person his age. However, Thorfinn is not part of the group for the plunder it entails\u2014instead, for having caused his family 
+great tragedy, the boy has vowed to kill Askeladd in a fair duel. Not yet skilled enough to defeat him, but unable to abandon his vengeance, Thorfinn spends 
+his boyhood with the mercenary crew, honing his skills on the battlefield among the war-loving Danes, where killing is just another pleasure of life. 
+One day, when Askeladd receives word that Danish prince Canute has been taken hostage, he hatches an ambitious plot\u2014one that will decide the next 
+King of England and drastically alter the lives of Thorfinn, Canute, and himself. Set in 11th century Europe, Vinland Saga tells a bloody epic in an era 
+where violence, madness, and injustice are inescapable, providing a paradise for the battle-crazed and utter hell for the rest who live in it. 
+[Written by MAL Rewrite]",
+"background":"Vinland Saga won the 13th Japan Media Arts Award Grand Prize in the Manga division and the 36th Kodansha Manga Award for Best General Manga 
+(which mangaka Makoto Yukimura accepted in full viking gear). An animated crossover between Vinland Saga and Ponkotsu Quest titled Ponkotsuland Saga was 
+released on October 24, 2015.The series has been published in English by Kodansha Comics USA in 2-in-1 hardcover omnibuses since October 14, 2013. 
+The release includes Makoto Yukimura's Sayonara ga Chikai no de (For Our Farewell Is Near) spread across the first five volumes. 
+It is also published in Brazilian Portuguese by Panini Comics since February 2014; in Spanish by Planeta C\u00f3mic since October 21, 2014; 
+and in Polish by Hanami since January 2017.",
+"related":{"Spin-off":
+[{"mal_id":22527,"type":"manga","name":"Ganso Ylva-chan","url":"https:\/\/myanimelist.net\/manga\/22527\/Ganso_Ylva-chan"}],
+"Other":[{"mal_id":131084,"type":"manga","name":"Assassin's Creed Valhalla x Vinland Saga","url":"https:\/\/myanimelist.net\/manga\/131084\/Assassins_Creed_Valhalla_x_Vinland_Saga"}],
+
+"Adaptation":[{"mal_id":49387,"type":"anime","name":"Vinland Saga Season 2","url":"https:\/\/myanimelist.net\/anime\/49387\/Vinland_Saga_Season_2"},{"mal_id":37521,"type":"anime","name":"Vinland Saga","url":"https:\/\/myanimelist.net\/anime\/37521\/Vinland_Saga"}]},
+
+"genres":[{"mal_id":1,"type":"manga","name":"Action","url":"https:\/\/myanimelist.net\/manga\/genre\/1\/Action"},{"mal_id":2,"type":"manga","name":"Adventure","url":"https:\/\/myanimelist.net\/manga\/genre\/2\/Adventure"},{"mal_id":8,"type":"manga","name":"Drama","url":"https:\/\/myanimelist.net\/manga\/genre\/8\/Drama"},{"mal_id":13,"type":"manga","name":"Historical","url":"https:\/\/myanimelist.net\/manga\/genre\/13\/Historical"},{"mal_id":41,"type":"manga","name":"Seinen","url":"https:\/\/myanimelist.net\/manga\/genre\/41\/Seinen"}],
+
+"authors":[{"mal_id":2034,"type":"people","name":"Yukimura, Makoto","url":"https:\/\/myanimelist.net\/people\/2034\/Makoto_Yukimura"}],
+
+"serializations":[{"mal_id":4,"type":"manga","name":"Afternoon","url":"https:\/\/myanimelist.net\/manga\/magazine\/4\/Afternoon"}]}
