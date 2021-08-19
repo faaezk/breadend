@@ -242,5 +242,70 @@ def animeStats(title):
         "dropped":anime["dropped"],"plan_to_watch":anime["plan_to_watch"],"total":anime["total"],
         "title" : name, "url" : url}
 
+def mangaSearch(title):
+
+    try:
+        response = requests.get(f'https://api.jikan.moe/v3/search/manga?q={title}&page=1', timeout=5)
+    except:
+        try:
+            response = requests.get(f'https://api.jikan.moe/v3/search/manga?q={title}&page=1', timeout=5)
+        except:
+            return False
+
+    id = json.loads(response.text)
+    if 'results' in id.keys():
+        id = id['results'][0]['mal_id']
+    else:
+        return None
+    
+    try:
+        response = requests.get(f'https://api.jikan.moe/v3/manga/{id}', timeout=5)
+    except:
+        try:
+            response = requests.get(f'https://api.jikan.moe/v3/manga/{id}', timeout=5)
+        except:
+            return False
+
+    manga = json.loads(response.text)
+
+    if manga['volumes'] == None:
+        vol_count = '?'
+    else:
+        vol_count = str(manga['volumes'])
+    
+    if manga['chapters'] == None:
+        chap_count = '?'
+    else:
+        chap_count = str(manga['chapters'])
+
+
+    genres = ""
+    for genre in manga['genres']:
+        genres += genre['name'] + ', '
+    genres = genres[:-2]
+
+    authors = ""
+    for author in manga['authors']:
+        authors += author['name'] + '\n'
+    studios = authors[:-1]
+
+    serializations = ""
+    for serialization in manga['licensors']:
+        serializations += serialization['name'] + ', '
+    licensors = serializations[:-2]
+
+    if genres == "":
+        genres = "None"
+    if studios == "":
+        studios = "None"
+    if licensors == "":
+        licensors = "None"
+    
+    return {"vol_count" : vol_count, "chap_count" : chap_count, "genres" : genres, "publishing" : manga['published']['string'],
+            "score" : manga['source'], "type" : manga['type'], "rank" : manga['rank'], "url" : manga['url'],
+            "eng_title" : manga['title_english'], "jap_title" : manga['title_japanese'], "image_url" : manga['image_url'],
+            "authors" : authors, "serialisations" : serializations}
+
+
 if __name__ == '__main__':
     animeStats('bunny girl senpai')
