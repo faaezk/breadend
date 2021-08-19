@@ -1,6 +1,7 @@
 import requests
 import json
 import datetime
+import random
 
 weapons = {
 "2f59173c-4bed-b6c3-2191-dea9b58be9c7" : "knife",
@@ -49,13 +50,16 @@ class Player():
 
 
 class Event():
-    def __init__(self, time, killer, deather, weapon_id, killer_location, deather_location):
+    def __init__(self, time, killer, deather, weapon_id, killer_location, deather_location, identifier):
         self.time = time
         self.killer = killer
         self.deather = deather
         self.weapon_id = weapon_id
         self.killer_location = killer_location
         self.deather_location = deather_location
+        self.identifier = identifier
+        self.nextEvent = None
+        self.lastEvent = None
 
     def getWeapon(self):
         global weapons
@@ -63,12 +67,13 @@ class Event():
 
 
 class Round():
-    def __init__(self, winner, ending, plant, defuse):
+    def __init__(self, winner, ending, plant, defuse, identifier):
         self.winner = winner
         self.ending = ending
         self.plant = plant
         self.defuse = defuse
         self.events = []
+        self.identifier = identifier
         self.nextRound = None
         self.lastRound = None
 
@@ -85,8 +90,11 @@ class Round():
 
                 temp = Event(event['kill_time_in_round'], killer, 
                             event['victim_display_name'], event['damage_weapon_id'],
-                            killer_location, event['victim_death_location'])
+                            killer_location, event['victim_death_location'], random.randint(0,1000000000))
                 
+                if len(self.events) != 0:
+                    self.events[-1].nextEvent = temp.identifier
+                    temp.lastEvent = self.events[-1].identifier
                 self.events.append(temp)
 
     def addEvent(self, event: Event):       
@@ -110,6 +118,7 @@ class Match():
         self.rounds = []
         self.score = []
         self.winner = ""
+        self.lastestRound = None
 
     def addPlayers(self, players:list, team):
         for player in players:
@@ -123,6 +132,12 @@ class Match():
 
     def addRound(self, round:Round):
         self.rounds.append(round)
+        
+        if self.lastestRound != None:
+            self.lastestRound.nextRound = round.identifier
+            round.lastRound = self.lastestRound.identifier
+
+        self.lastestRound = round
 
     def addPlayer(self, player:Player, team):
         if team == 'blue':
@@ -206,7 +221,13 @@ if __name__ == '__main__':
 
         for round in data['rounds']:
             tempRound = Round(round['winning_team'], round['end_type'], 
-                        round['bomb_planted'], round['bomb_defused'])
+                        round['bomb_planted'], round['bomb_defused'], random.randint(0,1000000000))
 
             tempRound.addEvents(round['player_stats'])
             match.addRound(tempRound)
+
+    print(match.rounds[2].nextRound)
+    print(match.rounds[3].identifier)
+
+    print(match.rounds[2].identifier)
+    print(match.rounds[3].lastRound)

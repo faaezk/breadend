@@ -7,6 +7,8 @@ import matchClass
 from discord_components import *
 import random
 
+m = ""
+
 def get_config():
     c = configparser.ConfigParser()
     c.read('/home/ubuntu/discord_bot/config.ini')
@@ -33,19 +35,20 @@ async def open(ctx):
 
     yes = Button(style=ButtonStyle.green, label="Yes")
     no = Button(style=ButtonStyle.red, label="No")
+
+    global m
     m = await ctx.send(embed = em,components=[[no,yes]])
 
-    def check(res):
-        return ctx.author == res.user and res.channel == ctx.channel and m == res.message
-
-    res = await client.wait_for("button_click", check=check)
-    player = res.component.label
-
-    if player=="Yes":
-        await m.edit(embed=em,components=[[no,yes]])
-    elif player=="No":
-        await m.edit(embed=em,components=[])
-
+@client.event
+async def on_button_click(interaction):
+    embed = discord.Embed(title = "Match Overview", description=f'gr:', color=0x00f900)
+    embed.add_field(name = "Statistics:", value = "john", inline = False)
+    embed2 = discord.Embed(title = "hjg asdf", description=f'as:', color=0x00f900)
+    embed2.add_field(name = "adsf:", value = "glenn", inline = False)
+    if interaction.component.label.startswith("Yes"):
+        await m.edit(embed = embed2)
+    if interaction.component.label.startswith("No"):
+        await m.edit(embed=embed)
 
 @client.command()
 async def lower(ctx, *, word):
