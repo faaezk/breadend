@@ -67,13 +67,13 @@ class Event():
 
 
 class Round():
-    def __init__(self, winner, ending, plant, defuse, identifier):
+    def __init__(self, winner, ending, plant, defuse, number):
         self.winner = winner
         self.ending = ending
         self.plant = plant
         self.defuse = defuse
         self.events = []
-        self.identifier = identifier
+        self.number = number
         self.nextRound = None
         self.lastRound = None
 
@@ -134,8 +134,8 @@ class Match():
         self.rounds.append(round)
         
         if self.lastestRound != None:
-            self.lastestRound.nextRound = round.identifier
-            round.lastRound = self.lastestRound.identifier
+            self.lastestRound.nextRound = round.number
+            round.lastRound = self.lastestRound.number
 
         self.lastestRound = round
 
@@ -218,16 +218,16 @@ if __name__ == '__main__':
 
         match.addPlayers(data['players']['red'], 'red')
         match.addPlayers(data['players']['blue'], 'blue')
-
+        
+        i = 1
         for round in data['rounds']:
-            tempRound = Round(round['winning_team'], round['end_type'], 
-                        round['bomb_planted'], round['bomb_defused'], random.randint(0,1000000000))
-
+            tempRound = Round(round['winning_team'], round['end_type'], round['bomb_planted'], round['bomb_defused'], i)
             tempRound.addEvents(round['player_stats'])
             match.addRound(tempRound)
+            i += 1
 
     print(match.rounds[2].nextRound)
-    print(match.rounds[3].identifier)
+    print(match.rounds[3].number)
 
-    print(match.rounds[2].identifier)
+    print(match.rounds[2].number)
     print(match.rounds[3].lastRound)

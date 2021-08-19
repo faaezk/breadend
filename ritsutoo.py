@@ -88,10 +88,11 @@ async def games(ctx, username, game, type):
             match.setScore(username, data['teams'])
             match.addPlayers(data['players']['red'], 'red')
             match.addPlayers(data['players']['blue'], 'blue')
-
+            
+            i = 1
             for round in data['rounds']:
                 tempRound = matchClass.Round(round['winning_team'], round['end_type'], 
-                            round['bomb_planted'], round['bomb_defused'])
+                            round['bomb_planted'], round['bomb_defused'], i)
 
                 tempRound.addEvents(round['player_stats'])
                 match.addRound(tempRound)
@@ -106,32 +107,46 @@ async def games(ctx, username, game, type):
 
                 msg = ""
                 for player in stats:
-                    msg += f'{player[0]}  /  {player[1]}: \n'
-                embed.add_field(name = "Red Team:", value = msg, inline = True)
+                    msg += f'{player[0]}/{player[1]}: \n'
+                embed.add_field(name = "Red Team:", value = '```\n' + msg + '\n```', inline = True)
                 
                 msg = ""
                 for player in stats:
-                    msg += f'{player[2]}  -  {player[3]}\n'
-                embed.add_field(name = "  ACS  -  K/D/A", value = msg, inline = True)
+                    msg += f'{player[2]} - {player[3]}\n'
+                embed.add_field(name = "  ACS  -  K/D/A", value = '```\n' + msg + '\n```', inline = True)
 
                 embed.add_field(name='\u200b', value='\u200b')
 
                 stats = match.getBlueTeamStats()
-                msg = ""
-                for player in stats:
-                    msg += f'{player[0]}  /  {player[1]}: \n'
-                embed.add_field(name = "Blue Team:", value = msg, inline = True)
                 
                 msg = ""
                 for player in stats:
-                    msg += f'{player[2]}  -  {player[3]}\n'
-                embed.add_field(name = "  ACS  -  K/D/A", value = msg, inline = True)
+                    msg += f'{player[0]}/{player[1]}: \n'
+                embed.add_field(name = "Blue Team:", value = '```\n' + msg + '\n```', inline = True)
+                
+                msg = ""
+                for player in stats:
+                    msg += f'{player[2]} - {player[3]}\n'
+                embed.add_field(name = "  ACS  -  K/D/A", value = '```\n' + msg + '\n```', inline = True)
 
                 embed.add_field(name='\u200b', value='\u200b')
 
                 await the_message.edit(embed = embed)
 
             if type == 'round-by-round':
-                await the_message.edit(content='ok.')
+                next = Button(style=ButtonStyle.green, label="Next Round")
+                last = Button(style=ButtonStyle.red, label="Last Round")
+                round = match.rounds[0]
+
+                embed = discord.Embed(title = f"Round {round.number} Overview", color=0x00f900)
+                
+                if round.plant == False:
+                    roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\n'
+                else:
+                    roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\nDefuse: {round.defuse}'
+
+                embed.add_field(name = "Round Stats:",value = roundStats, inline = True)
+
+                await ctx.send(embed=embed, components=[last,next])
 
 client.run(token)
