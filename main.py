@@ -31,11 +31,14 @@ async def on_ready():
 @slash.slash(description="Choices for Valorant",
              guild_ids=guild_ids,
              options = [
-             create_option(name="randomise", description="gives account to play on", option_type=3, required=True, 
+             create_option(name="randomise", description="returns random thing", option_type=3, required=False, 
                         choices=[create_choice(name="account",value="account"), create_choice(name="gamemode",value="gamemode"),
                         create_choice(name="weapon",value="weapon"), create_choice(name="agent",value="agent"),
-                        create_choice(name="map",value="map"), create_choice(name="tactic",value="tactic")])])
-async def choice(ctx, randomise):
+                        create_choice(name="map",value="map")]),
+             create_option(name="tactic", description="returns the plays for this round", option_type=3, required=False, 
+                        choices=[create_choice(name="attacking",value="attacking"), create_choice(name="defending",value="defending")])])
+
+async def choice(ctx, randomise="", tactic=""):
     
     if randomise == "account":
         await ctx.send(random.choice(['Smurfs', 'Smurfs', 'Smurfs', 'Smurfs', 'Mains', 'Mains', 'Mains', 'Mains', 'Mains', 'Mains']))
@@ -60,9 +63,12 @@ async def choice(ctx, randomise):
     if randomise == "map":
         await ctx.send(random.choice(["Bind", "Haven", "Split", "Ascent", "Icebox", "Breeze"]))
 
-    if randomise == "tactic":
-        await ctx.send(random.choice(["Rush A", "Rush B", "Rush C", "Cowboy Time", "Hide in Spawn", "Split push",
-                                        "Odin go brrr", "just ff", "Camp in corners"]))
+    if tactic == "attacking":
+        await ctx.send(random.choice(["Rush A", "Rush B", "Rush C", "Cowboy Time", "Hide in spawn", "Split push",
+                                        "Odin go brrr", "just ff", "Camp in corners", "Snipers only", "Pistol Prodigy"]))
+    if tactic == "defending":
+        await ctx.send(random.choice(["Everyone on A", "Everyone on B", "Everyone on C", "Cowboy Time", "Hide in spawn till plant",
+                                        "Odin go brrr", "just ff", "Camp in corners", "Snipers only", "Pistol Prodigy"]))
 
 @client.command()
 async def cat(ctx):

@@ -8,6 +8,7 @@ from discord_components import *
 import random
 
 m = ""
+i = 0
 
 def get_config():
     c = configparser.ConfigParser()
@@ -28,6 +29,13 @@ async def on_ready():
     print("it started working")
 
 @client.command()
+async def button(ctx):
+     await ctx.send(type=InteractionType.ChannelMessageWithSource, content="Message Here", 
+     components=[Button(style=ButtonStyle.URL, label="Example Invite Button", url="https://google.com"), 
+     Button(style=ButtonStyle.blue, label="Default Button", custom_id="xbutton")])
+
+
+@client.command()
 async def open(ctx):
     blue = ["Possibly", "No"]
     blueresult = random.choice(blue)
@@ -45,10 +53,16 @@ async def on_button_click(interaction):
     embed.add_field(name = "Statistics:", value = "john", inline = False)
     embed2 = discord.Embed(title = "hjg asdf", description=f'as:', color=0x00f900)
     embed2.add_field(name = "adsf:", value = "glenn", inline = False)
+    
     if interaction.component.label.startswith("Yes"):
         await m.edit(embed = embed2)
     if interaction.component.label.startswith("No"):
         await m.edit(embed=embed)
+
+    global i
+    if interaction.component.label.startswith("Default Button"):
+        await interaction.respond(type=InteractionType.ChannelMessageWithSource, content='Button Clicked' + str(i))
+        i += 1
 
 @client.command()
 async def lower(ctx, *, word):
