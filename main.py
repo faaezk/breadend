@@ -34,7 +34,7 @@ async def on_ready():
              create_option(name="randomise", description="gives account to play on", option_type=3, required=True, 
                         choices=[create_choice(name="account",value="account"), create_choice(name="gamemode",value="gamemode"),
                         create_choice(name="weapon",value="weapon"), create_choice(name="agent",value="agent"),
-                        create_choice(name="map",value="map")])])
+                        create_choice(name="map",value="map"), create_choice(name="tactic",value="tactic")])])
 async def choice(ctx, randomise):
     
     if randomise == "account":
@@ -59,6 +59,10 @@ async def choice(ctx, randomise):
 
     if randomise == "map":
         await ctx.send(random.choice(["Bind", "Haven", "Split", "Ascent", "Icebox", "Breeze"]))
+
+    if randomise == "tactic":
+        await ctx.send(random.choice(["Rush A", "Rush B", "Rush C", "Cowboy Time", "Hide in Spawn", "Split push",
+                                        "Odin go brrr", "just ff", "Camp in corners"]))
 
 @client.command()
 async def cat(ctx):
