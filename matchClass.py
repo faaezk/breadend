@@ -118,7 +118,7 @@ class Match():
         self.rounds = []
         self.score = []
         self.winner = ""
-        self.lastestRound = None
+        self.currentRound = None
 
     def addPlayers(self, players:list, team):
         for player in players:
@@ -133,11 +133,11 @@ class Match():
     def addRound(self, round:Round):
         self.rounds.append(round)
         
-        if self.lastestRound != None:
-            self.lastestRound.nextRound = round.number
-            round.lastRound = self.lastestRound.number
+        if self.currentRound != None:
+            self.currentRound.nextRound = round.number
+            round.lastRound = self.currentRound.number
 
-        self.lastestRound = round
+        self.currentRound = round
 
     def addPlayer(self, player:Player, team):
         if team == 'blue':
@@ -190,6 +190,28 @@ class Match():
             stats.append([player.getName(), player.agent, acs, player.getKDA()])
         
         return stats
+    
+    def setCurrentRound(self, id):
+        for round in self.rounds:
+            if round.number == id:
+                self.currentRound = round
+                break
+
+    def nextRound(self):
+        if self.currentRound.nextRound == None:
+            return None
+        for round in self.rounds:
+            if round.number == self.currentRound.nextRound:
+                self.currentRound = round
+                return round
+
+    def lastRound(self):
+        if self.currentRound.lastRound == None:
+            return None
+        for round in self.rounds:
+            if round.number == self.currentRound.lastRound:
+                self.currentRound = round
+                return round
 
 def get_data(ign, tag, game):
     
