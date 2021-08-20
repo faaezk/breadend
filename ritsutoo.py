@@ -8,7 +8,7 @@ from discord_components import *
 import random
 
 m = ""
-i = 0
+match = None
 
 def get_config():
     c = configparser.ConfigParser()
@@ -47,29 +47,12 @@ async def open(ctx):
     global m
     m = await ctx.send(embed = em,components=[[no,yes]])
 
-@client.event
-async def on_button_click(interaction):
-    embed = discord.Embed(title = "Match Overview", description=f'gr:', color=0x00f900)
-    embed.add_field(name = "Statistics:", value = "john", inline = False)
-    embed2 = discord.Embed(title = "hjg asdf", description=f'as:', color=0x00f900)
-    embed2.add_field(name = "adsf:", value = "glenn", inline = False)
-    
-    if interaction.component.label.startswith("Yes"):
-        await m.edit(embed = embed2)
-    if interaction.component.label.startswith("No"):
-        await m.edit(embed=embed)
-
-    global i
-    if interaction.component.label.startswith("Default Button"):
-        await interaction.respond(type=InteractionType.ChannelMessageWithSource, content='Button Clicked' + str(i))
-        i += 1
-
 @client.command()
 async def lower(ctx, *, word):
     
     word = word.lower()
     await ctx.send(word)
-
+'''
 @slash.slash(description="Information on last 5 games",
              guild_ids=guild_ids,
              options = [create_option(name="username", description="Enter Username (username#tag)", option_type=3, required=True),
@@ -80,6 +63,11 @@ async def lower(ctx, *, word):
              create_option(name="type", description="Select type of information", option_type=3, required=True,
                 choices=[create_choice(name="overview",value="overview"), create_choice(name="round-by-round",value="round-by-round")])])
 async def games(ctx, username, game, type):
+'''
+@client.command()
+async def games(ctx, *, input):
+
+    username, game, type = input.split(' ')
 
     if len(username.split('#')) != 2:
         await ctx.send("invalid player name")
@@ -96,6 +84,7 @@ async def games(ctx, username, game, type):
             await the_message.edit(content="Player not found")
 
         else:
+            global match
             match = matchClass.Match(data['metadata']['map'], data['metadata']['mode'], 
                                      data['metadata']['matchid'], data['metadata']['game_start'])
 
@@ -110,6 +99,7 @@ async def games(ctx, username, game, type):
 
                 tempRound.addEvents(round['player_stats'])
                 match.addRound(tempRound)
+                i += 1
         
             if type == 'overview':
                 embed = discord.Embed(title = "Match Overview", 
@@ -151,16 +141,57 @@ async def games(ctx, username, game, type):
                 next = Button(style=ButtonStyle.green, label="Next Round")
                 last = Button(style=ButtonStyle.red, label="Last Round")
                 round = match.rounds[0]
-
+                match.setCurrentRound(round.number)
                 embed = discord.Embed(title = f"Round {round.number} Overview", color=0x00f900)
-                
                 if round.plant == False:
                     roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\n'
                 else:
                     roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\nDefuse: {round.defuse}'
-
                 embed.add_field(name = "Round Stats:",value = roundStats, inline = True)
 
-                await ctx.send(embed=embed, components=[last,next])
+                await ctx.send(embed=embed, components=[[last,next]])
+
+@client.event
+async def on_button_click(interaction):
+
+    embed = discord.Embed(title = "this is the first one", description='woah', color=0x00f900)
+    embed2 = discord.Embed(title = "this is the second one", description='yooo', color=0x00f900)
+
+    next = Button(style=ButtonStyle.green, label="Next Round")
+    last = Button(style=ButtonStyle.red, label="Last Round")
+    
+    if interaction.component.label.startswith("Yes"):
+        await m.edit(embed = embed2)
+    if interaction.component.label.startswith("No"):
+        await m.edit(embed=embed)
+
+    global match
+    if interaction.component.label.startswith("Next Round"):
+        round = match.nextRound()
+
+        if round == None:
+            await interaction.respond(type=InteractionType.ChannelMessageWithSource, content="That was the last round", components=[last])
+        else:
+            embed = discord.Embed(title = f"Round {round.number} Overview", color=0x00f900)
+            if round.plant == False:
+                roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\n'
+            else:
+                roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\nDefuse: {round.defuse}'
+            embed.add_field(name = "Round Stats:",value = roundStats, inline = True)
+            await interaction.respond(type=InteractionType.ChannelMessageWithSource, embed=embed, components=[[last,next]])
+    
+    if interaction.component.label.startswith("Last Round"):
+        round = match.lastRound()
+
+        if round == None:
+            await interaction.respond(type=InteractionType.ChannelMessageWithSource, content="That was the first round", components=[next])
+        else:
+            embed = discord.Embed(title = f"Round {round.number} Overview", color=0x00f900)
+            if round.plant == False:
+                roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\n'
+            else:
+                roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\nDefuse: {round.defuse}'
+            embed.add_field(name = "Round Stats:",value = roundStats, inline = True)
+            await interaction.respond(type=InteractionType.ChannelMessageWithSource, embed=embed, components=[[last,next]])
 
 client.run(token)
