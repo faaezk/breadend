@@ -318,7 +318,7 @@ async def gettag(ctx, *, user):
 async def search(ctx, *, anime_title = "", manga_title = "", character = "", anime_stats = "", manga_stats = ""):
     
     if anime_title != "":
-        await ctx.send("Getting info for " + anime_title)
+        msg = await ctx.send("Getting info for " + anime_title)
         anime = malsearch.animeSearch(anime_title)
 
         if anime == False:
@@ -339,10 +339,10 @@ async def search(ctx, *, anime_title = "", manga_title = "", character = "", ani
             embed.add_field(name="Opening Theme", value=anime["opening_themes"], inline=False)
             embed.add_field(name="Ending Theme", value=anime["ending_themes"], inline=False)
             embed.set_footer(text="Studios: {}, Licensors: {}".format(anime["studios"], anime["licensors"]))
-            await ctx.send(embed=embed)
+            await msg.edit(content="", embed=embed)
 
     if manga_title != "":
-        await ctx.send("Getting info for " + manga_title)
+        msg = await ctx.send("Getting info for " + manga_title)
         manga = malsearch.mangaSearch(manga_title)
 
         if manga == False:
@@ -361,10 +361,10 @@ async def search(ctx, *, anime_title = "", manga_title = "", character = "", ani
             embed.add_field(name="Authors:", value=manga["authors"])
             embed.add_field(name="Synopsis:", value=manga["synopsis"])
             embed.set_footer(text="Serialisations: {}".format(manga["serialisations"]))
-            await ctx.send(embed=embed)
+            await msg.edit(content="", embed=embed)
 
     if character != "":
-        await ctx.send("Getting info for " + character)
+        msg = await ctx.send("Getting info for " + character)
         character = malsearch.characterSearch(character)
 
         if character == False:
@@ -383,10 +383,10 @@ async def search(ctx, *, anime_title = "", manga_title = "", character = "", ani
             embed.add_field(name="Manga:", value=character["manga"], inline=False)
             embed.add_field(name="Voice Actors:", value=character["voice_actors"], inline=False)
             
-            await ctx.send(embed=embed)
+            await msg.edit(content="", embed=embed)
 
     if anime_stats != "":
-        await ctx.send("Getting stats for " + anime_stats)
+        msg = await ctx.send("Getting stats for " + anime_stats)
         anime = malsearch.animeStats(anime_stats)
 
         if anime == False:
@@ -407,10 +407,10 @@ async def search(ctx, *, anime_title = "", manga_title = "", character = "", ani
                 anime["on_hold"], anime["total"]),
             inline=False)
             
-            await ctx.send(file=file, embed=embed)
+            await msg.edit(content="", file=file, embed=embed)
 
     if manga_stats != "":
-        await ctx.send("Getting stats for " + manga_stats)
+        msg = await ctx.send("Getting stats for " + manga_stats)
         manga = malsearch.mangaStats(manga_stats)
 
         if manga == False:
@@ -431,8 +431,7 @@ async def search(ctx, *, anime_title = "", manga_title = "", character = "", ani
                 manga["on_hold"], manga["total"]),
             inline=False)
             
-            await ctx.send(file=file, embed=embed)
-
+            await msg.edit(content="", file=file, embed=embed)
 
 @client.event
 async def on_message(message):

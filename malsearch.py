@@ -101,6 +101,75 @@ def animeSearch(title):
             "studios" : studios, "licensors" : licensors,"opening_themes": opening_themes, "ending_themes" : ending_themes}
 
 
+def mangaSearch(title):
+
+    try:
+        response = requests.get(f'https://api.jikan.moe/v3/search/manga?q={title}&page=1', timeout=5)
+    except:
+        try:
+            response = requests.get(f'https://api.jikan.moe/v3/search/manga?q={title}&page=1', timeout=5)
+        except:
+            return False
+
+    id = json.loads(response.text)
+    if 'results' in id.keys():
+        id = id['results'][0]['mal_id']
+    else:
+        return None
+    
+    try:
+        response = requests.get(f'https://api.jikan.moe/v3/manga/{id}', timeout=5)
+    except:
+        try:
+            response = requests.get(f'https://api.jikan.moe/v3/manga/{id}', timeout=5)
+        except:
+            return False
+
+    manga = json.loads(response.text)
+
+    if manga['volumes'] == None:
+        vol_count = '?'
+    else:
+        vol_count = str(manga['volumes'])
+    
+    if manga['chapters'] == None:
+        chap_count = '?'
+    else:
+        chap_count = str(manga['chapters'])
+
+    genres = ""
+    for genre in manga['genres']:
+        genres += genre['name'] + ', '
+    genres = genres[:-2]
+
+    authors = ""
+    for author in manga['authors']:
+        authors += author['name'] + '\n'
+    studios = authors[:-1]
+
+    serializations = ""
+    for serialization in manga['serializations']:
+        serializations += serialization['name'] + ', '
+    licensors = serializations[:-2]
+
+    info = manga['synopsis']
+    if len(info) > 980:
+        info = info[0:980]
+        info += "...\nMore at MyAnimeList (link in title)"
+
+    if genres == "":
+        genres = "None"
+    if studios == "":
+        studios = "None"
+    if licensors == "":
+        licensors = "None"
+    
+    return {"vol_count" : vol_count, "chap_count" : chap_count, "genres" : genres, "publishing" : manga['published']['string'],
+            "score" : manga['score'], "type" : manga['type'], "rank" : manga['rank'], "url" : manga['url'],
+            "eng_title" : manga['title_english'], "jap_title" : manga['title_japanese'], "image_url" : manga['image_url'],
+            "authors" : authors, "serialisations" : serializations, "synopsis" : info}
+
+
 def characterSearch(name):
     
     try:
@@ -198,6 +267,7 @@ def animeStats(title):
 
     name = id['results'][0]['title']
     url = id['results'][0]['url']
+    typer = id['results'][0]['type']
 
     if 'results' in id.keys():
         id = id['results'][0]['mal_id']
@@ -232,7 +302,7 @@ def animeStats(title):
     plt.figure(figsize=(9, 6))
     plt.bar(x, y)
     
-    plt.title(f'{name} Vote distribution')
+    plt.title(f'{name} ({typer}) Vote distribution')
     plt.xlabel('Scores')
     plt.ylabel('Votes')
     
@@ -246,75 +316,6 @@ def animeStats(title):
     return {"watching":anime["watching"],"completed":anime["completed"],"on_hold":anime["on_hold"],
         "dropped":anime["dropped"],"plan_to_watch":anime["plan_to_watch"],"total":anime["total"],
         "title" : name, "url" : url}
-
-
-def mangaSearch(title):
-
-    try:
-        response = requests.get(f'https://api.jikan.moe/v3/search/manga?q={title}&page=1', timeout=5)
-    except:
-        try:
-            response = requests.get(f'https://api.jikan.moe/v3/search/manga?q={title}&page=1', timeout=5)
-        except:
-            return False
-
-    id = json.loads(response.text)
-    if 'results' in id.keys():
-        id = id['results'][0]['mal_id']
-    else:
-        return None
-    
-    try:
-        response = requests.get(f'https://api.jikan.moe/v3/manga/{id}', timeout=5)
-    except:
-        try:
-            response = requests.get(f'https://api.jikan.moe/v3/manga/{id}', timeout=5)
-        except:
-            return False
-
-    manga = json.loads(response.text)
-
-    if manga['volumes'] == None:
-        vol_count = '?'
-    else:
-        vol_count = str(manga['volumes'])
-    
-    if manga['chapters'] == None:
-        chap_count = '?'
-    else:
-        chap_count = str(manga['chapters'])
-
-    genres = ""
-    for genre in manga['genres']:
-        genres += genre['name'] + ', '
-    genres = genres[:-2]
-
-    authors = ""
-    for author in manga['authors']:
-        authors += author['name'] + '\n'
-    studios = authors[:-1]
-
-    serializations = ""
-    for serialization in manga['serializations']:
-        serializations += serialization['name'] + ', '
-    licensors = serializations[:-2]
-
-    info = manga['synopsis']
-    if len(info) > 980:
-        info = info[0:980]
-        info += "...\nMore at MyAnimeList (link in title)"
-
-    if genres == "":
-        genres = "None"
-    if studios == "":
-        studios = "None"
-    if licensors == "":
-        licensors = "None"
-    
-    return {"vol_count" : vol_count, "chap_count" : chap_count, "genres" : genres, "publishing" : manga['published']['string'],
-            "score" : manga['score'], "type" : manga['type'], "rank" : manga['rank'], "url" : manga['url'],
-            "eng_title" : manga['title_english'], "jap_title" : manga['title_japanese'], "image_url" : manga['image_url'],
-            "authors" : authors, "serialisations" : serializations, "synopsis" : info}
 
 
 def mangaStats(title):
@@ -331,6 +332,7 @@ def mangaStats(title):
 
     name = id['results'][0]['title']
     url = id['results'][0]['url']
+    typer = id['results'][0]['type']
 
     if 'results' in id.keys():
         id = id['results'][0]['mal_id']
@@ -365,7 +367,7 @@ def mangaStats(title):
     plt.figure(figsize=(9, 6))
     plt.bar(x, y)
     
-    plt.title(f'{name} Vote distribution')
+    plt.title(f'{name} ({typer}) Vote distribution')
     plt.xlabel('Scores')
     plt.ylabel('Votes')
     
@@ -380,5 +382,7 @@ def mangaStats(title):
         "dropped":manga["dropped"],"plan_to_read":manga["plan_to_read"],"total":manga["total"],
         "title" : name, "url" : url}
 
+
+
 if __name__ == '__main__':
-    animeSearch('bunny girl senpai')
+    mangaStats('bunny girl senpai')
