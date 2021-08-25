@@ -138,18 +138,28 @@ async def games(ctx, *, input):
                 await the_message.edit(embed = embed)
 
             if type == 'round-by-round':
-                next = Button(style=ButtonStyle.green, label="Next Round")
-                last = Button(style=ButtonStyle.red, label="Last Round")
+                nextR = Button(style=ButtonStyle.green, label="Next Round")
+                lastR = Button(style=ButtonStyle.red, label="Last Round")
+                nextE = Button(style=ButtonStyle.green, label="Next Event")
+                lastE = Button(style=ButtonStyle.red, label="Last Event")
+
                 round = match.rounds[0]
+                event = round.events[0]
                 match.setCurrentRound(round.number)
+                round.setCurrentEvent(event.number)
+
                 embed = discord.Embed(title = f"Round {round.number} Overview", color=0x00f900)
+                eventStats = f'Killer: {event.killer}\nDeather: {event.deather}\nWeapon: {event.getWeapon()}'
+
                 if round.plant == False:
                     roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\n'
                 else:
                     roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\nDefuse: {round.defuse}'
-                embed.add_field(name = "Round Stats:",value = roundStats, inline = True)
+                
+                embed.add_field(name = "event details:", value = eventStats, inline = False)
+                embed.add_field(name = "Round Stats:",value = roundStats, inline = False)
 
-                await ctx.send(embed=embed, components=[[last,next]])
+                await ctx.send(embed=embed, components=[[lastR,nextR],[lastE,nextE]])
 
 @client.event
 async def on_button_click(interaction):
@@ -157,8 +167,10 @@ async def on_button_click(interaction):
     embed = discord.Embed(title = "this is the first one", description='woah', color=0x00f900)
     embed2 = discord.Embed(title = "this is the second one", description='yooo', color=0x00f900)
 
-    next = Button(style=ButtonStyle.green, label="Next Round")
-    last = Button(style=ButtonStyle.red, label="Last Round")
+    nextR = Button(style=ButtonStyle.green, label="Next Round")
+    lastR = Button(style=ButtonStyle.red, label="Last Round")
+    nextE = Button(style=ButtonStyle.green, label="Next Event")
+    lastE = Button(style=ButtonStyle.red, label="Last Event")
     
     if interaction.component.label.startswith("Yes"):
         await m.edit(embed = embed2)
@@ -168,30 +180,78 @@ async def on_button_click(interaction):
     global match
     if interaction.component.label.startswith("Next Round"):
         round = match.nextRound()
+        event = round.events[0]
 
-        if round == None:
-            await interaction.respond(type=InteractionType.ChannelMessageWithSource, content="That was the last round", components=[last])
+        if round == None or event == None:
+            await interaction.respond(type=InteractionType.ChannelMessageWithSource, content="That was the last round", components=[lastR])
         else:
             embed = discord.Embed(title = f"Round {round.number} Overview", color=0x00f900)
+            eventStats = f'Killer: {event.killer}\nDeather: {event.deather}\nWeapon: {event.getWeapon()}'
+
             if round.plant == False:
                 roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\n'
             else:
                 roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\nDefuse: {round.defuse}'
-            embed.add_field(name = "Round Stats:",value = roundStats, inline = True)
-            await interaction.respond(type=InteractionType.ChannelMessageWithSource, embed=embed, components=[[last,next]])
+            
+            embed.add_field(name = "event details:", value = eventStats, inline = False)
+            embed.add_field(name = "Round Stats:",value = roundStats, inline = False)
+            await interaction.respond(type=InteractionType.ChannelMessageWithSource, embed=embed, components=[[lastR,nextR],[lastE,nextE]])
     
     if interaction.component.label.startswith("Last Round"):
         round = match.lastRound()
+        event = round.events[0]
 
-        if round == None:
-            await interaction.respond(type=InteractionType.ChannelMessageWithSource, content="That was the first round", components=[next])
+        if round == None or event == None:
+            await interaction.respond(type=InteractionType.ChannelMessageWithSource, content="That was the first round", components=[nextR])
         else:
             embed = discord.Embed(title = f"Round {round.number} Overview", color=0x00f900)
+            eventStats = f'Killer: {event.killer}\nDeather: {event.deather}\nWeapon: {event.getWeapon()}'
+
             if round.plant == False:
                 roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\n'
             else:
                 roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\nDefuse: {round.defuse}'
-            embed.add_field(name = "Round Stats:",value = roundStats, inline = True)
-            await interaction.respond(type=InteractionType.ChannelMessageWithSource, embed=embed, components=[[last,next]])
+
+            embed.add_field(name = "event details:", value = eventStats, inline = False)
+            embed.add_field(name = "Round Stats:",value = roundStats, inline = False)
+            await interaction.respond(type=InteractionType.ChannelMessageWithSource, embed=embed, components=[[lastR,nextR],[lastE,nextE]])
+
+    if interaction.component.label.startswith("Next Event"):
+        round = match.currentRound
+        event = round.nextEvent()
+
+        if round == None or event == None:
+            await interaction.respond(type=InteractionType.ChannelMessageWithSource, content="That was the last round", components=[lastR])
+        else:
+            embed = discord.Embed(title = f"Round {round.number} Overview", color=0x00f900)
+            eventStats = f'Killer: {event.killer}\nDeather: {event.deather}\nWeapon: {event.getWeapon()}'
+
+            if round.plant == False:
+                roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\n'
+            else:
+                roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\nDefuse: {round.defuse}'
+            
+            embed.add_field(name = "event details:", value = eventStats, inline = False)
+            embed.add_field(name = "Round Stats:",value = roundStats, inline = False)
+            await interaction.respond(type=InteractionType.ChannelMessageWithSource, embed=embed, components=[[lastR,nextR],[lastE,nextE]])
+
+    if interaction.component.label.startswith("Last Event"):
+        round = match.currentRound
+        event = round.lastEvent()
+
+        if round == None or event == None:
+            await interaction.respond(type=InteractionType.ChannelMessageWithSource, content="That was the last round", components=[lastR])
+        else:
+            embed = discord.Embed(title = f"Round {round.number} Overview", color=0x00f900)
+            eventStats = f'Killer: {event.killer}\nDeather: {event.deather}\nWeapon: {event.getWeapon()}'
+
+            if round.plant == False:
+                roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\n'
+            else:
+                roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\nDefuse: {round.defuse}'
+            
+            embed.add_field(name = "event details:", value = eventStats, inline = False)
+            embed.add_field(name = "Round Stats:",value = roundStats, inline = False)
+            await interaction.respond(type=InteractionType.ChannelMessageWithSource, embed=embed, components=[[lastR,nextR],[lastE,nextE]])
 
 client.run(token)
