@@ -50,20 +50,26 @@ class Player():
 
 
 class Event():
-    def __init__(self, time, killer, deather, weapon_id, killer_location, deather_location, identifier):
+    def __init__(self, time, killer, deather, weapon_id, killer_location, deather_location, number):
         self.time = time
         self.killer = killer
         self.deather = deather
-        self.weapon_id = weapon_id
+        self.weapon_id = weapon_id.lower()
         self.killer_location = killer_location
         self.deather_location = deather_location
-        self.identifier = identifier
+        self.number = number
         self.nextEvent = None
         self.lastEvent = None
 
     def getWeapon(self):
         global weapons
         return weapons[self.weapon_id]
+
+    def set_nextEvent(self, event):
+        self.nextEvent = event
+
+    def set_lastEvent(self, event):
+        self.lastEvent = event
 
 
 class Round():
@@ -76,6 +82,7 @@ class Round():
         self.number = number
         self.nextRound = None
         self.lastRound = None
+        self.currentEvent = None
 
     def addEvents(self, events: list):
         for player in events:
@@ -93,8 +100,8 @@ class Round():
                             killer_location, event['victim_death_location'], random.randint(0,1000000000))
                 
                 if len(self.events) != 0:
-                    self.events[-1].nextEvent = temp.identifier
-                    temp.lastEvent = self.events[-1].identifier
+                    self.events[-1].nextEvent = temp.number
+                    temp.lastEvent = self.events[-1].number
                 self.events.append(temp)
 
     def addEvent(self, event: Event):       
@@ -105,6 +112,28 @@ class Round():
 
     def set_lastRound(self, round):
         self.lastRound = round
+    
+    def setCurrentEvent(self, id):
+        for event in self.events:
+            if event.number == id:
+                self.currentEvent = event
+                break
+
+    def nextEvent(self):
+        if self.currentEvent.nextEvent == None:
+            return None
+        for event in self.events:
+            if event.number == self.currentEvent.nextEvent:
+                self.currentEvent = event
+                return event
+
+    def lastEvent(self):
+        if self.currentEvent.lastEvent == None:
+            return None
+        for event in self.event:
+            if event.number == self.currentEvent.lastEvent:
+                self.currentEvent = event
+                return event
 
 
 class Match():
