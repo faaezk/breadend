@@ -99,10 +99,12 @@ class Round():
                             event['victim_display_name'], event['damage_weapon_id'],
                             killer_location, event['victim_death_location'], random.randint(0,1000000000))
                 
+
                 if len(self.events) != 0:
                     self.events[-1].nextEvent = temp.number
                     temp.lastEvent = self.events[-1].number
                 self.events.append(temp)
+
 
     def addEvent(self, event: Event):       
         self.events.append(event)
