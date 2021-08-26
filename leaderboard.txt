@@ -4,10 +4,10 @@ Player Leaderboard
 3. lyçhii         1000
 4. vkj             937
 5. thesugarman     884
-6. 8888            815
-7. dilka30003      810
+6. 8888            840
+7. dilka30003      832
 8. grovyle         805
-9. imabandwagon    770
+9. imabandwagon    785
 10.faqinator       770
 11.fade            746
 12.fakinator       745
@@ -19,10 +19,11 @@ Player Leaderboard
 18.lmao            640
 19.lol             625
 20.yovivels        600
-21.rustybeef       556
-22.slumonaire      542
-23.therealrobdez   477
-24.quackinator     379
-25.katchampion     265
-26.crossaxis       152
-27.jokii           105
+21.rustybeef       573
+22.tallewok        550
+23.slumonaire      542
+24.therealrobdez   477
+25.quackinator     379
+26.katchampion     265
+27.crossaxis       152
+28.jokii           105
