@@ -156,7 +156,8 @@ async def games(ctx, *, input):
                 else:
                     roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\nDefuse: {round.defuse}'
                 
-                embed.add_field(name = "event details:", value = eventStats, inline = False)
+                embed.add_field(name = "event details:", value = eventStats, inline = True)
+                embed.add_field(name = "Damage events:", value = event.getStats(), inline = True)
                 embed.add_field(name = "Round Stats:",value = roundStats, inline = False)
 
                 await ctx.send(embed=embed, components=[[lastR,nextR],[lastE,nextE]])
@@ -193,7 +194,8 @@ async def on_button_click(interaction):
             else:
                 roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\nDefuse: {round.defuse}'
             
-            embed.add_field(name = "event details:", value = eventStats, inline = False)
+            embed.add_field(name = "event details:", value = eventStats, inline = True)
+            embed.add_field(name = "Damage events:", value = event.getStats(), inline = True)
             embed.add_field(name = "Round Stats:",value = roundStats, inline = False)
             await interaction.respond(type=InteractionType.ChannelMessageWithSource, embed=embed, components=[[lastR,nextR],[lastE,nextE]])
     
@@ -212,7 +214,8 @@ async def on_button_click(interaction):
             else:
                 roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\nDefuse: {round.defuse}'
 
-            embed.add_field(name = "event details:", value = eventStats, inline = False)
+            embed.add_field(name = "event details:", value = eventStats, inline = True)
+            embed.add_field(name = "Damage events:", value = event.getStats(), inline = True)
             embed.add_field(name = "Round Stats:",value = roundStats, inline = False)
             await interaction.respond(type=InteractionType.ChannelMessageWithSource, embed=embed, components=[[lastR,nextR],[lastE,nextE]])
 
@@ -231,7 +234,8 @@ async def on_button_click(interaction):
             else:
                 roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\nDefuse: {round.defuse}'
             
-            embed.add_field(name = "event details:", value = eventStats, inline = False)
+            embed.add_field(name = "event details:", value = eventStats, inline = True)
+            embed.add_field(name = "Damage events:", value = event.getStats(), inline = True)
             embed.add_field(name = "Round Stats:",value = roundStats, inline = False)
             await interaction.respond(type=InteractionType.ChannelMessageWithSource, embed=embed, components=[[lastR,nextR],[lastE,nextE]])
 
@@ -250,7 +254,8 @@ async def on_button_click(interaction):
             else:
                 roundStats = f'Winner: {round.winner}\nEnding: {round.ending}\nPlant:{round.plant}\nDefuse: {round.defuse}'
             
-            embed.add_field(name = "event details:", value = eventStats, inline = False)
+            embed.add_field(name = "event details:", value = eventStats, inline = True)
+            embed.add_field(name = "Damage events:", value = event.getStats(), inline = True)
             embed.add_field(name = "Round Stats:",value = roundStats, inline = False)
             await interaction.respond(type=InteractionType.ChannelMessageWithSource, embed=embed, components=[[lastR,nextR],[lastE,nextE]])
 

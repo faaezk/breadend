@@ -70,6 +70,14 @@ class Event():
 
     def set_lastEvent(self, event):
         self.lastEvent = event
+    
+    def setStats(self, dmg, bshots, hshots, lshots):
+        self.stats = {'damage' : dmg, 'bodyshots' : bshots, 
+                    'headshots' : hshots, 'legshots' : lshots}
+    
+    def getStats(self):
+        return 'Headshots: {}\nBodyshots: {}\nLegshots: {}\nTotal Damage: {}'.format(
+            self.stats['headshots'], self.stats['bodyshots'], self.stats['legshots'], self.stats['damage'])
 
 
 class Round():
@@ -98,12 +106,17 @@ class Round():
                 temp = Event(event['kill_time_in_round'], killer, 
                             event['victim_display_name'], event['damage_weapon_id'],
                             killer_location, event['victim_death_location'], random.randint(0,1000000000))
-                
+
+                for dmgevent in player['damage_events']:
+                    if dmgevent['receiver_display_name'] == event['victim_display_name']:
+                        temp.setStats(dmgevent['damage'], dmgevent['bodyshots'],
+                                    dmgevent['headshots'], dmgevent['legshots'])
 
                 if len(self.events) != 0:
                     self.events[-1].nextEvent = temp.number
                     temp.lastEvent = self.events[-1].number
                 self.events.append(temp)
+
 
 
     def addEvent(self, event: Event):       
