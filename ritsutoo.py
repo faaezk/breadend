@@ -181,8 +181,9 @@ async def on_button_click(interaction):
     global match
     if interaction.component.label.startswith("Next Round"):
         round = match.nextRound()
-        event = round.events[0]
-        round.currentEvent = event
+        if round != None:
+            event = round.events[0]
+            round.currentEvent = event
 
         if round == None:
             await interaction.respond(type=InteractionType.ChannelMessageWithSource, content="That was the last round", components=[lastR])
