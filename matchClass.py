@@ -145,7 +145,7 @@ class Round():
     def lastEvent(self):
         if self.currentEvent.lastEvent == None:
             return None
-        for event in self.event:
+        for event in self.events:
             if event.number == self.currentEvent.lastEvent:
                 self.currentEvent = event
                 return event
