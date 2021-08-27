@@ -7,23 +7,23 @@ Player Leaderboard
 6. 8888            840
 7. dilka30003      832
 8. grovyle         805
-9. imabandwagon    785
-10.faqinator       770
-11.fade            746
-12.fakinator       745
+9. fakinator       787
+10.imabandwagon    785
+11.faqinator       770
+12.fade            746
 13.giroud          737
 14.azatory         734
 15.silentwhispers  710
 16.bento2          665
 17.hoben222        641
-18.lmao            640
-19.lol             625
+18.lol             625
+19.lmao            625
 20.yovivels        600
-21.rustybeef       573
-22.tallewok        550
-23.slumonaire      542
+21.slumonaire      599
+22.tallewok        589
+23.rustybeef       553
 24.therealrobdez   477
 25.quackinator     379
 26.katchampion     265
-27.crossaxis       152
+27.crossaxis       165
 28.jokii           105
