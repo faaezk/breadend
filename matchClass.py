@@ -91,6 +91,7 @@ class Round():
         self.nextRound = None
         self.lastRound = None
         self.currentEvent = None
+        self.score = [0,0]
 
     def addEvents(self, events: list):
         for player in events:
@@ -118,9 +119,11 @@ class Round():
                 self.events.append(temp)
 
 
-
     def addEvent(self, event: Event):       
         self.events.append(event)
+    
+    def getScore(self):
+        return f'{self.score[0]} - {self.score[1]}'
 
     def set_nextRound(self, round):
         self.nextRound = round
@@ -189,24 +192,23 @@ class Match():
         if team == 'red':
             self.redTeam.append(player)
 
-    def setScore(self, name:str, teams:dict):
-        team = ""
-        for player in self.redTeam:
-            if player.getName() == name.lower():
-                team = player.team()
-                break
-        if team == "":
-            team = "blue"
+    def setScore(self, teams:dict):
         
-        self.score = [teams[team]['rounds_won'], teams[team]['rounds_lost']]
+        self.score = [teams['red']['rounds_won'], teams['red']['rounds_lost']]
         
-        if teams[team]['has_won'] == True:
-            self.winner = team
+        if teams['red']['has_won'] == True:
+            self.winner = 'Red'
         else:
-            if team == 'blue':
-                self.winner = 'red'
+            self.winner = 'Blue'
+
+        currentScore = [0,0]
+        for round in self.rounds:
+            if round.winner == 'Red':
+                currentScore[0] += 1
             else:
-                self.winner = 'blue'
+                currentScore[1] += 1
+
+            round.score = currentScore
 
     def getScore(self):
         return f'{self.score[0]} - {self.score[1]}'
@@ -292,8 +294,4 @@ if __name__ == '__main__':
             match.addRound(tempRound)
             i += 1
 
-    print(match.rounds[2].nextRound)
-    print(match.rounds[3].number)
-
-    print(match.rounds[2].number)
-    print(match.rounds[3].lastRound)
+        match.setScore(data['teams'])
