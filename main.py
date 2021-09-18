@@ -88,25 +88,6 @@ async def cat(ctx):
 
     await ctx.send(embed=embed)
 
-@client.command()
-async def nasa(ctx):
-    url = "https://api.nasa.gov/planetary/apod"
-
-    payload={}
-    files={}
-    headers = {
-    'Content-Type': 'application/json',
-    'x-api-key': get_config()[2]
-    }
-
-    response = requests.request("GET", url, headers=headers, data=payload, files=files)
-    loaded = json.loads(response.text)
-    embed = discord.Embed(title="Astronomy Photo of The Day", description=loaded['title'])
-    embed.set_image(url=loaded['url'])
-    embed.set_footer(text = "Copyright: {}, {}".format(loaded['copyright'], loaded['date']))
-
-    await ctx.send(embed=embed)
-
 @client.command(
     help="Syntax: $graph username or $graph username#tag", 
     brief="Returns a graph of the player's elo over time")
