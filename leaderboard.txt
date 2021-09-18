@@ -1,6 +1,6 @@
 Player Leaderboard
-1. oshawott       1250
-2. lyçhii         1192
+1. oshawott       1267
+2. lyçhii         1210
 3. jack           1097
 4. vkj             937
 5. dilka30003      891
@@ -8,22 +8,23 @@ Player Leaderboard
 7. 8888            875
 8. thesugarman     858
 9. faqinator       817
-10.imabandwagon    810
-11.fakinator       806
+10.fakinator       806
+11.imabandwagon    772
 12.fade            746
 13.giroud          729
 14.lmao            720
 15.silentwhispers  694
 16.bento2          665
-17.azatory         645
-18.hoben222        642
+17.azatory         662
+18.hoben222        647
 19.lol             625
-20.rustybeef       594
+20.rustybeef       610
 21.tallewok        589
-22.slumonaire      551
-23.yovivels        514
+22.yovivels        500
+23.slumonaire      500
 24.therealrobdez   477
 25.quackinator     379
 26.katchampion     257
-27.crossaxis       231
-28.jokii           150
+27.dilka20002      250
+28.crossaxis       247
+29.jokii           150
