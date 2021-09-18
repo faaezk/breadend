@@ -15,7 +15,7 @@ def get_config():
     c = configparser.ConfigParser()
     c.read('/home/ubuntu/discord_bot/config.ini')
 
-    return c['discord']['token'], c['cat']['api'], c['NASA']['api']
+    return c['discord']['token'], c['cat']['api']
 
 token = get_config()[0]
 
@@ -180,7 +180,7 @@ async def leaderboard(ctx, *, command="john"):
     help="No longer works", 
     brief="Returns the player who are online from the list")
 async def online(ctx):
-    await ctx.send("```\nUnfortunately, the API deprecated this endpoint so the command no longer works.\n```")
+    await ctx.send("Unfortunately, the API deprecated this endpoint so the command no longer works.")
 
 
 @client.command(
