@@ -196,28 +196,11 @@ async def leaderboard(ctx, *, command="john"):
         await ctx.send("```\n" + john + "\n```")
 
 @client.command(
-    help="See $addonline to be added to the list", 
+    help="No longer works", 
     brief="Returns the player who are online from the list")
 async def online(ctx):
-    await ctx.send("```\nUnfortunately, the API is being weird so this command does not work at the moment.\n```")
+    await ctx.send("```\nUnfortunately, the API deprecated this endpoint so the command no longer works.\n```")
 
-    # the_message = await ctx.send("please wait...")
-    # valorant_online.loadData()
-    # john = valorant_online.main()
-    # msg = ""
-
-    # for i in range(0, len(john)):
-
-    #     if john[i][0] == "no parties" or john[i][0] == "Players Online:" or john[i][0] == "All players offline":
-    #         msg += john[i][0] + '\n'
-
-    #     elif john[i][0] == "Parties:":
-    #         msg += '\n' + john[i][0] + '\n'
-            
-    #     else:  
-    #         msg += john[i][0] + ": " + john[i][1] + '\n'
-
-    # await the_message.edit(content="```\n" + msg + "\n```")
 
 @client.command(
     help="Syntax: $add username#tag name (name field is optional)", 
@@ -226,23 +209,6 @@ async def add(ctx, *, username):
 
     username = username.lower()
     jg = valorant_online.addPlayer(username, False)
-
-    if jg == False:
-        await ctx.send("Player does not exist")
-    elif jg == True:
-        await ctx.send("Player has already been added")
-    else:
-        await ctx.send("Player added")
-
-@client.command(
-    help="""Syntax: $addonline username#tag name (name field optional)
-Note: Being added to the online requires you to add valorant#API as a friend, after adding yourself,
-you will hopefully be send a friend request. (don't send the friend request yourself)""", 
-    brief="Adds the player to the list for $online")
-async def addonline(ctx, *, username):
-
-    username = username.lower()
-    jg = valorant_online.addPlayer(username, True)
 
     if jg == False:
         await ctx.send("Player does not exist")
