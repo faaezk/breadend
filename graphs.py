@@ -21,9 +21,6 @@ def rounddown(x):
     return int(math.floor(x / 100.0)) * 100
 
 def make_graph(username):
-
-    if os.path.isfile('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username)) == False:
-        return False
     
     playerlist = playerclass.PlayerList('playerlist.csv')
     playerlist.load()
@@ -34,7 +31,11 @@ def make_graph(username):
             tagline = player.tag
             break
 
-    valorant.update_elo_history(username, tagline)
+    if valorant.update_elo_history(username, tagline) == -1:
+        return False
+
+    if os.path.isfile('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username)) == False:
+        return False
     
     file1 = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username), 'r')
 
@@ -221,4 +222,5 @@ def double_graph(players):
 if __name__ == "__main__":
     #double_graph(['8888','azatory','bento2','crossaxis','fade','fakinator', 'giroud', 'grovyle', 'imabandwagon', 'jokii', 'katchampion',
     # 'yovivels', 'dilka30003', 'slumonaire', 'silentwhispers', 'lmao', 'jack', 'thesugarman', 'hoben222', 'quackinator'])
-    double_graph(['8888', 'yovivels', 'dilka30003', 'slumonaire'])
+    #double_graph(['8888', 'yovivels', 'dilka30003', 'slumonaire'])
+    print(make_graph("thomyorke"))

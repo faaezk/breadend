@@ -137,7 +137,10 @@ async def elolist(ctx, *, username):
 
     username = username.split('#')[0].lower()
     elolist = valorant.get_elolist(username)
-    await ctx.send("```\n" + elolist + "\n```")
+    if elolist == None:
+        await ctx.send("No comp games recorded")
+    else:
+        await ctx.send("```\n" + elolist + "\n```")
 
 @client.command(
     help="Syntax: $stats username#tag", 

@@ -1,30 +1,34 @@
 Player Leaderboard
-1. oshawott       1267
-2. lyçhii         1210
-3. jack           1097
-4. vkj             937
-5. dilka30003      891
-6. grovyle         879
-7. 8888            875
-8. thesugarman     858
-9. faqinator       817
-10.fakinator       806
-11.imabandwagon    772
-12.fade            746
-13.giroud          729
-14.lmao            720
-15.silentwhispers  694
-16.bento2          665
-17.azatory         662
-18.hoben222        647
-19.lol             625
-20.rustybeef       610
-21.tallewok        589
-22.yovivels        500
-23.slumonaire      500
-24.therealrobdez   477
-25.quackinator     379
-26.katchampion     257
-27.dilka20002      250
-28.crossaxis       247
-29.jokii           150
+1. oshawott         1267
+2. lyçhii           1210
+3. jack             1097
+4. dilka30003        941
+5. vkj               937
+6. 8888              907
+7. grovyle           879
+8. thesugarman       858
+9. fakinator         833
+10.imabandwagon      831
+11.azatory           826
+12.faqinator         817
+13.fade              746
+14.giroud            729
+15.lmao              720
+16.silentwhispers    694
+17.bento2            665
+18.hoben222          647
+19.lol               625
+20.rustybeef         610
+21.tallewok          589
+22.slumonaire        543
+23.kleenexwipes      542
+24.yovivels          537
+25.therealrobdez     477
+26.thomyorke         450
+27.crossaxis         266
+28.katchampion       247
+29.quackinator       204
+30.jokii             150
+31.boishebouttastab   83
+32.boiimbouttastab    83
+33.boiubouttastab     12

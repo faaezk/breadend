@@ -60,7 +60,7 @@ def update_elo_history(username, tagline):
     player_data = get_elo_history(username, tagline)
 
     if player_data == False:
-        return 0
+        return -1
     
     player_file_path = '/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username)
 
@@ -129,11 +129,10 @@ def get_elolist(username):
     file1 = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username), 'r')
 
     lines = [x.strip() for x in file1.readlines()]
-    if len(lines) == 2:
+    if len(lines) == 1:
         return None
     lines.pop(0)
     
-    lines = lines[1:]
     elolist = ""
 
     for elem in lines:
@@ -169,7 +168,7 @@ def elo_leaderboard():
         user = bohn[i][1]
         elo = bohn[i][0]
         rank = i + 1
-        leaderboard += str(str(rank) + '.').ljust(3) + str(user).ljust(14) + str(elo).rjust(5) + '\n'
+        leaderboard += str(str(rank) + '.').ljust(3) + str(user).ljust(16) + str(elo).rjust(5) + '\n'
 
     f = open("leaderboard.txt", "w")
     f.write(leaderboard)
