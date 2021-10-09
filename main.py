@@ -117,7 +117,7 @@ async def multigraph(ctx, *, players):
     for i in range(0, len(players)):
         players[i] = players[i].lower()
 
-    flag = graphs.double_graph(players)
+    flag = graphs.multigraph(players)
     
     if flag == False:
         await ctx.send("Player not found")
@@ -142,23 +142,42 @@ async def elolist(ctx, *, username):
     else:
         await ctx.send("```\n" + elolist + "\n```")
 
-@client.command(
-    help="Syntax: $stats username#tag", 
-    brief="Returns some comp statistics from each Act")
-async def stats(ctx, *, username):
 
+@slash.slash(description="Ranked statistics for all acts",
+             guild_ids=guild_ids,
+             options = [
+             create_option(name="username", description="enter username (user#tag)", option_type=3, required=True)])
+async def stats(ctx, username=""):
+
+    the_message = await ctx.send("fetching stats...")
     username = username.split('#')
+
     if len(username) == 2:
+
         fields = valorant.stats(username[0].lower(), username[1].lower())
         embed=discord.Embed(title = f'{username[0]}\'s Competitive Statistics', url = "https://youtu.be/MtN1YnoL46Q", description="", color=0x00f900)
+
         for field in fields:
             embed.add_field(name = field[0], value = field[1], inline = True)
 
         embed.set_footer(text = "unlucky")
-        await ctx.send(embed = embed)
-
+        await the_message.edit(embed = embed)
+    
     else:
-        await ctx.send("```\n" + "Player not found, check syntax: (username#tag)" + "\n```")
+        tag = valorant.get_tag(username[0].lower())
+        
+        if tag != "Player not found.":
+            fields = valorant.stats(username[0].lower(), tag)
+            embed=discord.Embed(title = f'{username[0]}\'s Competitive Statistics', url = "https://youtu.be/MtN1YnoL46Q", description="", color=0x00f900)
+
+            for field in fields:
+                embed.add_field(name = field[0], value = field[1], inline = True)
+
+            await the_message.edit(embed = embed)
+
+        else:
+            await the_message.edit(content="```\n" + "Player not found, check syntax: (username#tag)" + "\n```")
+
 
 @slash.slash(description="Valorant Leaderboards",
              guild_ids=guild_ids,
@@ -167,7 +186,6 @@ async def stats(ctx, *, username):
                         choices=[create_choice(name="Update local leaderboard",value="update"), create_choice(name="Asia Pacific",value="ap"),
                         create_choice(name="Europe",value="eu"), create_choice(name="Korea",value="kr"),
                         create_choice(name="North America",value="na")])])
-
 async def leaderboard(ctx, options=""):
     
     if options == "":
@@ -259,7 +277,6 @@ async def valhelp(ctx):
     embed.add_field(name = "add", value = "Adds the player to the database for leaderboard/graph/elolist\nSyntax: $add username#tag name (name field is optional)", inline = False)
     embed.add_field(name = "elolist", value = "Returns the elo values used in the graph\nSyntax: $elolist username or $elolist username#tag", inline = False)
     embed.add_field(name = "graph", value = "Returns a graph of the player's elo over time\nSyntax: $graph username or $graph username#tag", inline = False)
-    embed.add_field(name = "leaderboard", value = "Returns a MMR leaderboard (updates every 13 minutes)\nOptional argument: update", inline = False)
     embed.add_field(name = "multigraph", value = "Returns a graph with multiple player's elo over time\nSyntax: $multigraph username1, username2, username3\n (not username#tag)", inline = False)
     embed.add_field(name = "stats", value = "Returns some comp statistics from each Act\nSyntax: $stats username#tag", inline = False)
 

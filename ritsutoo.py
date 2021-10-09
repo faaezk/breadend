@@ -101,7 +101,7 @@ async def games(ctx, *, input):
 
                 msg = ""
                 for player in stats:
-                    msg += f'{player[0]}/{player[1]}: \n'
+                    msg += f'{player[0]} ({player[1]}) \n'
                 embed.add_field(name = "Red Team:", value = '```\n' + msg + '\n```', inline = True)
                 
                 msg = ""
