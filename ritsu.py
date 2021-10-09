@@ -31,7 +31,7 @@ async def on_ready():
                         create_choice(name="Europe",value="eu"), create_choice(name="Korea",value="kr"),
                         create_choice(name="North America",value="na")])])
 
-async def choice(ctx, options=""):
+async def leaderboard(ctx, options=""):
     
     if options == "":
         john = "this is like, potentially up to 13 minutes old\n"
@@ -47,17 +47,17 @@ async def choice(ctx, options=""):
         john = valorant.elo_leaderboard()
         await the_message.edit(content="```\n" + john + "\n```")
 
-    if options == "AP" or options == "EU" or options == "KR" or options == "NA":
+    if options == "ap" or options == "eu" or options == "kr" or options == "na":
+
+        regions = {"ap" : "Asia Pacific", "eu" : "Europe", "kr" : "Korea", "na" : "North America"}
         
+        the_message = await ctx.send("fetching leaderboard...")
         rleaderboard = valorant.region_leaderboard(options)
 
         if rleaderboard:
-            contents = f'{options} Ranked Leaderboard\n'
+            contents = f'{regions[options]} Ranked Leaderboard\n'
             contents += rleaderboard
-            await ctx.send("```\n" + contents + "\n```")
-        
-        else:
-            await ctx.send("invalid region. select from: AP, NA, EU, KR")
+            await the_message.edit(content="```\n" + contents + "\n```")
 
 
 @client.event
