@@ -176,6 +176,32 @@ def elo_leaderboard():
 
     return leaderboard
 
+def region_leaderboard(region):
+
+    url = f"https://api.henrikdev.xyz/valorant/v1/leaderboard/{region}"
+    r = requests.get(url)
+
+    if str(r) == "<Response [204]>":
+        return False
+
+    data = json.loads(r.text)
+    players = []
+    length = 20
+    
+    for i in range(length):
+        players.append([data[i]['gameName'], data[i]['rankedRating']])
+
+    rleaderboard = ""
+    
+    for i in range(0, len(players)):
+
+        elo = players[i][1]
+        user = players[i][0]
+        rank = i + 1
+        rleaderboard += str(str(rank) + '.').ljust(3) + str(user).ljust(20) + str(elo).rjust(5) + '\n'
+
+    return rleaderboard
+
 def stats(ign, tag):
 
     url = f'https://api.henrikdev.xyz/valorant/v2/mmr/ap/{ign}/{tag}'
