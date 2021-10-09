@@ -189,7 +189,10 @@ def region_leaderboard(region):
     length = 20
     
     for i in range(length):
-        players.append([data[i]['gameName'], data[i]['rankedRating']])
+        if data[i]['IsAnonymized'] == True:
+            players.append(["Anonymous", data[i]['rankedRating']])
+        else:
+            players.append([data[i]['gameName'], data[i]['rankedRating']])
 
     rleaderboard = ""
     
