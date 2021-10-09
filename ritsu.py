@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import configparser
-import malsearch
+import valorant
 from discord_slash import SlashCommand
 from discord_slash.utils.manage_commands import create_option, create_choice
 
@@ -22,42 +22,46 @@ guild_ids = [731539222141468673]
 async def on_ready():
     print("it started working")
 
-@client.command()
-async def g(ctx, message=None):
 
-        member = message.author.name
+@slash.slash(description="Valorant Leaderboards",
+             guild_ids=guild_ids,
+             options = [
+             create_option(name="options", description="Region/options for leaderboard (leave blank for local)", option_type=3, required=False, 
+                        choices=[create_choice(name="Update local leaderboard",value="update"), create_choice(name="Asia Pacific",value="ap"),
+                        create_choice(name="Europe",value="eu"), create_choice(name="Korea",value="kr"),
+                        create_choice(name="North America",value="na")])])
 
-        webhook = await ctx.channel.create_webhook(name=member.name)
-        await webhook.send(
-            str(message), username=member.name, avatar_url=member.avatar_url)
+async def choice(ctx, options=""):
+    
+    if options == "":
+        john = "this is like, potentially up to 13 minutes old\n"
+        f = open("leaderboard.txt", "r")
+        for x in f:
+            john += x
+        f.close()
 
-        webhooks = await ctx.channel.webhooks()
-        for webhook in webhooks:
-                await webhook.delete()
+        await ctx.send("```\n" + john + "\n```")
+    
+    if options == "update":
+        the_message = await ctx.send("this is gonna take a while...")
+        john = valorant.elo_leaderboard()
+        await the_message.edit(content="```\n" + john + "\n```")
+
+    if options == "AP" or options == "EU" or options == "KR" or options == "NA":
+        
+        rleaderboard = valorant.region_leaderboard(options)
+
+        if rleaderboard:
+            contents = f'{options} Ranked Leaderboard\n'
+            contents += rleaderboard
+            await ctx.send("```\n" + contents + "\n```")
+        
+        else:
+            await ctx.send("invalid region. select from: AP, NA, EU, KR")
+
 
 @client.event
 async def on_message(message):
-
-    if message.author == client.user:
-        return
-
-    user = client.get_user(message.author.id)
-
-    print(user)
-    print(message.author.display_name)
-
-    if message.content.startswith('name'):
-        
-        member=message.author
-
-        webhook = await message.channel.create_webhook(name=member.display_name)
-        await webhook.send("changed name\n", username=member.display_name, avatar_url=member.avatar_url)
-
-        webhooks = await message.channel.webhooks()
-        for webhook in webhooks:
-                await webhook.delete()
-
-
 
     if message.content.lower().startswith('good evening'):
         await message.channel.send(file=discord.File('good_evening.mp4'))

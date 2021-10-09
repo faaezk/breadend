@@ -170,6 +170,21 @@ async def leaderboard(ctx, *, command="john"):
         john = valorant.elo_leaderboard()
         await the_message.edit(content="```\n" + john + "\n```")
          
+    elif command.lower() == "na" or command.lower() == "eu" or command.lower() == "ap" or command.lower() == "oce":
+        region = command.lower()
+        if region == "oce":
+            region = "ap"
+        
+        rleaderboard = valorant.region_leaderboard(region)
+
+        if rleaderboard:
+            contents = f'{region.upper()} Ranked Leaderboard\n'
+            contents += rleaderboard
+            await ctx.send("```\n" + valorant.region_leaderboard(region) + "\n```")
+        
+        else:
+            await ctx.send("invalid region. select from: AP, NA, EU, KR")
+
     else:
         john = "this is like, potentially up to 13 minutes old\n"
         f = open("leaderboard.txt", "r")
