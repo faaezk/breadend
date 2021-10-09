@@ -1,24 +1,26 @@
 import requests
 import json
+import random
 
-url = f"https://api.henrikdev.xyz/valorant/v1/leaderboard/kr"
+url = f"https://api.henrikdev.xyz/valorant/v1/website/en-us?filter=game_updates"
+
 r = requests.get(url)
 
 data = json.loads(r.text)
-players = []
-length = 20
-    
-for i in range(length):
-        players.append([data[i]['gameName'], data[i]['rankedRating']])
-        ign = data[i]['gameName']
-        print(ign + "  " + str(len(ign)))
+data = data['data']
+i = 0
 
-rleaderboard = ""
-    
-for i in range(0, len(players)):
+while not "Patch Notes" in data[i]['title']:
+        i += 1
 
-    elo = players[i][1]
-    user = players[i][0]
-    rank = i + 1
-    rleaderboard += str(str(rank) + '.').ljust(3) + str(user).ljust(20) + str(elo).rjust(5) + '\n'
+print(data[i]['title'])
 
+url = f"https://api.henrikdev.xyz/valorant/v1/website/en-us"
+
+r = requests.get(url)
+
+data = json.loads(r.text)
+data = data['data']
+i = random.randint(0, len(data))
+
+print(data[i]['banner_url'])

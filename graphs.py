@@ -123,7 +123,7 @@ def make_graph(username):
     return True
 
 
-def double_graph(players):
+def multigraph(players):
 
     ymin = 10000
     ymax = 0
@@ -220,7 +220,7 @@ def double_graph(players):
     return True
 
 if __name__ == "__main__":
-    #double_graph(['8888','azatory','bento2','crossaxis','fade','fakinator', 'giroud', 'grovyle', 'imabandwagon', 'jokii', 'katchampion',
+    #multigraph(['8888','azatory','bento2','crossaxis','fade','fakinator', 'giroud', 'grovyle', 'imabandwagon', 'jokii', 'katchampion',
     # 'yovivels', 'dilka30003', 'slumonaire', 'silentwhispers', 'lmao', 'jack', 'thesugarman', 'hoben222', 'quackinator'])
-    #double_graph(['8888', 'yovivels', 'dilka30003', 'slumonaire'])
+    #multigraph(['8888', 'yovivels', 'dilka30003', 'slumonaire'])
     print(make_graph("fakinator"))
