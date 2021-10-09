@@ -9,15 +9,15 @@ Player Leaderboard
 8. imabandwagon     1013
 9. vkj               937
 10.grovyle           879
-11.azatory           850
+11.azatory           845
 12.faqinator         829
 13.silentwhispers    821
-14.thesugarman       771
+14.thesugarman       755
 15.fade              746
 16.lmao              730
 17.giroud            686
-18.bento2            665
-19.hoben222          664
+18.hoben222          680
+19.bento2            665
 20.yovivels          636
 21.slumonaire        633
 22.lol               625
