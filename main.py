@@ -161,7 +161,7 @@ async def stats(ctx, username=""):
             embed.add_field(name = field[0], value = field[1], inline = True)
 
         embed.set_footer(text = "unlucky")
-        await the_message.edit(embed = embed)
+        await the_message.edit(contents = "", embed = embed)
     
     else:
         tag = valorant.get_tag(username[0].lower())
@@ -173,7 +173,7 @@ async def stats(ctx, username=""):
             for field in fields:
                 embed.add_field(name = field[0], value = field[1], inline = True)
 
-            await the_message.edit(embed = embed)
+            await the_message.edit(contents = "", embed = embed)
 
         else:
             await the_message.edit(content="```\n" + "Player not found, check syntax: (username#tag)" + "\n```")
