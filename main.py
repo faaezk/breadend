@@ -57,7 +57,7 @@ async def choice(ctx, randomise="", tactic=""):
         await ctx.send(random.choice(selected))
     
     if randomise == "agent":
-        await ctx.send(random.choice(["Astra", "Breach", "Brimstone", "Cypher", "Jett", "Killjoy", "Kay/O"
+        await ctx.send(random.choice(["Astra", "Breach", "Brimstone", "Cypher", "Jett", "Killjoy", "Kay/O",
                                      "Omen", "Phoenix", "Raze", "Reyna", "Sage", "Skye", "Sova", "Viper", "Yoru"]))
 
     if randomise == "map":
