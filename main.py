@@ -425,9 +425,9 @@ async def on_message(message):
     if message.content.lower().startswith('good evening'):
         await message.channel.send(file=discord.File('good_evening.mp4'))
     
-    if "wow" in message.content.lower() and message.author.id == 203311457666990082:
+    if "wow" in message.content.lower() and message.author.id == 897988862658367549:
         await message.add_reaction("<:stevens:785800069957943306>")
-    
+
     await client.process_commands(message)
 
 
