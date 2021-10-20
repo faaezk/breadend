@@ -30,6 +30,9 @@ def make_graph(username):
         if player.ign == username:
             tagline = player.tag
             break
+    
+    if tagline == "":
+        return False
 
     if valorant.update_elo_history(username, tagline) == -1:
         return False
@@ -121,7 +124,6 @@ def make_graph(username):
     plt.clf()
 
     return True
-
 
 def multigraph(players):
 

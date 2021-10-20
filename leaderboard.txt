@@ -1,36 +1,38 @@
 Player Leaderboard
-1. oshawott         1363
+1. oshawott         1400
 2. lyçhii           1200
 3. windy            1134
 4. jack             1097
-5. imabandwagon     1053
-6. fakinator        1047
-7. dilka30003       1041
-8. 8888             1038
-9. vkj               937
-10.grovyle           910
-11.azatory           891
-12.faqinator         829
-13.silentwhispers    821
-14.thesugarman       753
-15.giroud            749
-16.fade              746
-17.lmao              730
-18.hoben222          700
+5. 8888             1078
+6. fakinator        1072
+7. dilka30003       1069
+8. imabandwagon     1053
+9. azatory          1033
+10.vkj               937
+11.grovyle           910
+12.silentwhispers    876
+13.giroud            870
+14.faqinator         829
+15.thesugarman       810
+16.hoben222          810
+17.fade              746
+18.lmao              730
 19.bento2            665
-20.lol               625
-21.tallewok          617
-22.kleenexwipes      558
-23.slumonaire        551
-24.rustybeef         533
-25.yovivels          528
-26.therealrobdez     490
-27.thomyorke         436
-28.boiwhogotstabbed  300
-29.quackinator       278
-30.katchampion       235
-31.crossaxis         172
-32.jokii             131
-33.boishebouttastab   65
-34.boiimbouttastab    64
-35.boiubouttastab      1
+20.slumonaire        655
+21.lol               625
+22.tallewok          617
+23.kleenexwipes      596
+24.rustybeef         586
+25.yovivels          556
+26.nadizheloof       550
+27.therealrobdez     490
+28.dilka40004        450
+29.thomyorke         439
+30.quackinator       326
+31.katchampion       286
+32.boiwhogotstabbed  275
+33.crossaxis         248
+34.jokii             163
+35.boishebouttastab   44
+36.boiimbouttastab    35
+37.boiubouttastab      0
