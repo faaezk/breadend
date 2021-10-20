@@ -22,7 +22,7 @@ token = get_config()[0]
 help_command = commands.DefaultHelpCommand(no_category = 'Commands')
 client = commands.Bot(command_prefix='$',help_command = help_command)
 slash = SlashCommand(client, sync_commands=True)
-guild_ids = [509314650265878530]
+guild_ids = [509314650265878530, 731539222141468673]
 
 @client.event
 async def on_ready():
@@ -93,8 +93,15 @@ async def cat(ctx):
     brief="Returns a graph of the player's elo over time")
 async def graph(ctx, *, username):
 
-    username = username.split('#')[0].lower()
-    flag = graphs.make_graph(username)
+    username = username.split('#')
+    flag = False
+
+    if len(username) > 2:
+        await ctx.send("Player not found")
+
+    else:
+        username = username[0].lower()
+        flag = graphs.make_graph(username)
     
     if flag == False:
         await ctx.send("Player not found")
