@@ -62,7 +62,7 @@ def update_elo_history(username, tagline):
     if player_data == False:
         return -1
     
-    player_file_path = '/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username)
+    player_file_path = f'/home/ubuntu/discord_bot/elo_history/{username}.txt'
 
     if os.path.isfile(player_file_path) == False:
         initialise_file(username)
