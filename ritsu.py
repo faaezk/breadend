@@ -1,9 +1,9 @@
 import discord
 from discord.ext import commands
 import configparser
-import valorant
+import graphs
 from discord_slash import SlashCommand
-from discord_slash.utils.manage_commands import create_option, create_choice
+from discord_slash.utils.manage_commands import create_option
 
 def get_config():
     c = configparser.ConfigParser()
@@ -21,6 +21,40 @@ guild_ids = [731539222141468673]
 @client.event
 async def on_ready():
     print("it started working")
+
+@client.command(
+    help="Syntax: $graph username or $graph username#tag", 
+    brief="Returns a graph of the player's elo over time")
+async def graph(ctx, *, username):
+
+    username = username.split('#')[0].lower()
+    flag = graphs.make_graph(username)
+    
+    if flag == False:
+        await ctx.send("Player not found")
+
+    elif flag == None:
+        await ctx.send("Not enough data to plot graph")
+
+    else:
+        with open("/home/ubuntu/discord_bot/elo_graphs/{}.png".format(username), 'rb') as f:
+            picture = discord.File(f)
+            await ctx.send(file=picture)
+
+
+@slash.slash(description="graph",
+             guild_ids=guild_ids,
+             options = [
+             create_option(name="username(s)", description="Enter usernames, seperate with commas for more than one", option_type=3, required=True)])
+async def leaderboard(ctx, options=""):
+    
+    users = options.split(',')
+
+    for user in users:
+        user.strip()
+        user = user.split('#')[0].lower()
+    
+    print(users)
 
 
 
