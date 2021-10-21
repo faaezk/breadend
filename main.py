@@ -88,54 +88,15 @@ async def cat(ctx):
 
     await ctx.send(embed=embed)
 
-@client.command(
-    help="Syntax: $graph username or $graph username#tag", 
-    brief="Returns a graph of the player's elo over time")
+@client.command()
 async def graph(ctx, *, username):
 
-    username = username.split('#')
-    flag = False
+    await ctx.send("use /graph")
 
-    if len(username) > 2:
-        await ctx.send("Player not found")
-
-    else:
-        username = username[0].lower()
-        flag = graphs.make_graph(username)
-    
-    if flag == False:
-        await ctx.send("Player not found")
-
-    elif flag == None:
-        await ctx.send("Not enough data to plot graph")
-
-    else:
-        with open("/home/ubuntu/discord_bot/elo_graphs/{}.png".format(username), 'rb') as f:
-            picture = discord.File(f)
-            await ctx.send(file=picture)
-
-@client.command(
-    help="Where players is a list of username's (not username#tag) seperated by commas.\nSyntax: $multigraph username1, username2, username3", 
-    brief="Returns a graph with multiple player's elo over time")
+@client.command()
 async def multigraph(ctx, *, players):
 
-    players = players.replace(" ", "").split(',')
-
-    for i in range(0, len(players)):
-        players[i] = players[i].lower()
-
-    flag = graphs.multigraph(players)
-    
-    if flag == False:
-        await ctx.send("Player not found")
-
-    elif flag == None:
-        await ctx.send("Not enough data to plot graph")
-
-    else:
-        with open("/home/ubuntu/discord_bot/elo_graphs/multigraph.png", 'rb') as f:
-            picture = discord.File(f)
-            await ctx.send(file=picture)
+    await ctx.send("use /graph")
 
 @client.command(
     help="Syntax: $elolist username or $elolist username#tag", 
@@ -185,6 +146,43 @@ async def stats(ctx, username=""):
         else:
             await the_message.edit(content="```\n" + "Player not found, check syntax: (username#tag)" + "\n```")
 
+@slash.slash(description="graph",
+             guild_ids=guild_ids,
+             options = [
+             create_option(name="usernames", description="Enter username(s), seperate with commas for more than one", option_type=3, required=True)])
+async def graph(ctx, usernames=""):
+    users = usernames.split(',')
+    
+    for i in range(0, len(users)):
+        users[i] = users[i].split('#')[0].lower().strip()
+
+    if len(users) == 1:
+        flag = graphs.make_graph(users[0])
+        if flag == False:
+            await ctx.send("Player not found")
+
+        elif flag == None:
+            await ctx.send("Not enough data to plot graph")
+
+        else:
+            with open(f"/home/ubuntu/discord_bot/elo_graphs/{users[0]}.png", 'rb') as f:
+                picture = discord.File(f)
+                await ctx.send(file=picture)
+
+    else:
+        await ctx.send("please wait...")
+        flag = graphs.multigraph(users)
+        
+        if flag == False:
+            await ctx.send("Player not found")
+
+        elif flag == None:
+            await ctx.send("Not enough data to plot graph")
+
+        else:
+            with open("/home/ubuntu/discord_bot/elo_graphs/multigraph.png", 'rb') as f:
+                picture = discord.File(f)
+                await ctx.send(content="", file=picture)
 
 @slash.slash(description="Valorant Leaderboards",
              guild_ids=guild_ids,

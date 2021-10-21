@@ -22,40 +22,44 @@ guild_ids = [731539222141468673]
 async def on_ready():
     print("it started working")
 
-@client.command(
-    help="Syntax: $graph username or $graph username#tag", 
-    brief="Returns a graph of the player's elo over time")
-async def graph(ctx, *, username):
-
-    username = username.split('#')[0].lower()
-    flag = graphs.make_graph(username)
-    
-    if flag == False:
-        await ctx.send("Player not found")
-
-    elif flag == None:
-        await ctx.send("Not enough data to plot graph")
-
-    else:
-        with open("/home/ubuntu/discord_bot/elo_graphs/{}.png".format(username), 'rb') as f:
-            picture = discord.File(f)
-            await ctx.send(file=picture)
-
-
 @slash.slash(description="graph",
              guild_ids=guild_ids,
              options = [
-             create_option(name="username(s)", description="Enter usernames, seperate with commas for more than one", option_type=3, required=True)])
-async def leaderboard(ctx, options=""):
+             create_option(name="usernames", description="Enter username(s), seperate with commas for more than one", option_type=3, required=True)])
+async def graph(ctx, usernames=""):
+    users = usernames.split(',')
     
-    users = options.split(',')
+    for i in range(0, len(users)):
+        users[i] = users[i].split('#')[0].lower().strip()
 
-    for user in users:
-        user.strip()
-        user = user.split('#')[0].lower()
+    if len(users) == 1:
+        flag = graphs.make_graph(users[0])
+        if flag == False:
+            await ctx.send("Player not found")
+
+        elif flag == None:
+            await ctx.send("Not enough data to plot graph")
+
+        else:
+            with open(f"/home/ubuntu/discord_bot/elo_graphs/{users[0]}.png", 'rb') as f:
+                picture = discord.File(f)
+                await ctx.send(file=picture)
+
+    else:
+        await ctx.send("please wait...")
+        flag = graphs.multigraph(users)
+        
+        if flag == False:
+            await ctx.send("Player not found")
+
+        elif flag == None:
+            await ctx.send("Not enough data to plot graph")
+
+        else:
+            with open("/home/ubuntu/discord_bot/elo_graphs/multigraph.png", 'rb') as f:
+                picture = discord.File(f)
+                await ctx.send(content="", file=picture)
     
-    print(users)
-
 
 
 @client.event
