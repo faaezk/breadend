@@ -88,16 +88,6 @@ async def cat(ctx):
 
     await ctx.send(embed=embed)
 
-@client.command()
-async def graph(ctx, *, username):
-
-    await ctx.send("use /graph")
-
-@client.command()
-async def multigraph(ctx, *, players):
-
-    await ctx.send("use /graph")
-
 @client.command(
     help="Syntax: $elolist username or $elolist username#tag", 
     brief="Returns the elo values used in the graph")
@@ -170,19 +160,19 @@ async def graph(ctx, usernames=""):
                 await ctx.send(file=picture)
 
     else:
-        await ctx.send("please wait...")
+        the_message = await ctx.send("please wait...")
         flag = graphs.multigraph(users)
         
         if flag == False:
-            await ctx.send("Player not found")
+            await the_message.edit("Player not found")
 
         elif flag == None:
-            await ctx.send("Not enough data to plot graph")
+            await the_message.edit("Not enough data to plot graph")
 
         else:
             with open("/home/ubuntu/discord_bot/elo_graphs/multigraph.png", 'rb') as f:
                 picture = discord.File(f)
-                await ctx.send(content="", file=picture)
+                await the_message.edit(content="", file=picture)
 
 @slash.slash(description="Valorant Leaderboards",
              guild_ids=guild_ids,
