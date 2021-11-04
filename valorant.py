@@ -30,6 +30,9 @@ def get_elo_history(username, tagline):
     if john['status'] == '404' or john['status'] == '500':
         return False
     
+    if john['status'] == '429':
+        return "welp"
+
     return john
 
 def get_elo_from_file(username):
@@ -62,6 +65,9 @@ def update_elo_history(username, tagline):
 
     if player_data == False:
         return -1
+    
+    if player_data == "welp":
+        return "welp"
     
     player_file_path = f'/home/ubuntu/discord_bot/elo_history/{username}.txt'
 
