@@ -423,6 +423,17 @@ async def on_message(message):
     if "wow" in message.content.lower() and message.author.id == 897988862658367549:
         await message.add_reaction("<:stevens:785800069957943306>")
 
+    if message.content.lower().startswith('$lastupdate'):
+        f = open("elo_history/run_check.out", "r")
+        last = f.readlines()[-1]
+        f.close()
+
+        f = open("leaderboard_log.out", "r")
+        last2 = f.readlines()[-1]
+        f.close()
+
+        await message.channel.send(last[14:len(last) - 16] + " and " + last2)
+
     await client.process_commands(message)
 
 
