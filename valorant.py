@@ -1,3 +1,4 @@
+from datetime import datetime
 import requests
 import json
 import os
@@ -242,3 +243,5 @@ if __name__ == "__main__":
     f.write(leaderboard)
     f.close()
     #print("leaderboard updated")
+    now = datetime.now()
+    print(now.strftime("%d/%m/%Y") + " at " + now.strftime("%H:%M:%S"))
