@@ -436,15 +436,7 @@ async def on_message(message):
         last = f.readlines()[-1]
         f.close()
 
-        f = open("leaderboard_log.out", "r")
-        last2 = f.readlines()[-1]
-        f.close()
-
-        f = open("leaderboard_log.out", "w")
-        f.write(last2)
-        f.close()
-
-        await message.channel.send(last[14:len(last) - 16] + "\n" + last2)
+        await message.channel.send(last[14:len(last) - 16])
 
     await client.process_commands(message)
 
