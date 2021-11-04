@@ -149,17 +149,11 @@ def elo_leaderboard():
     bohn = []
 
     for player in playerlist.players:
-        data = get_elo_history(player.ign, player.tag)
 
-        if data == False:
-            file_elo = get_elo_from_file(player.ign)
+        file_elo = get_elo_from_file(player.ign)
 
-            if file_elo != False:
-                bohn.append((file_elo, player.ign))
-
-            continue
-
-        bohn.append((data['data'][0]['elo'], player.ign))
+        if type(file_elo) == int:
+            bohn.append((file_elo, player.ign))
 
     bohn = sorted(bohn, reverse=True)
     leaderboard = "Player Leaderboard\n"
@@ -243,5 +237,3 @@ if __name__ == "__main__":
     f.write(leaderboard)
     f.close()
     #print("leaderboard updated")
-    now = datetime.now()
-    print(now.strftime("%d/%m/%Y") + " at " + now.strftime("%H:%M:%S"))
