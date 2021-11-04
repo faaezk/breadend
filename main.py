@@ -4,6 +4,7 @@ import configparser
 import valorant_online
 import graphs
 import valorant
+import elo_history_updater
 import requests
 import json
 import malsearch
@@ -194,7 +195,14 @@ async def leaderboard(ctx, options=""):
     
     if options == "update":
         the_message = await ctx.send("this is gonna take a while...")
-        john = valorant.elo_leaderboard()
+        elo_history_updater.update_all_elo_history()
+
+        john = ""
+        f = open("leaderboard.txt", "r")
+        for x in f:
+            john += x
+        f.close()
+        
         await the_message.edit(content="```\n" + john + "\n```")
 
     if options == "ap" or options == "eu" or options == "kr" or options == "na":
@@ -436,7 +444,7 @@ async def on_message(message):
         f.write(last2)
         f.close()
 
-        await message.channel.send(last[14:len(last) - 16] + " and " + last2)
+        await message.channel.send(last[14:len(last) - 16] + "\n" + last2)
 
     await client.process_commands(message)
 

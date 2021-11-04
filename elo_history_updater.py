@@ -16,6 +16,7 @@ def update_all_elo_history():
         #graphs.make_graph(playerList.players[i].ign)
     return str(update_count) + " updates"
 
-updates = update_all_elo_history()
-now = datetime.now()
-print("completed on: " + now.strftime("%d/%m/%Y") + " at " + now.strftime("%H:%M:%S") + " with " + updates)
+if __name__ == '__main__':
+    updates = update_all_elo_history()
+    now = datetime.now()
+    print("completed on: " + now.strftime("%d/%m/%Y") + " at " + now.strftime("%H:%M:%S") + " with " + updates)
