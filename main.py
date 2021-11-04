@@ -432,6 +432,10 @@ async def on_message(message):
         last2 = f.readlines()[-1]
         f.close()
 
+        f = open("leaderboard_log.out", "w")
+        f.write(last2)
+        f.close()
+
         await message.channel.send(last[14:len(last) - 16] + " and " + last2)
 
     await client.process_commands(message)
