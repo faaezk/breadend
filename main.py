@@ -185,7 +185,7 @@ async def graph(ctx, usernames=""):
 async def leaderboard(ctx, options=""):
     
     if options == "":
-        john = "this is like, potentially up to 13 minutes old\n"
+        john = "this is like, potentially up to an hour old\n"
         f = open("leaderboard.txt", "r")
         for x in f:
             john += x
@@ -436,7 +436,7 @@ async def on_message(message):
         last = f.readlines()[-1]
         f.close()
 
-        await message.channel.send(last[14:len(last) - 16])
+        await message.channel.send(last)
 
     await client.process_commands(message)
 
