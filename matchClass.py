@@ -48,7 +48,6 @@ class Player():
         return self.kda['score']
 
 
-
 class Event():
     def __init__(self, time, killer, deather, weapon_id, killer_location, deather_location, number):
         self.time = time
