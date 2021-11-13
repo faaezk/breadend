@@ -186,6 +186,7 @@ async def leaderboard(ctx, options=""):
     
     if options == "":
         john = "this is like, potentially up to an hour old\n"
+        valorant.elo_leaderboard()
         f = open("leaderboard.txt", "r")
         for x in f:
             john += x
@@ -196,7 +197,7 @@ async def leaderboard(ctx, options=""):
     if options == "update":
         the_message = await ctx.send("this is gonna take a while...")
         elo_history_updater.update_all_elo_history()
-
+        valorant.elo_leaderboard()
         john = ""
         f = open("leaderboard.txt", "r")
         for x in f:
