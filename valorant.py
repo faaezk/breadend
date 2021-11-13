@@ -70,8 +70,8 @@ def update_elo_history(username, tagline):
 
     player_data = get_elo_history(username, tagline)
 
-    if player_data == False:
-        return -1
+    if not player_data:
+        return False
     
     if player_data == "welp":
         return "welp"
