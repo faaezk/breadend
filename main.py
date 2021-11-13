@@ -114,9 +114,12 @@ async def stats(ctx, username=""):
     if len(username) == 2:
 
         fields = valorant.stats(username[0].lower(), username[1].lower())
-        embed=discord.Embed(title = f'{username[0]}\'s Competitive Statistics', url = "https://youtu.be/MtN1YnoL46Q", description="", color=0x00f900)
+        data = fields[0]
+        card = fields[1]
+        embed=discord.Embed(title = "Competitive Statistics", description="", color=0x00f900)
+        embed.set_author(name=username[0].lower(), url = "https://youtu.be/MtN1YnoL46Q", icon_url=card)
 
-        for field in fields:
+        for field in data:
             embed.add_field(name = field[0], value = field[1], inline = True)
 
         embed.set_footer(text = "unlucky")
@@ -127,15 +130,19 @@ async def stats(ctx, username=""):
         
         if tag != "Player not found.":
             fields = valorant.stats(username[0].lower(), tag)
-            embed=discord.Embed(title = f'{username[0]}\'s Competitive Statistics', url = "https://youtu.be/MtN1YnoL46Q", description="", color=0x00f900)
-
-            for field in fields:
+            data = fields[0]
+            card = fields[1]
+            embed=discord.Embed(title = "Competitive Statistics", description="", color=0x00f900)
+            embed.set_author(name=username[0].lower(), url = "https://youtu.be/MtN1YnoL46Q", icon_url=card)
+            
+            for field in data:
                 embed.add_field(name = field[0], value = field[1], inline = True)
 
             await the_message.edit(contents = "", embed = embed)
 
         else:
             await the_message.edit(content="```\n" + "Player not found, check syntax: (username#tag)" + "\n```")
+
 
 @slash.slash(description="graph",
              guild_ids=guild_ids,
