@@ -34,7 +34,7 @@ def make_graph(username):
     if tagline == "":
         return False
 
-    if valorant.update_elo_history(username, tagline) == -1:
+    if not valorant.update_elo_history(username, tagline):
         return False
 
     if os.path.isfile('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username)) == False:
