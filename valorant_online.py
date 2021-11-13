@@ -60,7 +60,6 @@ def form_parties():
 
     return parties
 
-
 def main():
 
     parties = form_parties()

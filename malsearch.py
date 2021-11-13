@@ -100,7 +100,6 @@ def animeSearch(title):
             "eng_title" : anime['title_english'], "jap_title" : anime['title_japanese'], "image_url" : anime['image_url'],
             "studios" : studios, "licensors" : licensors,"opening_themes": opening_themes, "ending_themes" : ending_themes}
 
-
 def mangaSearch(title):
 
     try:
@@ -168,7 +167,6 @@ def mangaSearch(title):
             "score" : manga['score'], "type" : manga['type'], "rank" : manga['rank'], "url" : manga['url'],
             "eng_title" : manga['title_english'], "jap_title" : manga['title_japanese'], "image_url" : manga['image_url'],
             "authors" : authors, "serialisations" : serializations, "synopsis" : info}
-
 
 def characterSearch(name):
     
@@ -248,7 +246,6 @@ def characterSearch(name):
             "voice_actors" : voice_actors, "anime" : anime, "manga" : manga, "description" : info,
             "member_favourites" : character["member_favorites"]}
 
-
 def addlabels(x,y):
     for i in range(len(x)):
         plt.text(i, y[i], y[i], ha = 'center')
@@ -317,7 +314,6 @@ def animeStats(title):
         "dropped":anime["dropped"],"plan_to_watch":anime["plan_to_watch"],"total":anime["total"],
         "title" : name, "url" : url}
 
-
 def mangaStats(title):
     
     try:
@@ -381,7 +377,6 @@ def mangaStats(title):
     return {"reading":manga["reading"],"completed":manga["completed"],"on_hold":manga["on_hold"],
         "dropped":manga["dropped"],"plan_to_read":manga["plan_to_read"],"total":manga["total"],
         "title" : name, "url" : url}
-
 
 
 if __name__ == '__main__':

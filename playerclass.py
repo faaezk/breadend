@@ -78,7 +78,6 @@ class Player():
         self.status = igstatus
 
 
-
 class PlayerList():
     def __init__(self, filePath):
         self.filePath = filePath
