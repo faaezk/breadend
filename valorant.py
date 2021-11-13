@@ -246,3 +246,23 @@ def stats(ign, tag):
     card = john['data']['card']['small']
 
     return [final, card]
+
+def banner(ign, tag):
+
+    url = f'https://api.henrikdev.xyz/valorant/v1/account/{ign}/{tag}'
+    r = requests.get(url)
+
+    if str(r) == "<Response [204]>":
+        return "Player not found"
+
+    john = json.loads(r.text)
+
+    if john['status'] == '404' or john['status'] == '500':
+        return "Player not found, check syntax: (username#tag)"
+    
+    url = john['data']['card']['large']
+    r = requests.get(url, allow_redirects=True)
+
+    open('banner.png', 'wb').write(r.content)
+
+    return True

@@ -303,6 +303,24 @@ async def gettag(ctx, *, user):
     else:
         await ctx.send(f'{user}#{valorant.get_tag(user)}')
 
+@client.command()
+async def banner(ctx, *, username):
+    username = username.split('#')
+
+    if len(username) == 2:
+        valorant.banner(username[0].lower(), username[1].lower())
+        await ctx.send(file=discord.File('banner.png'))
+    
+    else:
+        tag = valorant.get_tag(username[0].lower())
+        
+        if tag != "Player not found.":
+            valorant.banner(username[0].lower(), tag)
+            await ctx.send(file=discord.File('banner.png'))
+
+        else:
+            await ctx.send(content="```\n" + "Player not found, check syntax: (username#tag)" + "\n```")
+
 @slash.slash(description="search MAL database",
              guild_ids=guild_ids,
              options = [create_option(name="anime_title", description="Enter an anime to search for", option_type=3, required=False),
