@@ -59,7 +59,6 @@ async def graph(ctx, usernames=""):
             with open("/home/ubuntu/discord_bot/elo_graphs/multigraph.png", 'rb') as f:
                 picture = discord.File(f)
                 await the_message.edit(content="", file=picture)
-    
 
 
 @client.event

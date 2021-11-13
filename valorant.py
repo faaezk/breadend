@@ -1,4 +1,3 @@
-from datetime import datetime
 import requests
 import json
 import os
@@ -242,7 +241,3 @@ def stats(ign, tag):
             final.append([f'Episode {key[1]} Act {key[3]}:', f'{rank}\nGames Played: {games}\nWinrate: {round((wins/games) * 100, 2)}%'])
     
     return final
-
-#Don't remove as this is how the leaderboard is being refreshed
-if __name__ == "__main__":
-    print(update_elo_history('skzcross', 'oce'))
