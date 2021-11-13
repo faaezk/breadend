@@ -27,11 +27,19 @@ def get_elo_history(username, tagline):
 
     john = json.loads(r.text)
 
-    if john['status'] == '404' or john['status'] == '500':
-        return False
+    if 'status' in john:
+        if john['status'] == '404' or john['status'] == '500':
+            return False
+        
+        if john['status'] == '429':
+            return "welp"
     
-    if john['status'] == '429':
-        return "welp"
+    if 'statusCode' in john:
+        if john['statusCode'] == 404 or john['statusCode'] == 500:
+            return False
+        
+        if john['statusCode'] == 429:
+            return "welp"
 
     return john
 
@@ -54,7 +62,7 @@ def initialise_file(username):
     f.close()
 
     f = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username), "w")
-    f.writelines(str(0) + '\n')
+    f.writelines('\n')
     f.close()
 
     return
@@ -237,9 +245,4 @@ def stats(ign, tag):
 
 #Don't remove as this is how the leaderboard is being refreshed
 if __name__ == "__main__":
-    leaderboard = elo_leaderboard()
-
-    f = open("leaderboard.txt", "w")
-    f.write(leaderboard)
-    f.close()
-    #print("leaderboard updated")
+    print(update_elo_history('skzcross', 'oce'))
