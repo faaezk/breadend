@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import configparser
-import graphs
+import valorant
 from discord_slash import SlashCommand
 from discord_slash.utils.manage_commands import create_option
 
@@ -22,43 +22,47 @@ guild_ids = [731539222141468673]
 async def on_ready():
     print("it started working")
 
-@slash.slash(description="graph",
+@slash.slash(description="Ranked statistics for all acts",
              guild_ids=guild_ids,
              options = [
-             create_option(name="usernames", description="Enter username(s), seperate with commas for more than one", option_type=3, required=True)])
-async def graph(ctx, usernames=""):
-    users = usernames.split(',')
+             create_option(name="username", description="enter username (user#tag)", option_type=3, required=True)])
+async def stats(ctx, username=""):
+
+    the_message = await ctx.send("fetching stats...")
+    username = username.split('#')
+
+    if len(username) == 2:
+
+        fields = valorant.stats(username[0].lower(), username[1].lower())
+        data = fields[0]
+        card = fields[1]
+        embed=discord.Embed(title = "Competitive Statistics", description="", color=0x00f900)
+        embed.set_author(name=username[0].lower(), url = "https://youtu.be/MtN1YnoL46Q", icon_url=card)
+
+        for field in data:
+            embed.add_field(name = field[0], value = field[1], inline = True)
+
+        embed.set_footer(text = "unlucky")
+        await the_message.edit(contents = "", embed = embed)
     
-    for i in range(0, len(users)):
-        users[i] = users[i].split('#')[0].lower().strip()
-
-    if len(users) == 1:
-        flag = graphs.make_graph(users[0])
-        if flag == False:
-            await ctx.send("Player not found")
-
-        elif flag == None:
-            await ctx.send("Not enough data to plot graph")
-
-        else:
-            with open(f"/home/ubuntu/discord_bot/elo_graphs/{users[0]}.png", 'rb') as f:
-                picture = discord.File(f)
-                await ctx.send(file=picture)
-
     else:
-        the_message = await ctx.send("please wait...")
-        flag = graphs.multigraph(users)
+        tag = valorant.get_tag(username[0].lower())
         
-        if flag == False:
-            await the_message.edit("Player not found")
+        if tag != "Player not found.":
+            fields = valorant.stats(username[0].lower(), tag)
+            data = fields[0]
+            card = fields[1]
+            embed=discord.Embed(title = "Competitive Statistics", description="", color=0x00f900)
+            embed.set_author(name=username[0].lower(), url = "https://youtu.be/MtN1YnoL46Q", icon_url=card)
+            
+            for field in data:
+                embed.add_field(name = field[0], value = field[1], inline = True)
 
-        elif flag == None:
-            await the_message.edit("Not enough data to plot graph")
+            await the_message.edit(contents = "", embed = embed)
 
         else:
-            with open("/home/ubuntu/discord_bot/elo_graphs/multigraph.png", 'rb') as f:
-                picture = discord.File(f)
-                await the_message.edit(content="", file=picture)
+            await the_message.edit(content="```\n" + "Player not found, check syntax: (username#tag)" + "\n```")
+
 
 
 @client.event

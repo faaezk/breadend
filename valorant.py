@@ -240,4 +240,9 @@ def stats(ign, tag):
             rank = data[key]['final_rank_patched']
             final.append([f'Episode {key[1]} Act {key[3]}:', f'{rank}\nGames Played: {games}\nWinrate: {round((wins/games) * 100, 2)}%'])
     
-    return final
+    url = f'https://api.henrikdev.xyz/valorant/v1/account/{ign}/{tag}'
+    r = requests.get(url)
+    john = json.loads(r.text)
+    card = john['data']['card']['small']
+
+    return [final, card]
