@@ -266,3 +266,24 @@ def banner(ign, tag):
     open('banner.png', 'wb').write(r.content)
 
     return True
+
+def check_if_account_exists(ign, tag):
+
+    url = f'https://api.henrikdev.xyz/valorant/v1/account/{ign}/{tag}'
+
+    r = requests.get(url)
+
+    if str(r) == "<Response [204]>":
+        return False
+
+    john = json.loads(r.text)
+
+    if 'status' in john:
+        if john['status'] != '200':
+            return False
+    
+    if 'statusCode' in john:
+        if john['statusCode'] != 200:
+            return False
+
+    return john

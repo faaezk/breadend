@@ -313,12 +313,18 @@ async def namechange(ctx, old_username="", new_username=""):
         new_ign = new_username.split('#')[0].lower()
         new_tag = new_username.split('#')[1].lower()
 
-        playerList = playerclass.PlayerList('playerlist.csv')
-        playerList.load()
-        playerList.change_ign(old, new_ign, new_tag)
-        playerList.save()
-
-        await ctx.send(f'{old} is now {new_ign}#{new_tag}')
+        if valorant.check_if_account_exists(new_ign, new_tag):
+            playerList = playerclass.PlayerList('playerlist.csv')
+            playerList.load()
+            if playerList.change_ign(old, new_ign, new_tag):
+                playerList.save()
+                await ctx.send(f'{old} is now {new_ign}#{new_tag}')
+            
+            else:
+                await ctx.send(f'{old} not found in database, check player list using `$getcsv`')
+        
+        else:
+            await ctx.send("user does not exist.")
             
     else:
         await ctx.send("ask faaez to do it.")
