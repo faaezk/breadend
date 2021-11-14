@@ -342,6 +342,11 @@ async def getcsv(ctx):
 
     await ctx.send(content="```\n" + msg + "\n```")
 
+@slash.slash(description="Valorant Servers Status",
+             guild_ids=guild_ids)
+async def serverstatus(ctx):
+    await ctx.send(valorant.servercheck())
+
 @slash.slash(description="search MAL database",
              guild_ids=guild_ids,
              options = [create_option(name="anime_title", description="Enter an anime to search for", option_type=3, required=False),
