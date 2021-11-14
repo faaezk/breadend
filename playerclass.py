@@ -1,3 +1,5 @@
+import os
+
 class Player():
     def __init__(self, ign, tag, name = None, active = True):
         self.ign = ign
@@ -18,6 +20,14 @@ class Player():
 
     def __eq__(self, o: object) -> bool:
         return str(self) == str(o)
+    
+    def setUser(self, ign, tag):
+
+        if self.ign == self.name:
+            self.name = ign
+
+        self.ign = ign
+        self.tag = tag
 
 class PlayerList():
     def __init__(self, filePath):
@@ -53,6 +63,26 @@ class PlayerList():
                 return True
         
         return False
+
+    def change_ign(self, old_ign, new_ign, tag):
+        player = None
+
+        for elem in self.players:
+            if elem.ign == old_ign:
+                player = elem
+                break
+
+        if player == None:
+            return "player not found"
+
+        player.setUser(new_ign, tag)
+
+        if os.path.isfile(f'elo_history/{old_ign}.txt'):
+            os.rename(f'elo_history/{old_ign}.txt', f'elo_history/{new_ign}.txt')
+        
+        self.save()
+
+        return True
 
 if __name__ == '__main__':
     playerList = PlayerList('playerlist.csv')

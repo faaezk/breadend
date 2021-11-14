@@ -11,6 +11,7 @@ import malsearch
 from discord_slash import SlashCommand
 from discord_slash.utils.manage_commands import create_option, create_choice
 import random
+import playerclass
 
 def get_config():
     c = configparser.ConfigParser()
@@ -265,22 +266,23 @@ async def remove(ctx, *, username):
         await ctx.send("no.")
 
 @client.command(
-    help="ask Faaez (Fakinator) if you wanna be removed", 
-    brief="Removes the player from the online list")
-async def removeonline(ctx, *, username):
+    help="ask Faaez (Fakinator) if you changed username", 
+    brief="Changes player's name in the database")
+async def namechange(ctx, *, names):
 
     if ctx.author.id == 410771947522359296:
-        username = username.lower()
+        names = names.split(' ')
+        old = names[0]
+        new = names[1].split('#')
 
-        if valorant_online.removePlayer(username, True) == False:
-            await ctx.send("Player not in list")
-
-        else:
-            await ctx.send("Player removed")
+        playerList = playerclass.PlayerList('playerlist.csv')
+        playerList.load()
+        playerList.change_ign(old, new[0], new[1])
+        playerList.save()
             
     else:
         await ctx.send("no.")
-    
+
 @client.command()
 async def valhelp(ctx):
     embed=discord.Embed(title = "List of Commands", url = "https://youtu.be/MtN1YnoL46Q", description="", color=0x00f900)
