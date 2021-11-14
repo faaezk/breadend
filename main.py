@@ -342,10 +342,10 @@ async def getcsv(ctx):
 
     await ctx.send(content="```\n" + msg + "\n```")
 
-@slash.slash(description="Valorant Servers Status",
-             guild_ids=guild_ids)
+@slash.slash(description="Valorant Servers Status", guild_ids=guild_ids)
 async def serverstatus(ctx):
-    await ctx.send(valorant.servercheck())
+    the_message = await ctx.send("fetching statuses")
+    await the_message.edit(content=valorant.servercheck())
 
 @slash.slash(description="search MAL database",
              guild_ids=guild_ids,

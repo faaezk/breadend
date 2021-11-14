@@ -1,33 +1,33 @@
 Player Leaderboard
-1. oshawott         1269
+1. oshawott         1271
 2. lyçhii           1200
 3. vkj              1150
 4. windy            1125
 5. jack             1069
-6. imabandwagon     1016
-7. dilka30003        981
-8. giroud            972
-9. fakinator         971
-10.8888              970
-11.azatory           914
+6. imabandwagon     1010
+7. giroud           1010
+8. 8888             1010
+9. dilka30003        981
+10.fakinator         971
+11.silentwhispers    910
 12.grovyle           910
-13.hoben222          861
-14.silentwhispers    854
+13.azatory           900
+14.hoben222          882
 15.lmao              813
-16.kyouko            782
-17.thesugarman       761
+16.thesugarman       784
+17.kyouko            782
 18.fade              746
-19.therealrobdez     689
-20.bento2            665
-21.yovivels          657
-22.kleenexwipes      652
+19.kleenexwipes      677
+20.therealrobdez     671
+21.bento2            665
+22.yovivels          657
 23.lol               625
 24.tallewok          617
-25.slumonaire        608
-26.quyteriyaki       600
-27.rustybeef         584
-28.nadizheloof       552
-29.dilka40004        446
+25.nadizheloof       610
+26.slumonaire        608
+27.quyteriyaki       600
+28.rustybeef         584
+29.dilka40004        481
 30.thomyorke         439
 31.quackinator       380
 32.katchampion       331
