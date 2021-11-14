@@ -39,7 +39,6 @@ async def on_ready():
                         create_choice(name="map",value="map")]),
              create_option(name="tactic", description="returns the plays for this round", option_type=3, required=False, 
                         choices=[create_choice(name="attacking",value="attacking"), create_choice(name="defending",value="defending")])])
-
 async def choice(ctx, randomise="", tactic=""):
     
     if randomise == "account":
@@ -102,7 +101,6 @@ async def elolist(ctx, *, username):
     else:
         await ctx.send("```\n" + elolist + "\n```")
 
-
 @slash.slash(description="Ranked statistics for all acts",
              guild_ids=guild_ids,
              options = [
@@ -143,7 +141,6 @@ async def stats(ctx, username=""):
 
         else:
             await the_message.edit(content="```\n" + "Player not found, check syntax: (username#tag)" + "\n```")
-
 
 @slash.slash(description="graph",
              guild_ids=guild_ids,
@@ -232,7 +229,6 @@ async def leaderboard(ctx, options=""):
 async def online(ctx):
     await ctx.send("Unfortunately, the API deprecated this endpoint so the command no longer works.")
 
-
 @client.command(
     help="Syntax: $add username#tag name (name field is optional)", 
     brief="Adds the player to the database for leaderboard/graph/elolist")
@@ -265,24 +261,6 @@ async def remove(ctx, *, username):
     else:
         await ctx.send("no.")
 
-@client.command(
-    help="ask Faaez (Fakinator) if you changed username", 
-    brief="Changes player's name in the database")
-async def namechange(ctx, *, names):
-
-    if ctx.author.id == 410771947522359296:
-        names = names.split(' ')
-        old = names[0]
-        new = names[1].split('#')
-
-        playerList = playerclass.PlayerList('playerlist.csv')
-        playerList.load()
-        playerList.change_ign(old, new[0], new[1])
-        playerList.save()
-            
-    else:
-        await ctx.send("no.")
-
 @client.command()
 async def valhelp(ctx):
     embed=discord.Embed(title = "List of Commands", url = "https://youtu.be/MtN1YnoL46Q", description="", color=0x00f900)
@@ -295,7 +273,6 @@ async def valhelp(ctx):
 
     embed.set_footer(text = "unlucky")
     await ctx.send(embed = embed)
-
 
 @client.command()
 async def gettag(ctx, *, user):
@@ -322,6 +299,42 @@ async def banner(ctx, *, username):
 
         else:
             await ctx.send(content="```\n" + "Player not found, check syntax: (username#tag)" + "\n```")
+
+@slash.slash(description="Changing your in-game name",
+             guild_ids=guild_ids,
+             options = [
+             create_option(name="old_username", description="enter your old username", option_type=3, required=True),
+             create_option(name="new_username", description="enter your new username (user#tag)", option_type=3, required=True)])
+async def namechange(ctx, old_username="", new_username=""):
+
+    if ctx.author.id == 410771947522359296:
+
+        old = old_username.split('#')[0].lower()
+        new_ign = new_username.split('#')[0].lower()
+        new_tag = new_username.split('#')[1].lower()
+
+        playerList = playerclass.PlayerList('playerlist.csv')
+        playerList.load()
+        playerList.change_ign(old, new_ign, new_tag)
+        playerList.save()
+
+        await ctx.send(f'{old} is now {new_ign}#{new_tag}')
+            
+    else:
+        await ctx.send("ask faaez to do it.")
+
+@client.command()
+async def getcsv(ctx):
+
+    playerList = playerclass.PlayerList('playerlist.csv')
+    playerList.load()
+
+    msg = ""
+
+    for player in playerList.players:
+        msg += str(player) + '\n'
+
+    await ctx.send(content="```\n" + msg + "\n```")
 
 @slash.slash(description="search MAL database",
              guild_ids=guild_ids,
