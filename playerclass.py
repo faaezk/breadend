@@ -73,7 +73,7 @@ class PlayerList():
                 break
 
         if player == None:
-            return "player not found"
+            return False
 
         player.setUser(new_ign, tag)
 
