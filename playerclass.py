@@ -1,8 +1,5 @@
-import requests
-import json
-
 class Player():
-    def __init__(self, ign, tag, name = None, onlineList = False, online = False, status = None, partyid = False, partysize = 0):
+    def __init__(self, ign, tag, name = None, active = True):
         self.ign = ign
         self.tag = tag
         
@@ -10,73 +7,17 @@ class Player():
             self.name = ign
         else:
             self.name = name
-        self.onlineList = onlineList
-        self.online = online
 
-        self.status = status
-        self.partyid = partyid
-        self.partysize = partysize
-
-    def isOnline(self) -> bool:
-        return self.isOnline
+        self.active = active
     
     def getCsv(self) -> str:
-        return f"{self.ign},{self.tag},{self.name},{self.onlineList}\n"
+        return f"{self.ign},{self.tag},{self.name},{self.active}\n"
 
     def __str__(self) -> str:
         return f"{self.ign}#{self.tag}"
 
     def __eq__(self, o: object) -> bool:
         return str(self) == str(o)
-
-    def updateStuff(self):
-        url = "https://api.henrikdev.xyz/valorant/v1/live-match/{}/{}".format(self.ign, self.tag)
-        r = requests.get(url)
-        data = json.loads(r.text)
-
-        igstatus = ""
-        complicated = False
-
-        if data['status'] == '200':
-            complicated = True
-
-        if data['status'] == '200' and 'message' in data.keys():
-            if data['message'] == "Send friend request to user, the player have to accept this friendrequest to track live game data":
-                complicated = False
-
-        if complicated == True:
-            
-            self.partyid = data['data']['party_id']
-
-            if data['data']['current_state'] == 'MENUS':
-                self.partysize = data['data']['party_size']
-
-            state = data['data']['current_state']
-
-            if state == 'PREGAME':
-                igstatus = "Online and in agent select"
-
-            elif state == 'MENUS':
-                igstatus = "Online and in menu"
-
-            elif state == 'INGAME':
-                map = data['data']['map']
-
-                if map == 'Range':
-                    igstatus = "Online in the range"
-
-                else:
-                    game_mode = data['data']['gamemode']
-                    if game_mode == '':
-                        game_mode = 'custom'
-                    score = str(data['data']['score_ally_team']) + '-' + str(data['data']['score_enemy_team'])
-                    map = data['data']['map']
-                    igstatus = "Online in " + game_mode + " going " + score + " on " + map
-        else:
-            igstatus = False
-        
-        self.status = igstatus
-
 
 class PlayerList():
     def __init__(self, filePath):
@@ -100,20 +41,11 @@ class PlayerList():
                 ign = playerData[0]
                 tag = playerData[1]
                 name = playerData[2]
-                onlineList = playerData[3][:-1]
-                self.players.append(Player(ign, tag, name, onlineList))
+                active = playerData[3][:-1]
+                self.players.append(Player(ign, tag, name, active))
     
     def getPlayers(self):
         return self.players
-    
-    def getOnlinePlayers(self):
-        onlinePLayers = []
-        for player in self.players:
-            if player.onlineList == 'True':
-                player.updateStuff()
-                if player.status != False:
-                    onlinePLayers.append(player)
-        return onlinePLayers
 
     def inList(self, player:Player):
         for i in self.players:
@@ -121,3 +53,8 @@ class PlayerList():
                 return True
         
         return False
+
+if __name__ == '__main__':
+    playerList = PlayerList('playerlist.csv')
+    playerList.load()
+    print('yes')
