@@ -1,9 +1,9 @@
 import discord
 from discord.ext import commands
 import configparser
-import valorant
+import playerclass
 from discord_slash import SlashCommand
-from discord_slash.utils.manage_commands import create_option
+from discord_slash.utils.manage_commands import create_option, create_choice
 
 def get_config():
     c = configparser.ConfigParser()
@@ -21,24 +21,6 @@ guild_ids = [731539222141468673]
 @client.event
 async def on_ready():
     print("it started working")
-
-@client.command()
-async def banner(ctx, *, username):
-    username = username.split('#')
-
-    if len(username) == 2:
-        valorant.banner(username[0].lower(), username[1].lower())
-        await ctx.send(file=discord.File('banner.png'))
-    
-    else:
-        tag = valorant.get_tag(username[0].lower())
-        
-        if tag != "Player not found.":
-            valorant.banner(username[0].lower(), tag)
-            await ctx.send(file=discord.File('banner.png'))
-
-        else:
-            await ctx.send(content="```\n" + "Player not found, check syntax: (username#tag)" + "\n```")
 
 @client.event
 async def on_message(message):
