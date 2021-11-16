@@ -24,7 +24,7 @@ def update_all_elo_history():
 
         update_count += int(thing)
 
-        print("completed " + str(i + 1) + "/" + str(len(playerList.players)))
+        #print("completed " + str(i + 1) + "/" + str(len(playerList.players)))
         #graphs.make_graph(playerList.players[i].ign)
 
     return str(update_count) + " updates"
