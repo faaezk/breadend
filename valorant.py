@@ -53,6 +53,9 @@ def get_elo_from_file(username):
     lines = f.readlines()
     f.close()
 
+    if lines[-1] == '\n':
+        return False
+
     return int(lines[-1])
 
 def initialise_file(username):
@@ -84,7 +87,11 @@ def update_elo_history(username, tagline):
     # Dates of last update
     date_raw = player_data["data"][0]["date_raw"]
     player_file = open(player_file_path, 'r')
-    last_file_update = int(player_file.readline())
+    first_line = player_file.readline()
+    if first_line == '\n':
+        last_file_update = 0
+    else:
+        last_file_update = int(first_line)
     player_file.close()
 
     new_elo_list = []
@@ -137,7 +144,7 @@ def get_elolist(username):
     
     update_elo_history(username, tagline)
 
-    if os.path.isfile('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username)) == False:
+    if get_elo_from_file(username) == False:
         return "Player not found or hasn't played any comp games recently"
     
     file1 = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username), 'r')
@@ -324,3 +331,7 @@ def servercheck():
         return "no maintenances or incidents reported"
         
     return report
+
+if __name__ == '__main__':
+    print(get_elo_from_file('fakinator'))
+    print(update_elo_history('glizzardwizard', '1001'))
