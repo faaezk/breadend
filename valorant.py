@@ -130,7 +130,7 @@ def update_elo_history(username, tagline):
     lines[0] = str(player_data["data"][0]["date_raw"]) + '\n'
 
     with open(player_file_path, "w") as f:
-        f.writelines(lines)   
+        f.writelines(lines)
     
     return len(correctly_sorted_new_elo_list)
 
@@ -336,4 +336,4 @@ def servercheck():
     return report
 
 if __name__ == '__main__':
-    print(get_elolist('fakinator'))
+    print(get_elolist('fakj'))

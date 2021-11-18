@@ -28,14 +28,10 @@ async def on_ready():
              create_option(name="username", description="enter username", option_type=3, required=True)])
 async def tester(ctx, username=""):
 
-    the_message = await ctx.send("fetching list...")
     username = username.split('#')[0].lower()
 
     elolist = valorant.get_elolist(username)
-    if elolist == None:
-        await the_message.edit(contents="No comp games recorded")
-    else:
-        await ctx.send("```\n" + elolist + "\n```")
+    await ctx.send("```\n" + elolist + "\n```")
 
 
 @client.event
