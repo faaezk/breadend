@@ -148,7 +148,7 @@ def get_elolist(username):
     update_elo_history(username, tagline)
 
     if get_elo_from_file(username) == False:
-        return "Player not found or hasn't played any comp games recently"
+        return False
     
     file1 = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username), 'r')
 
