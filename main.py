@@ -89,15 +89,20 @@ async def cat(ctx):
 
     await ctx.send(embed=embed)
 
-@client.command(
-    help="Syntax: $elolist username or $elolist username#tag", 
-    brief="Returns the elo values used in the graph")
-async def elolist(ctx, *, username):
-
+@slash.slash(description="MMR history list",
+             guild_ids=guild_ids,
+             options = [
+             create_option(name="username", description="enter username", option_type=3, required=True)])
+async def elolist(ctx, username=""):
+    
     username = username.split('#')[0].lower()
     elolist = valorant.get_elolist(username)
     if elolist == None:
         await ctx.send("No comp games recorded")
+    
+    elif elolist == False:
+        await ctx.send("Player not found")
+    
     else:
         await ctx.send("```\n" + elolist + "\n```")
 
