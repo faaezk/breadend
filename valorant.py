@@ -17,8 +17,11 @@ def get_tag(username):
     return tagline
 
 def get_elo_history(username, tagline):
+
+    if tagline == "":
+        return False
     
-    url = "https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{}/{}".format(username, tagline)
+    url = f"https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{username}/{tagline}"
     r = requests.get(url)
 
     if str(r) == "<Response [204]>":
@@ -141,7 +144,7 @@ def get_elolist(username):
         if player.ign == username:
             tagline = player.tag
             break
-    
+
     update_elo_history(username, tagline)
 
     if get_elo_from_file(username) == False:
@@ -333,5 +336,4 @@ def servercheck():
     return report
 
 if __name__ == '__main__':
-    print(get_elo_from_file('fakinator'))
-    print(update_elo_history('glizzardwizard', '1001'))
+    print(get_elolist('fakinator'))
