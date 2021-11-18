@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import configparser
-import playerclass
+import valorant
 from discord_slash import SlashCommand
 from discord_slash.utils.manage_commands import create_option, create_choice
 
@@ -21,6 +21,22 @@ guild_ids = [731539222141468673]
 @client.event
 async def on_ready():
     print("it started working")
+
+@slash.slash(description="MMR history list",
+             guild_ids=guild_ids,
+             options = [
+             create_option(name="username", description="enter username", option_type=3, required=True)])
+async def tester(ctx, username=""):
+
+    the_message = await ctx.send("fetching list...")
+    username = username.split('#')[0].lower()
+
+    elolist = valorant.get_elolist(username)
+    if elolist == None:
+        await the_message.edit(contents="No comp games recorded")
+    else:
+        await ctx.send("```\n" + elolist + "\n```")
+
 
 @client.event
 async def on_message(message):
