@@ -58,8 +58,8 @@ class PlayerList():
         return self.players
 
     def inList(self, player:Player):
-        for i in self.players:
-            if i == player:
+        for x in self.players:
+            if x == player:
                 return True
         
         return False
