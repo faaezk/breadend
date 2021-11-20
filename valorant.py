@@ -1,27 +1,26 @@
+import os
 import requests
 import json
-import os
 import playerclass
 
-def get_tag(username):
-    
-    playerlist = playerclass.PlayerList('playerlist.csv')
+def get_tag(ign):
+    playerlist = playerclass.PlayerList("playerlist.csv")
     playerlist.load()
 
-    tagline = "Player not found."
     for player in playerlist.players:
-        if player.ign == username:
-            tagline = player.tag
-            break
+        if ign == player.ign:
+            return player.tag
     
-    return tagline
+    return False
 
-def get_elo_history(username, tagline):
+def get_mmr_history(ign, tag=""):
 
-    if tagline == "":
-        return False
+    if tag == "":
+        tag = get_tag(ign)
+        if not tag:
+            return False
     
-    url = f"https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{username}/{tagline}"
+    url = f"https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{ign}/{tag}"
     r = requests.get(url)
 
     if str(r) == "<Response [204]>":
@@ -30,24 +29,36 @@ def get_elo_history(username, tagline):
     john = json.loads(r.text)
 
     if 'status' in john:
-        if john['status'] == '404' or john['status'] == '500':
-            return False
-        
         if john['status'] == '429':
             return "welp"
-    
-    if 'statusCode' in john:
-        if john['statusCode'] == 404 or john['statusCode'] == 500:
-            return False
         
+        elif john['status'] == '404':
+            return "User not found"
+        
+        elif john['status'] == '500':
+            return "No matches available"
+        
+        elif john['status'] != '200':
+            return False
+    
+    elif 'statusCode' in john:
         if john['statusCode'] == 429:
             return "welp"
+        
+        elif john['statusCode'] == 404:
+            return "User not found"
+        
+        elif john['statusCode'] == 500:
+            return "No matches available"
+        
+        elif john['statusCode'] != 200:
+            return False
 
     return john
 
-def get_elo_from_file(username):
+def get_file_mmr(ign):
 
-    file_path = '/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username)
+    file_path = f'elo_history/{ign}.txt'
 
     if os.path.isfile(file_path) == False:
         return False
@@ -59,50 +70,57 @@ def get_elo_from_file(username):
     if lines[-1] == '\n':
         return False
 
+    #return the latest MMR value in file
     return int(lines[-1])
 
-def initialise_file(username):
+def initialise_file(ign):
 
-    f = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username), "x")
+    f = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(ign), "x")
     f.close()
 
-    f = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username), "w")
+    f = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(ign), "w")
     f.writelines('\n')
     f.close()
 
-    return
+def update_database(ign, tag=""):
 
-def update_elo_history(username, tagline):
+    if tag == "":
+        tag = get_tag(ign)
+        if not tag:
+            return False
+    
+    player_data = get_mmr_history(ign, tag)
 
-    player_data = get_elo_history(username, tagline)
-
-    if not player_data:
+    if type(player_data) != dict:
         return False
-    
-    if player_data == "welp":
-        return "welp"
-    
-    player_file_path = f'/home/ubuntu/discord_bot/elo_history/{username}.txt'
+
+    player_file_path = f'elo_history/{ign}.txt'
 
     if os.path.isfile(player_file_path) == False:
-        initialise_file(username)
-
+        if len(player_data['data']) == 0:
+            return False
+        else:
+            initialise_file(ign)
+    
     # Dates of last update
     date_raw = player_data["data"][0]["date_raw"]
+
     player_file = open(player_file_path, 'r')
     first_line = player_file.readline()
+    
     if first_line == '\n':
         last_file_update = 0
     else:
         last_file_update = int(first_line)
+    
     player_file.close()
 
-    new_elo_list = []
+    new_list = []
     i = 0
 
     if last_file_update == 0:
         for i in range(0, len(player_data['data'])):
-            new_elo_list.append(player_data['data'][i]['elo'])
+            new_list.append(player_data['data'][i]['elo'])
 
     else:
         for i in range(0, len(player_data['data'])):
@@ -110,16 +128,16 @@ def update_elo_history(username, tagline):
             date_raw = player_data['data'][i]['date_raw']
 
             if last_file_update < date_raw:
-                new_elo_list.append(player_data['data'][i]['elo'])
+                new_list.append(player_data['data'][i]['elo'])
             else:
                 break
     
-    correctly_sorted_new_elo_list = new_elo_list[::-1]
+    new_list = new_list[::-1]
 
     player_file = open(player_file_path, 'a')
     
-    for elem in range(0, len(correctly_sorted_new_elo_list)):
-        player_file.writelines(str(correctly_sorted_new_elo_list[elem]) + '\n')
+    for elem in range(0, len(new_list)):
+        player_file.writelines(str(new_list[elem]) + '\n')
 
     player_file.close()
 
@@ -132,29 +150,26 @@ def update_elo_history(username, tagline):
     with open(player_file_path, "w") as f:
         f.writelines(lines)
     
-    return len(correctly_sorted_new_elo_list)
+    return len(new_list)
 
-def get_elolist(username):
+def get_elo_list(ign):
     
-    playerlist = playerclass.PlayerList('playerlist.csv')
-    playerlist.load()
+    tag = get_tag(ign)
+    if not tag:
+        return "Player not found"
 
-    tagline = ""
-    for player in playerlist.players:
-        if player.ign == username:
-            tagline = player.tag
-            break
+    update_database(ign, tag)
 
-    update_elo_history(username, tagline)
-
-    if get_elo_from_file(username) == False:
-        return False
+    if not get_file_mmr(ign):
+        return "Player not found"
     
-    file1 = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username), 'r')
+    file1 = open(f'/home/ubuntu/discord_bot/elo_history/{ign}.txt', 'r')
 
     lines = [x.strip() for x in file1.readlines()]
+
     if len(lines) == 1:
-        return None
+        return "No comp games recorded"
+        
     lines.pop(0)
     
     elolist = ""
@@ -164,29 +179,30 @@ def get_elolist(username):
 
     return elolist[:-2]
 
-def elo_leaderboard():
+def local_leaderboard():
 
     playerlist = playerclass.PlayerList('playerlist.csv')
     playerlist.load()
-    
-    bohn = []
+
+    players = []
 
     for player in playerlist.players:
 
-        file_elo = get_elo_from_file(player.ign)
+        mmr = get_file_mmr(player.ign)
 
-        if type(file_elo) == int:
-            bohn.append((file_elo, player.ign))
+        if type(mmr) == int:
+            players.append((player.ign, mmr))
+        
+    players.sort(key=lambda x:x[1], reverse=True)
 
-    bohn = sorted(bohn, reverse=True)
     leaderboard = "Player Leaderboard\n"
 
-    for i in range(0, len(bohn)):
+    for i in range(0, len(players)):
 
-        user = bohn[i][1]
-        elo = bohn[i][0]
+        ign = players[i][0]
+        mmr = players[i][1]
         rank = i + 1
-        leaderboard += str(str(rank) + '.').ljust(3) + str(user).ljust(16) + str(elo).rjust(5) + '\n'
+        leaderboard += (str(rank) + '.').ljust(3) + str(ign).ljust(16) + str(mmr).rjust(5) + '\n'
 
     f = open("leaderboard.txt", "w")
     f.write(leaderboard)
@@ -194,7 +210,7 @@ def elo_leaderboard():
 
     return leaderboard
 
-def region_leaderboard(region):
+def region_leaderboard(region, length=20):
 
     url = f"https://api.henrikdev.xyz/valorant/v1/leaderboard/{region}"
     r = requests.get(url)
@@ -202,28 +218,34 @@ def region_leaderboard(region):
     if str(r) == "<Response [204]>":
         return False
 
+    regions = {"ap" : "Asia Pacific", "eu" : "Europe", "kr" : "Korea", "na" : "North America"}
     data = json.loads(r.text)
     players = []
-    length = 20
     
     for i in range(length):
         if data[i]['IsAnonymized'] == True:
-            players.append(["Anonymous", data[i]['rankedRating']])
+            players.append(("Anonymous", data[i]['rankedRating']))
         else:
-            players.append([data[i]['gameName'], data[i]['rankedRating']])
+            players.append((data[i]['gameName'], data[i]['rankedRating']))
 
-    rleaderboard = ""
+
+    leaderboard = f'{regions[region]} Ranked Leaderboard\n'
     
     for i in range(0, len(players)):
 
-        elo = players[i][1]
-        user = players[i][0]
+        ign = players[i][0]
+        mmr = players[i][1]
         rank = i + 1
-        rleaderboard += str(str(rank) + '.').ljust(3) + str(user).ljust(20) + str(elo).rjust(5) + '\n'
+        leaderboard += (str(rank) + '.').ljust(3) + str(ign).ljust(16) + str(mmr).rjust(5) + '\n'
 
-    return rleaderboard
+    return leaderboard    
 
-def stats(ign, tag):
+def stats(ign, tag=""):
+
+    if tag == "":
+        tag = get_tag(ign)
+        if not tag:
+            return "Player not found, check syntax: (username#tag)"
 
     url = f'https://api.henrikdev.xyz/valorant/v2/mmr/ap/{ign}/{tag}'
     r = requests.get(url)
@@ -257,7 +279,7 @@ def stats(ign, tag):
 
     return [final, card]
 
-def banner(ign, tag):
+def get_banner(ign, tag):
 
     url = f'https://api.henrikdev.xyz/valorant/v1/account/{ign}/{tag}'
     r = requests.get(url)
@@ -265,19 +287,19 @@ def banner(ign, tag):
     if str(r) == "<Response [204]>":
         return "Player not found"
 
-    john = json.loads(r.text)
+    data = json.loads(r.text)
 
-    if john['status'] == '404' or john['status'] == '500':
-        return "Player not found, check syntax: (username#tag)"
+    if data['status'] == '404' or data['status'] == '500':
+        return "Player not found, check syntax: (ign#tag)"
     
-    url = john['data']['card']['large']
+    url = data['data']['card']['large']
     r = requests.get(url, allow_redirects=True)
 
     open('banner.png', 'wb').write(r.content)
 
     return True
 
-def check_if_account_exists(ign, tag):
+def account_check(ign, tag):
 
     url = f'https://api.henrikdev.xyz/valorant/v1/account/{ign}/{tag}'
 
@@ -286,17 +308,17 @@ def check_if_account_exists(ign, tag):
     if str(r) == "<Response [204]>":
         return False
 
-    john = json.loads(r.text)
+    data = json.loads(r.text)
 
-    if 'status' in john:
-        if john['status'] != '200':
+    if 'status' in data:
+        if data['status'] == '404':
             return False
     
-    if 'statusCode' in john:
-        if john['statusCode'] != 200:
+    if 'statusCode' in data:
+        if data['statusCode'] != 404:
             return False
 
-    return john
+    return True
 
 def servercheck():
 
@@ -335,5 +357,39 @@ def servercheck():
         
     return report
 
+def add_player(ign, tag):
+
+    playerlist = playerclass.PlayerList("playerlist.csv")
+    playerlist.load()
+
+    if not account_check(ign, tag):
+        return "Account does not exist"
+
+    player = playerclass.Player(ign.lower(), tag.lower())
+
+    if playerlist.inList(player):
+        return "Account already added"
+    
+    playerlist.add(player)
+    playerlist.save()
+
+    return f'{ign}#{tag} successfully added'
+
+def remove_player(ign, tag):
+
+    playerlist = playerclass.PlayerList("playerlist.csv")
+    playerlist.load()
+
+    player = playerclass.Player(ign.lower(), tag.lower())
+
+    if not playerlist.inList(player):
+        return "Player not in list"
+        
+    playerlist.remove(player)
+    playerlist.save()
+
+    return f'{ign}#{tag} has been removed'
+
 if __name__ == '__main__':
-    print(get_elolist('fakj'))
+    print(local_leaderboard())
+    print(region_leaderboard('na'))

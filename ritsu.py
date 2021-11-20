@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import configparser
 import newvalorant
+import valorant
 import elo_history_updater
 import playerclass
 from discord_slash import SlashCommand
@@ -31,7 +32,7 @@ async def on_ready():
 async def newelolist(ctx, username=""):
     
     username = username.split('#')[0].lower()
-    elolist = newvalorant.get_elolist(username)
+    elolist = newvalorant.get_elo_list(username)
     if elolist == None:
         await ctx.send("No comp games recorded")
     
@@ -88,7 +89,7 @@ async def newleaderboard(ctx, options=""):
         lines = log_file.readlines()
         log_file.close()
 
-        leaderboard = "Last updated at" + lines[-1].split(' ')[4] +'\n'
+        leaderboard = "Last updated at " + lines[-1].split(' ')[4] +'\n'
         newvalorant.local_leaderboard()
         f = open("leaderboard.txt", 'r')
         for x in f:
@@ -126,8 +127,9 @@ async def newadd(ctx, username=""):
     username = username.split('#')
 
     if len(username) == 2:
-        msg = newvalorant.add_player(username[0].lower(), username[1].lower())
-        await ctx.send(msg)
+        the_message = await ctx.send("please wait...")
+        msg = valorant.add_player(username[0].lower(), username[1].lower())
+        await the_message.edit(contents=msg)
 
     else:
         await ctx.send("Player not found, check syntax: (ign#tag)")
@@ -157,11 +159,8 @@ async def newgettag(ctx, *, ign):
     else:
         await ctx.send(f'{ign}#{newvalorant.get_tag(ign)}')
 
-@slash.slash(description="Returns current banner",
-             guild_ids=guild_ids,
-             options = [
-             create_option(name="username", description="enter username (ign#tag)", option_type=3, required=True)])
-async def newadd(ctx, username=""):
+@client.command()
+async def banner(ctx, *, username):
 
     username = username.split('#')
     ign = username[0].lower()
@@ -199,26 +198,37 @@ async def newnamechange(ctx, old_username="", new_username=""):
             await ctx.send("check syntax: (ign#tag)")
         
         else:
-            new_ign = new_username.split('#')[0].lower()
-            new_tag = new_username.split('#')[1].lower()
+            the_message = await ctx.send("please wait...")
+            new_ign = new_username[0].lower()
+            new_tag = new_username[1].lower()
 
-            if newvalorant.account_check(new_ign, new_tag):
+            if valorant.account_check(new_ign, new_tag):
                 playerList = playerclass.PlayerList('playerlist.csv')
                 playerList.load()
                 if playerList.change_ign(old, new_ign, new_tag):
                     playerList.save()
-                    await ctx.send(f'{old} is now {new_ign}#{new_tag}')
+                    await the_message.edit(content = f'{old} is now {new_ign}#{new_tag}')
                 
                 else:
-                    await ctx.send(f'{old} not found in database, check player list using `$getcsv`')
+                    await the_message.edit(content = f'{old} not found in database, check player list using `$getcsv`')
             
             else:
-                await ctx.send(f'{new_ign}#{new_tag} does not exist.')
-            
-    else:
-        await ctx.send("ask faaez to do it.")
+                await the_message.edit(content = f'{new_ign}#{new_tag} does not exist.')
 
 @slash.slash(description="Valorant Servers Status", guild_ids=guild_ids)
 async def newserverstatus(ctx):
     the_message = await ctx.send("fetching statuses")
     await the_message.edit(content = newvalorant.servercheck())
+
+@client.event
+async def on_message(message):
+    if message.author == client.user:
+        return
+
+    if message.content.lower().startswith('good evening'):
+        await message.channel.send(file=discord.File('good_evening.mp4'))
+
+    await client.process_commands(message)
+
+
+client.run(token)

@@ -17,7 +17,7 @@ def update_all_elo_history():
         if playerList.players[i].active == 'False':
             continue
 
-        thing = valorant.update_elo_history(playerList.players[i].ign, playerList.players[i].tag)
+        thing = valorant.update_database(playerList.players[i].ign, playerList.players[i].tag)
 
         if thing == "welp":
             return ["welp", i]
