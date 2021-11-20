@@ -153,12 +153,11 @@ def update_database(ign, tag=""):
     
     return len(new_list)
 
-def get_elo_list(ign, tag=""):
+def get_elo_list(ign):
     
-    if tag == "":
-        tag = get_tag(ign)
-        if not tag:
-            return False
+    tag = get_tag(ign)
+    if not tag:
+        return False
 
     update_database(ign, tag)
 
@@ -212,7 +211,7 @@ def local_leaderboard():
 
     return leaderboard
 
-def region_leaderboard(region, length):
+def region_leaderboard(region, length=20):
 
     url = f"https://api.henrikdev.xyz/valorant/v1/leaderboard/{region}"
     r = requests.get(url)
@@ -242,7 +241,12 @@ def region_leaderboard(region, length):
 
     return leaderboard    
 
-def stats(ign, tag):
+def stats(ign, tag=""):
+
+    if tag == "":
+        tag = get_tag(ign)
+        if not tag:
+            return "Player not found, check syntax: (username#tag)"
 
     url = f'https://api.henrikdev.xyz/valorant/v2/mmr/ap/{ign}/{tag}'
     r = requests.get(url)
@@ -276,7 +280,7 @@ def stats(ign, tag):
 
     return [final, card]
 
-def banner(ign, tag):
+def get_banner(ign, tag):
 
     url = f'https://api.henrikdev.xyz/valorant/v1/account/{ign}/{tag}'
     r = requests.get(url)
@@ -287,7 +291,7 @@ def banner(ign, tag):
     data = json.loads(r.text)
 
     if data['status'] == '404' or data['status'] == '500':
-        return "Player not found, check syntax: (username#tag)"
+        return "Player not found, check syntax: (ign#tag)"
     
     url = data['data']['card']['large']
     r = requests.get(url, allow_redirects=True)
@@ -354,6 +358,38 @@ def servercheck():
         
     return report
 
+def add_player(ign, tag):
+
+    playerlist = playerclass.PlayerList("playerlist.csv")
+    playerlist.load()
+
+    if not account_check(ign, tag):
+        return "Account does not exist"
+
+    player = playerclass.Player(ign.lower(), tag.lower())
+
+    if playerlist.inList(player):
+        return "Account already added"
+    
+    playerlist.add(player)
+    playerlist.save()
+
+    return f'{ign}#{tag} successfully added'
+
+def remove_player(ign, tag):
+
+    playerlist = playerclass.PlayerList("playerlist.csv")
+    playerlist.load()
+
+    player = playerclass.Player(ign.lower(), tag.lower())
+
+    if not playerlist.inList(player):
+        return "Player not in list"
+        
+    playerlist.remove(player)
+    playerlist.save()
+
+    return f'{ign}#{tag} has been removed'
 
 if __name__ == '__main__':
     print(local_leaderboard())
