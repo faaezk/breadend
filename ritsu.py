@@ -85,7 +85,7 @@ async def newleaderboard(ctx, options=""):
     
     if options == "":
 
-        log_file = open("elo_history/run_check.out",'r')
+        log_file = open("/home/ubuntu/discord_bot/elo_history/run_check.out",'r')
         lines = log_file.readlines()
         log_file.close()
 

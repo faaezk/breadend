@@ -179,7 +179,7 @@ async def leaderboard(ctx, options=""):
     
     if options == "":
 
-        log_file = open("elo_history/run_check.out",'r')
+        log_file = open("/home/ubuntu/discord_bot/elo_history/run_check.out",'r')
         lines = log_file.readlines()
         log_file.close()
 
@@ -479,7 +479,7 @@ async def on_message(message):
         await message.add_reaction("<:stevens:785800069957943306>")
 
     if message.content.lower().startswith('$lastupdate'):
-        f = open("elo_history/run_check.out", "r")
+        f = open("/home/ubuntu/discord_bot/elo_history/run_check.out", "r")
         last = f.readlines()[-1]
         f.close()
 
