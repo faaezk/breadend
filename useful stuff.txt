@@ -1,7 +1,11 @@
-import os
-import time
 
-str(int(time.time()))
+
+status codes:
+200 - it works
+403 - server down
+404 - user doesnt exist
+429 - calling the api too much
+500 - No matches available, can't get puuid
 
 * 0 * * * cd /home/ubuntu/discord_bot && /usr/bin/python3.8 elo_history.py >> elo_history/run_check.out
 
