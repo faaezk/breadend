@@ -156,17 +156,26 @@ async def graph(ctx, usernames=""):
     else:
         the_message = await ctx.send("please wait...")
         flag = graphs.multigraph(users)
-        
-        if flag == False:
-            await the_message.edit("Player not found")
+        msg = ""
+        if len(flag[0]) > 0:
+            msg = "Players not found: "
+            for elem in flag[0]:
+                msg += elem + ", "
+            msg = msg[:-2]
 
-        elif flag == None:
-            await the_message.edit("Not enough data to plot graph")
+        if len(flag[1]) > 0:
+            msg += '\n Players with not enough data to plot graph: '
+            for elem in flag[1]:
+                msg += elem + ", "
+            msg = msg[:-2]
 
-        else:
+        if msg == "":
             with open("/home/ubuntu/discord_bot/elo_graphs/multigraph.png", 'rb') as f:
                 picture = discord.File(f)
                 await the_message.edit(content="", file=picture)
+        
+        else:
+            await the_message.edit(content=msg)
 
 @slash.slash(description="Valorant Leaderboards",
              guild_ids=guild_ids,
