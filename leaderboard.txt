@@ -27,8 +27,8 @@ Player Leaderboard
 26.tallewok          617
 27.nadizheloof       610
 28.quyteriyaki       600
-29.gerald            600
-30.rustybeef         584
+29.rustybeef         584
+30.gerald            577
 31.dilka40004        481
 32.thomyorke         439
 33.quackinator       380
