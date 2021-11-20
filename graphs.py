@@ -20,29 +20,22 @@ def roundup(x):
 def rounddown(x):
     return int(math.floor(x / 100.0)) * 100
 
-def make_graph(username):
-    
-    playerlist = playerclass.PlayerList('playerlist.csv')
-    playerlist.load()
+def make_graph(ign):
 
-    tagline = ""
-    for player in playerlist.players:
-        if player.ign == username:
-            tagline = player.tag
-            break
+    tag = valorant.get_tag(ign)
     
-    if tagline == "":
+    if not tag:
         return False
 
-    thing = valorant.update_elo_history(username, tagline)
+    thing = valorant.update_database(ign, tag)
 
     if type(thing) == bool and thing == False:
         return False
 
-    if os.path.isfile('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username)) == False:
+    if os.path.isfile(f'/home/ubuntu/discord_bot/elo_history/{ign}.txt') == False:
         return False
     
-    file1 = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(username), 'r')
+    file1 = open(f'/home/ubuntu/discord_bot/elo_history/{ign}.txt', 'r')
 
     y = [x.strip() for x in file1.readlines()]
     if len(y) == 2:
@@ -118,9 +111,9 @@ def make_graph(username):
     plt.axhline(y=y[-1], color=colour, linestyle='--')
     plt.xlabel('Games played')
     plt.ylabel('MMR')
-    plt.title(username + '\'s MMR over time')
+    plt.title(ign + '\'s MMR over time')
 
-    plt.savefig('/home/ubuntu/discord_bot/elo_graphs/{}.png'.format(username), bbox_inches="tight")
+    plt.savefig(f'/home/ubuntu/discord_bot/elo_graphs/{ign}.png', bbox_inches="tight")
 
     file1.close()
     plt.clf()
@@ -134,27 +127,29 @@ def multigraph(players):
     mostGames = 0
     yvalues = []
     xvalues = []
+    fail = [[], []]
 
-    for username in players:
-        if os.path.isfile(f'/home/ubuntu/discord_bot/elo_history/{username}.txt') == False:
-            return False
+    for ign in players:
+
+        if os.path.isfile(f'/home/ubuntu/discord_bot/elo_history/{ign}.txt') == False:
+            fail[0].append(ign)
+            continue
         
-        playerlist = playerclass.PlayerList('playerlist.csv')
-        playerlist.load()
 
-        tagline = ""
-        for player in playerlist.players:
-            if player.ign == username:
-                tagline = player.tag
-                break
+        tag = valorant.get_tag(ign)
 
-        valorant.update_elo_history(username, tagline)
+        if not tag:
+            fail[0].append(ign)
+            continue
+
+        valorant.update_database(ign, tag)
         
-        file1 = open(f'/home/ubuntu/discord_bot/elo_history/{username}.txt', 'r')
+        file1 = open(f'/home/ubuntu/discord_bot/elo_history/{ign}.txt', 'r')
 
         y = [x.strip() for x in file1.readlines()]
         if len(y) == 2:
-            return None
+            fail[1].append(ign)
+            continue
         y.pop(0)
         
         x = []
@@ -176,6 +171,8 @@ def multigraph(players):
 
         file1.close()
 
+    if len(fail[0]) + len(fail[1]) > 0:
+        return fail
 
     axes = plt.gca()
     axes.set_ylim([ymin,ymax])
@@ -220,8 +217,6 @@ def multigraph(players):
 
     file1.close()
     plt.clf()
-
-    return True
 
 if __name__ == "__main__":
     #multigraph(['8888','azatory','bento2','crossaxis','fade','fakinator', 'giroud', 'grovyle', 'imabandwagon', 'jokii', 'katchampion',
