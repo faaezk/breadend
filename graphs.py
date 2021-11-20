@@ -218,6 +218,8 @@ def multigraph(players):
     file1.close()
     plt.clf()
 
+    return fail
+
 if __name__ == "__main__":
     #multigraph(['8888','azatory','bento2','crossaxis','fade','fakinator', 'giroud', 'grovyle', 'imabandwagon', 'jokii', 'katchampion',
     # 'yovivels', 'dilka30003', 'slumonaire', 'silentwhispers', 'lmao', 'jack', 'thesugarman', 'hoben222', 'quackinator'])
