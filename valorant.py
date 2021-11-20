@@ -58,7 +58,7 @@ def get_mmr_history(ign, tag=""):
 
 def get_file_mmr(ign):
 
-    file_path = f'elo_history/{ign}.txt'
+    file_path = f'/home/ubuntu/discord_bot/elo_history/{ign}.txt'
 
     if os.path.isfile(file_path) == False:
         return False
@@ -75,10 +75,10 @@ def get_file_mmr(ign):
 
 def initialise_file(ign):
 
-    f = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(ign), "x")
+    f = open(f'/home/ubuntu/discord_bot/elo_history/{ign}.txt', "x")
     f.close()
 
-    f = open('/home/ubuntu/discord_bot/elo_history/{}.txt'.format(ign), "w")
+    f = open(f'/home/ubuntu/discord_bot/elo_history/{ign}.txt', "w")
     f.writelines('\n')
     f.close()
 
@@ -94,7 +94,7 @@ def update_database(ign, tag=""):
     if type(player_data) != dict:
         return False
 
-    player_file_path = f'elo_history/{ign}.txt'
+    player_file_path = f'/home/ubuntu/discord_bot/elo_history/{ign}.txt'
 
     if os.path.isfile(player_file_path) == False:
         if len(player_data['data']) == 0:
