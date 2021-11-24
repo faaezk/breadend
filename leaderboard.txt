@@ -9,8 +9,8 @@ Player Leaderboard
 8. fakinator        1047
 9. dilka30003       1043
 10.silentwhispers   1032
-11.hoben222         1032
-12.giroud           1027
+11.giroud           1027
+12.hoben222         1013
 13.azatory           913
 14.grovyle           910
 15.lmao              813
@@ -23,11 +23,11 @@ Player Leaderboard
 22.therealrobdez     660
 23.glizzardwizard    654
 24.kleenexwipes      648
-25.lol               625
-26.tallewok          617
-27.nadizheloof       610
-28.quyteriyaki       600
-29.gerald            598
+25.gerald            636
+26.lol               625
+27.tallewok          617
+28.nadizheloof       610
+29.quyteriyaki       600
 30.rustybeef         584
 31.dilka40004        481
 32.thomyorke         439
