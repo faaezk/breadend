@@ -391,5 +391,4 @@ def remove_player(ign, tag):
     return f'{ign}#{tag} has been removed'
 
 if __name__ == '__main__':
-    print(local_leaderboard())
     print(region_leaderboard('na'))

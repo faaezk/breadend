@@ -181,18 +181,20 @@ async def graph(ctx, usernames=""):
              guild_ids=guild_ids,
              options = [
              create_option(name="options", description="Region/options for leaderboard (leave blank for local)", option_type=3, required=False, 
-                        choices=[create_choice(name="Update local leaderboard",value="update"), create_choice(name="Asia Pacific",value="ap"),
-                        create_choice(name="Europe",value="eu"), create_choice(name="Korea",value="kr"),
-                        create_choice(name="North America",value="na")])])
+                        choices=[create_choice(name="Update local leaderboard",value="update")
+                        #,create_choice(name="Asia Pacific",value="ap"),
+                        #create_choice(name="Europe",value="eu"), create_choice(name="Korea",value="kr"),
+                        #create_choice(name="North America",value="na")
+                        ])])
 async def leaderboard(ctx, options=""):
     
     if options == "":
 
-        log_file = open("/home/ubuntu/discord_bot/elo_history/run_check.out",'r')
+        log_file = open("/home/ubuntu/discord_bot/run_check.out",'r')
         lines = log_file.readlines()
         log_file.close()
 
-        leaderboard = "Last updated at " + lines[-1].split(' ')[4] +'\n'
+        leaderboard = "Last updated at " + lines[-1].split(' ')[4] + ', ' + lines[-1].split(' ')[2] + '\n'
         valorant.local_leaderboard()
         f = open("leaderboard.txt", 'r')
         for x in f:
