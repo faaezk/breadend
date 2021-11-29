@@ -344,6 +344,18 @@ async def serverstatus(ctx):
     the_message = await ctx.send("fetching statuses")
     await the_message.edit(content = valorant.servercheck())
 
+@slash.slash(description="Lineup thing",
+             guild_ids=guild_ids,
+             options = [
+             create_option(name="agent", description="Select agent to show lineup for", option_type=3, required=True, 
+                        choices=[create_choice(name="Viper",value="viper")]),
+             create_option(name="map", description="Select map to show lineup for", option_type=3, required=True, 
+                        choices=[create_choice(name="Ascent",value="ascent")])])
+async def lineup(ctx, agent="", map=""):
+
+    if agent != "" and map != "":
+        await ctx.send(f'https://atomic-potatos.github.io/Valorant-Lineups/agents/{agent}/{map}.html')
+
 @slash.slash(description="Other Commands", guild_ids=guild_ids)
 async def other(ctx):
     msg = "```List of other commands:\n"
