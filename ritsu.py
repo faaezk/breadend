@@ -103,7 +103,6 @@ async def on_message(message):
                         if dontlook[i][1] == '0':
                             dontlook[i][1] = str(receiver.anonID)
                             flag = True
-
                         else:
                             if dontlook[i][1] == str(receiver.anonID):
                                 flag = True
@@ -113,28 +112,15 @@ async def on_message(message):
 
                 for line in dontlook:
                     csvfile.write(line[0] + ',' + line[1] + '\n')
-                
                 csvfile.close()
-                
 
                 if flag:
                     receiverUser = await client.fetch_user(receiver.discordID)
                     await receiverUser.send(words.strip() + '\nfrom: ' + str(sender.anonID))
                     await message.author.send("message sent")
-                
                 else:
                     await message.author.send("you cant send a message to that person")
 
     await client.process_commands(message)
-
-# This always sends the same message to the same person.  Is that what you want?
-@client.command(pass_context=True)
-@commands.is_owner()  # The account that owns the client
-async def dm(ctx):
-    memberID = "410771947522359296"
-    person = await client.get_user_info(memberID)
-    await client.send_message(person, "WHAT I'D LIKE TO SAY TO THEM")
-    await client.delete_message(ctx.message)
-
 
 client.run(token)
