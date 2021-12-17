@@ -1,12 +1,9 @@
 import discord
 from discord.ext import commands
 import configparser
-import valorant
-import graphs
-import playerclass
-import elo_history_updater
 from discord_slash import SlashCommand
-from discord_slash.utils.manage_commands import create_option, create_choice
+import personClass
+import csv
 
 def get_config():
     c = configparser.ConfigParser()
@@ -25,27 +22,119 @@ guild_ids = [731539222141468673]
 async def on_ready():
     print("it started working")
 
-@slash.slash(description="Lineup thing",
-             guild_ids=guild_ids,
-             options = [
-             create_option(name="agent", description="Select agent to show lineup for", option_type=3, required=False, 
-                        choices=[create_choice(name="Viper",value="viper")]),
-             create_option(name="map", description="Select map to show lineup for", option_type=3, required=False, 
-                        choices=[create_choice(name="Ascent",value="ascent")])])
-async def lineup(ctx, agent="", map=""):
-
-    if agent != "" and map != "":
-        await ctx.send(f'https://atomic-potatos.github.io/Valorant-Lineups/agents/{agent}/{map}.html')
-
 @client.event
 async def on_message(message):
-    if message.author == client.user:
-        return
 
-    if message.content.lower().startswith('good evening'):
-        await message.channel.send(file=discord.File('good_evening.mp4'))
+    file = open('peoplecodes.txt','r')
+    anonIDs = file.readlines()
+    file.close()
+
+    for i in range(0, len(anonIDs)):
+        anonIDs[i] = anonIDs[i].strip()
+
+    dontlook = []
+    with open("dontlook.csv", "r") as f:
+        reader = csv.reader(f, delimiter="\t")
+        for i, line in enumerate(reader):
+            dontlook.append(line[0].split(','))
+
+    Faaez =     personClass.Person("faaez",     410771947522359296, anonIDs[0])
+    faq =       personClass.Person("faq",       776365641576742932, anonIDs[1])
+    Dhiluka =   personClass.Person("dhiluka",   305132419474784257, anonIDs[2])
+    Rasindu =   personClass.Person("rasindu",   285341337899761673, anonIDs[3])
+    Dylan =     personClass.Person("dylan",     236820135254425600, anonIDs[4])
+    Josh =      personClass.Person("josh",      389600778651959296, anonIDs[5])
+    Vivian =    personClass.Person("vivian",    261818489159811072, anonIDs[6])
+    Ethan =     personClass.Person("ethan",     400499749263769600, anonIDs[7])
+    Albert =    personClass.Person("albert",    284881791335006209, anonIDs[8])
+    Henry =     personClass.Person("henry",     290323655437713419, anonIDs[9])
+    Joseph =    personClass.Person("joseph",    219270614362488832, anonIDs[10])
+    Darren =    personClass.Person("darren",    286762644067713035, anonIDs[11])
+    Delwyn =    personClass.Person("delwyn",    389687347605798913, anonIDs[12])
+    Hadi =      personClass.Person("hadi",      251576622698856449, anonIDs[13])
+    Will =      personClass.Person("will",      409908597397389313, anonIDs[14])
+    Chris =     personClass.Person("chris",     320792211174195210, anonIDs[15])
+
+    receiver = None
+    people = [Faaez, faq, Rasindu]
+
+    if message.guild is None and not message.author.bot:
+        print(message.content)
+
+        name = message.content.split(' ')[0]
+        words = message.content.replace(name, '')
+
+        if name.lower() == 'reply':
+            anonReceiverID = message.content.split(' ')[1]
+            words = message.content.replace(name, '')
+            words = words.replace(anonReceiverID, '')
+
+            for person in people:
+                if person.anonID == int(anonReceiverID):
+                    receiver = person
+                    break
+            
+            if receiver == None:
+                await message.author.send("incorrect format, please provide name")
+            
+            else:
+                receiverUser = await client.fetch_user(receiver.discordID)
+                await receiverUser.send("reply: \n" + words.strip())
+                await message.author.send("message sent")
+
+        else:
+            for person in people:
+                if person.discordID == message.author.id:
+                    sender = person
+                    break
+
+            for person in people:
+                if person.name == name:
+                    receiver = person
+                    break
+            
+            if receiver == None:
+                await message.author.send("incorrect format, please provide name")
+            
+            else:
+                flag = False
+                for i in range(0, len(dontlook)):
+                    if dontlook[i][0] == str(sender.discordID):
+                        if dontlook[i][1] == '0':
+                            dontlook[i][1] = str(receiver.anonID)
+                            flag = True
+
+                        else:
+                            if dontlook[i][1] == str(receiver.anonID):
+                                flag = True
+                        break
+                
+                csvfile = open('dontlook.csv', 'w')
+
+                for line in dontlook:
+                    csvfile.write(line[0] + ',' + line[1] + '\n')
+                
+                csvfile.close()
+                
+
+                if flag:
+                    receiverUser = await client.fetch_user(receiver.discordID)
+                    await receiverUser.send(words.strip() + '\nfrom: ' + str(sender.anonID))
+                    await message.author.send("message sent")
+                
+                else:
+                    await message.author.send("you cant send a message to that person")
 
     await client.process_commands(message)
+
+# This always sends the same message to the same person.  Is that what you want?
+@client.command(pass_context=True)
+@commands.is_owner()  # The account that owns the client
+async def dm(ctx):
+    memberID = "410771947522359296"
+    person = await client.get_user_info(memberID)
+    await client.send_message(person, "WHAT I'D LIKE TO SAY TO THEM")
+    await client.delete_message(ctx.message)
 
 
 client.run(token)
