@@ -56,7 +56,7 @@ async def on_message(message):
     Chris =     personClass.Person("chris",     320792211174195210, anonIDs[15])
 
     receiver = None
-    people = [Faaez, faq, Rasindu]
+    people = [Faaez, faq, Rasindu, Dhiluka, Dylan, Josh, Vivian, Ethan, Albert, Henry, Joseph, Darren, Delwyn, Hadi, Will, Chris]
 
     if message.guild is None and not message.author.bot:
         print(message.content)
@@ -70,17 +70,29 @@ async def on_message(message):
             words = words.replace(anonReceiverID, '')
 
             for person in people:
-                if person.anonID == int(anonReceiverID):
+                if int(person.anonID) == int(anonReceiverID):
                     receiver = person
                     break
             
             if receiver == None:
-                await message.author.send("incorrect format, please provide name")
-            
+                await message.author.send("invalid ID")
+
             else:
-                receiverUser = await client.fetch_user(receiver.discordID)
-                await receiverUser.send("reply: \n" + words.strip())
-                await message.author.send("message sent")
+                flag = False
+                for i in range(0, len(dontlook)):
+                    if message.author.id == int(dontlook[i][0]):
+                        if int(dontlook[i][2]) < 4:
+                            dontlook[i][2] = int(dontlook[i][2]) + 1
+                            flag = True
+                            break
+
+                if flag:
+                    receiverUser = await client.fetch_user(receiver.discordID)
+                    await receiverUser.send("reply: \n" + words.strip())
+                    await message.author.send("message sent")
+                
+                else:
+                    await message.author.send("message limit reached")
 
         else:
             for person in people:
@@ -102,24 +114,25 @@ async def on_message(message):
                     if dontlook[i][0] == str(sender.discordID):
                         if dontlook[i][1] == '0':
                             dontlook[i][1] = str(receiver.anonID)
+                            dontlook[i][2] = int(dontlook[i][2]) + 1
                             flag = True
                         else:
-                            if dontlook[i][1] == str(receiver.anonID):
+                            if dontlook[i][1] == str(receiver.anonID) and int(dontlook[i][2]) < 4:
+                                dontlook[i][2] = int(dontlook[i][2]) + 1
                                 flag = True
                         break
-                
-                csvfile = open('dontlook.csv', 'w')
-
-                for line in dontlook:
-                    csvfile.write(line[0] + ',' + line[1] + '\n')
-                csvfile.close()
 
                 if flag:
                     receiverUser = await client.fetch_user(receiver.discordID)
-                    await receiverUser.send(words.strip() + '\nfrom: ' + str(sender.anonID))
+                    await receiverUser.send(words.strip() + '\n') #from: ' + str(sender.anonID)) 
                     await message.author.send("message sent")
                 else:
-                    await message.author.send("you cant send a message to that person")
+                    await message.author.send("you cant send a message to that person or message limit reached")
+
+        csvfile = open('dontlook.csv', 'w')
+        for line in dontlook:
+            csvfile.write(str(line[0]) + ',' + str(line[1]) + ',' + str(line[2]) + '\n')
+        csvfile.close()
 
     await client.process_commands(message)
 
