@@ -27,7 +27,10 @@ def update_all_elo_history():
         #print("completed " + str(i + 1) + "/" + str(len(playerList.players)))
         #graphs.make_graph(playerList.players[i].ign)
 
-    return str(update_count) + " updates"
+    if update_count == 0:
+        return "no"
+    else:
+        return str(update_count) + " updates"
 
 if __name__ == '__main__':
     updates = update_all_elo_history()
@@ -37,5 +40,5 @@ if __name__ == '__main__':
     if updates[0] == "welp":
         print("welp at " + str(updates[1]) + ": " + melb_now.strftime("%d/%m/%Y") + " at " + melb_now.strftime("%H:%M:%S"))
 
-    else:
+    elif updates != "no":
         print("completed on: " + melb_now.strftime("%d/%m/%Y") + " at " + melb_now.strftime("%H:%M:%S") + " with " + updates)
