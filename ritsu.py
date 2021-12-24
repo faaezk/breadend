@@ -124,7 +124,7 @@ async def on_message(message):
 
                 if flag:
                     receiverUser = await client.fetch_user(receiver.discordID)
-                    await receiverUser.send(words.strip() + '\n') #from: ' + str(sender.anonID)) 
+                    await receiverUser.send(words.strip() + '\nfrom: ' + str(sender.anonID)) 
                     await message.author.send("message sent")
                 else:
                     await message.author.send("you cant send a message to that person or message limit reached")

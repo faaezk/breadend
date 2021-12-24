@@ -23,7 +23,7 @@ def get_mmr_history(ign, tag=""):
     url = f"https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{ign}/{tag}"
     r = requests.get(url)
 
-    if str(r) == "<Response [204]>":
+    if str(r) == "<Response [204]>" or str(r) == "<Response [504]>":
         return False
 
     john = json.loads(r.text)
@@ -391,4 +391,4 @@ def remove_player(ign, tag):
     return f'{ign}#{tag} has been removed'
 
 if __name__ == '__main__':
-    print(region_leaderboard('na'))
+    print(local_leaderboard())
