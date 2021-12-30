@@ -122,6 +122,20 @@ def update_database(ign, tag=""):
         for i in range(0, len(player_data['data'])):
             new_list.append(player_data['data'][i]['elo'])
 
+    elif len(str(last_file_update)) == 13:
+
+        for i in range(0, len(player_data['data'])):
+
+            date_raw = player_data['data'][i]['date_raw']
+
+            if (len(str(date_raw)) == 10):
+                last_file_update = int(str(last_file_update)[-3])
+
+            if last_file_update < date_raw:
+                new_list.append(player_data['data'][i]['elo'])
+            else:
+                break
+    
     else:
         for i in range(0, len(player_data['data'])):
 
@@ -391,4 +405,4 @@ def remove_player(ign, tag):
     return f'{ign}#{tag} has been removed'
 
 if __name__ == '__main__':
-    print(local_leaderboard())
+    print(update_database('fakinator'))
