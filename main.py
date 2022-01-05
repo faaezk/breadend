@@ -186,15 +186,15 @@ async def graph(ctx, usernames=""):
              options = [
              create_option(name="options", description="Region/options for leaderboard (leave blank for local)", option_type=3, required=False, 
                         choices=[create_choice(name="Update local leaderboard",value="update")
-                        #,create_choice(name="Asia Pacific",value="ap"),
-                        #create_choice(name="Europe",value="eu"), create_choice(name="Korea",value="kr"),
-                        #create_choice(name="North America",value="na")
+                        ,create_choice(name="Asia Pacific",value="ap"),
+                        create_choice(name="Europe",value="eu"), create_choice(name="Korea",value="kr"),
+                        create_choice(name="North America",value="na")
                         ])])
 async def leaderboard(ctx, options=""):
     
     if options == "":
 
-        log_file = open("/home/ubuntu/discord_bot/run_check.out",'r')
+        log_file = open("/home/ubuntu/discord_bot/updater_log-2022.out",'r')
         lines = log_file.readlines()
         log_file.close()
 
@@ -506,7 +506,7 @@ async def on_message(message):
         await message.add_reaction("<:stevens:785800069957943306>")
 
     if message.content.lower().startswith('$lastupdate'):
-        f = open("/home/ubuntu/discord_bot/elo_history/run_check.out", "r")
+        f = open("/home/ubuntu/discord_bot/elo_history/updater_log-2022.out", "r")
         last = f.readlines()[-1]
         f.close()
 
