@@ -32,10 +32,10 @@ def make_graph(ign):
     if type(thing) == bool and thing == False:
         return False
 
-    if os.path.isfile(f'/home/ubuntu/discord_bot/elo_history/{ign}.txt') == False:
+    if os.path.isfile(f'elo_history/{ign}.txt') == False:
         return False
     
-    file1 = open(f'/home/ubuntu/discord_bot/elo_history/{ign}.txt', 'r')
+    file1 = open(f'elo_history/{ign}.txt', 'r')
 
     y = [x.strip() for x in file1.readlines()]
     if len(y) == 2:
@@ -113,7 +113,7 @@ def make_graph(ign):
     plt.ylabel('MMR')
     plt.title(ign + '\'s MMR over time')
 
-    plt.savefig(f'/home/ubuntu/discord_bot/elo_graphs/{ign}.png', bbox_inches="tight")
+    plt.savefig(f'elo_graphs/{ign}.png', bbox_inches="tight")
 
     file1.close()
     plt.clf()
@@ -131,7 +131,7 @@ def multigraph(players):
 
     for ign in players:
 
-        if os.path.isfile(f'/home/ubuntu/discord_bot/elo_history/{ign}.txt') == False:
+        if os.path.isfile(f'elo_history/{ign}.txt') == False:
             fail[0].append(ign)
             continue
         
@@ -144,7 +144,7 @@ def multigraph(players):
 
         valorant.update_database(ign, tag)
         
-        file1 = open(f'/home/ubuntu/discord_bot/elo_history/{ign}.txt', 'r')
+        file1 = open(f'elo_history/{ign}.txt', 'r')
 
         y = [x.strip() for x in file1.readlines()]
         if len(y) == 2:
@@ -213,7 +213,7 @@ def multigraph(players):
     plt.title("change in MMR over time")
     plt.legend()
 
-    plt.savefig(f'/home/ubuntu/discord_bot/elo_graphs/multigraph.png', bbox_inches="tight")
+    plt.savefig(f'elo_graphs/multigraph.png', bbox_inches="tight")
 
     file1.close()
     plt.clf()

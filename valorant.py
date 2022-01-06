@@ -23,22 +23,22 @@ def get_mmr_history(ign, tag=""):
     url = f"https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{ign}/{tag}"
     r = requests.get(url)
 
-    if str(r) == "<Response [204]>" or str(r) == "<Response [504]>":
+    if str(r) == "<Response [204]>" or str(r) == "<Response [504]>" or str(r) == "<Response [503]>":
         return False
 
     john = json.loads(r.text)
 
     if 'status' in john:
-        if john['status'] == '429':
+        if john['status'] == 429:
             return "welp"
         
-        elif john['status'] == '404':
+        elif john['status'] == 404:
             return "User not found"
         
-        elif john['status'] == '500':
+        elif john['status'] == 500:
             return "No matches available"
         
-        elif john['status'] != '200':
+        elif john['status'] != 200:
             return False
     
     elif 'statusCode' in john:
@@ -93,8 +93,11 @@ def update_database(ign, tag=""):
 
     if type(player_data) != dict:
         return False
-
+    
     player_file_path = f'/home/ubuntu/discord_bot/elo_history/{ign}.txt'
+        return False
+
+    player_file_path = f'elo_history/{ign}.txt'
 
     if os.path.isfile(player_file_path) == False:
         if len(player_data['data']) == 0:
@@ -123,13 +126,16 @@ def update_database(ign, tag=""):
             new_list.append(player_data['data'][i]['elo'])
 
     elif len(str(last_file_update)) == 13:
+        
+        if (len(str(date_raw)) == 10):
+            last_file_update = int(str(last_file_update)[:-3])
+            last_num = int(str(last_file_update)[-1])
+            last_num += 1
+            last_file_update = int(str(last_file_update)[:-1] + str(last_num))
 
         for i in range(0, len(player_data['data'])):
 
             date_raw = player_data['data'][i]['date_raw']
-
-            if (len(str(date_raw)) == 10):
-                last_file_update = int(str(last_file_update)[-3])
 
             if last_file_update < date_raw:
                 new_list.append(player_data['data'][i]['elo'])
@@ -405,4 +411,5 @@ def remove_player(ign, tag):
     return f'{ign}#{tag} has been removed'
 
 if __name__ == '__main__':
-    print(update_database('fakinator'))
+    print(update_database('dilka30003'))
+    print(update_database('katchampion'))
