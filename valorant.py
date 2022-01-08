@@ -94,10 +94,10 @@ def update_database(ign, tag=""):
     if type(player_data) != dict:
         return False
     
-    player_file_path = f'/home/ubuntu/discord_bot/elo_history/{ign}.txt'
+    if 'error' in player_data.keys():
         return False
 
-    player_file_path = f'elo_history/{ign}.txt'
+    player_file_path = f'/home/ubuntu/discord_bot/elo_history/{ign}.txt'
 
     if os.path.isfile(player_file_path) == False:
         if len(player_data['data']) == 0:
