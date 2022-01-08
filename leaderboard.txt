@@ -1,41 +1,41 @@
 Player Leaderboard
-1. oshawott         1401
-2. azatory          1241
-3. horus            1219
-4. giroud           1194
-5. vkj              1150
-6. windy            1125
-7. hoben222         1123
+1. oshawott         1488
+2. azatory          1218
+3. horus            1200
+4. hoben222         1179
+5. giroud           1160
+6. vkj              1150
+7. windy            1125
 8. jack             1082
-9. fakinator        1018
-10.silentwhispers   1007
-11.8888              988
+9. fakinator        1028
+10.8888             1010
+11.silentwhispers    958
 12.grovyle           931
 13.dilka30003        894
-14.imabandwagon      849
-15.therealrobdez     837
-16.lmao              784
+14.imabandwagon      877
+15.therealrobdez     835
+16.kleenexwipes      826
 17.kyouko            782
-18.kleenexwipes      777
+18.lmao              754
 19.fade              746
-20.thesugarman       706
-21.gerald            700
-22.yovivels          681
-23.bento2            665
-24.glizzardwizard    654
+20.thesugarman       728
+21.yovivels          717
+22.bento2            665
+23.glizzardwizard    654
+24.gerald            654
 25.lol               625
-26.tallewok          617
-27.slumonaire        610
-28.nadizheloof       610
-29.rustybeef         602
+26.rustybeef         623
+27.tallewok          617
+28.slumonaire        610
+29.nadizheloof       610
 30.quyteriyaki       600
 31.dilka40004        481
 32.thomyorke         431
 33.quackinator       380
-34.boiwhogotstabbed  370
-35.katchampion       334
-36.crossaxis         319
-37.jokii             259
+34.boiwhogotstabbed  371
+35.crossaxis         359
+36.katchampion       329
+37.jokii             231
 38.boishebouttastab   44
 39.boiimbouttastab    35
 40.boiubouttastab      0
