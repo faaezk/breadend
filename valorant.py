@@ -38,6 +38,9 @@ def get_mmr_history(ign, tag=""):
         elif john['status'] == 500:
             return "No matches available"
         
+        elif john['status'] == 403:
+            return "riot servers are down at the moment"
+        
         elif john['status'] != 200:
             return False
     
@@ -92,7 +95,7 @@ def update_database(ign, tag=""):
     player_data = get_mmr_history(ign, tag)
 
     if type(player_data) != dict:
-        return False
+        return player_data
     
     if 'error' in player_data.keys():
         return False
@@ -411,5 +414,4 @@ def remove_player(ign, tag):
     return f'{ign}#{tag} has been removed'
 
 if __name__ == '__main__':
-    print(update_database('dilka30003'))
-    print(update_database('katchampion'))
+    print(update_database('oshawott'))
