@@ -147,7 +147,7 @@ async def graph(ctx, usernames=""):
         msg = ""
         flag = graphs.make_graph(users[0])
         if flag == False:
-            await the_message.edit(content="Player not found or api being stupid")
+            await the_message.edit(content="Player not found or api being stupid, or it might even be aws :(")
 
         elif flag == None:
             await the_message.edit(content="Not enough data to plot graph")
