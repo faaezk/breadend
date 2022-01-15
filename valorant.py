@@ -57,6 +57,9 @@ def get_mmr_history(ign, tag=""):
         elif john['statusCode'] != 200:
             return False
 
+    if john['name'] == None or john['tag'] == None:
+        return False
+
     return john
 
 def get_file_mmr(ign):
@@ -414,4 +417,4 @@ def remove_player(ign, tag):
     return f'{ign}#{tag} has been removed'
 
 if __name__ == '__main__':
-    print(update_database('oshawott'))
+    print(update_database('bhairav'))
