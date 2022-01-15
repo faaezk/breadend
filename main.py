@@ -506,7 +506,7 @@ async def on_message(message):
         await message.add_reaction("<:stevens:785800069957943306>")
 
     if message.content.lower().startswith('$lastupdate'):
-        f = open("/home/ubuntu/discord_bot/elo_history/updater_log-2022.out", "r")
+        f = open("/home/ubuntu/discord_bot/updater_log-2022.out", "r")
         last = f.readlines()[-1]
         f.close()
 
