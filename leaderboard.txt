@@ -1,35 +1,35 @@
 Player Leaderboard
-1. azatory          1483
-2. horus            1200
-3. hoben222         1179
-4. giroud           1160
-5. vkj              1150
-6. windy            1125
-7. jack             1082
-8. oshawott         1076
-9. fakinator        1010
-10.8888              993
-11.silentwhispers    958
-12.grovyle           937
-13.dilka30003        894
-14.kleenexwipes      826
-15.kyouko            782
-16.lmao              771
-17.fade              746
-18.thesugarman       728
-19.bento2            665
-20.yovivels          650
-21.glizzardwizard    641
-22.gerald            641
-23.lol               625
-24.nadizheloof       617
-25.tallewok          617
-26.slumonaire        610
-27.imabandwagon      605
-28.quyteriyaki       600
-29.therealrobdez     571
-30.dilka40004        481
-31.rustybeef         462
+1. oshawott         1332
+2. azatory          1169
+3. giroud           1160
+4. vkj              1150
+5. windy            1125
+6. jack             1082
+7. fakinator        1010
+8. horus            1000
+9. silentwhispers    958
+10.grovyle           937
+11.dilka30003        894
+12.kyouko            782
+13.lmao              771
+14.hoben222          755
+15.fade              746
+16.imabandwagon      667
+17.bento2            665
+18.8888              650
+19.yovivels          650
+20.glizzardwizard    641
+21.lol               625
+22.nadizheloof       617
+23.tallewok          617
+24.therealrobdez     612
+25.slumonaire        610
+26.quyteriyaki       600
+27.thesugarman       532
+28.gerald            503
+29.dilka40004        481
+30.rustybeef         478
+31.kleenexwipes      459
 32.thomyorke         431
 33.boiwhogotstabbed  410
 34.quackinator       380
