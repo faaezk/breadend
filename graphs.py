@@ -220,8 +220,23 @@ def multigraph(players):
 
     return fail
 
+def update_all_graphs():
+    
+    playerList = playerclass.PlayerList('playerlist.csv')
+    playerList.load()
+
+    for i in range(0, len(playerList.players)):
+
+        if playerList.players[i].active == 'False':
+            continue
+
+        print(make_graph(playerList.players[i].ign))
+
+    return
+
 if __name__ == "__main__":
     #multigraph(['8888','azatory','bento2','crossaxis','fade','fakinator', 'giroud', 'grovyle', 'imabandwagon', 'jokii', 'katchampion',
     # 'yovivels', 'dilka30003', 'slumonaire', 'silentwhispers', 'lmao', 'jack', 'thesugarman', 'hoben222', 'quackinator'])
     #multigraph(['8888', 'yovivels', 'dilka30003', 'slumonaire'])
-    print(make_graph("fakinator"))
+    #print(make_graph("fakinator"))
+    update_all_graphs()

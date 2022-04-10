@@ -64,7 +64,7 @@ def get_mmr_history(ign, tag=""):
 
 def get_file_mmr(ign):
 
-    file_path = f'/home/ubuntu/discord_bot/elo_history/{ign}.txt'
+    file_path = f'elo_history/{ign}.txt'
 
     if os.path.isfile(file_path) == False:
         return False
@@ -81,10 +81,10 @@ def get_file_mmr(ign):
 
 def initialise_file(ign):
 
-    f = open(f'/home/ubuntu/discord_bot/elo_history/{ign}.txt', "x")
+    f = open(f'elo_history/{ign}.txt', "x")
     f.close()
 
-    f = open(f'/home/ubuntu/discord_bot/elo_history/{ign}.txt', "w")
+    f = open(f'elo_history/{ign}.txt', "w")
     f.writelines('\n')
     f.close()
 
@@ -103,7 +103,7 @@ def update_database(ign, tag=""):
     if 'error' in player_data.keys():
         return False
 
-    player_file_path = f'/home/ubuntu/discord_bot/elo_history/{ign}.txt'
+    player_file_path = f'elo_history/{ign}.txt'
 
     if os.path.isfile(player_file_path) == False:
         if len(player_data['data']) == 0:
@@ -189,7 +189,7 @@ def get_elo_list(ign):
     if not get_file_mmr(ign):
         return "Player not found"
     
-    file1 = open(f'/home/ubuntu/discord_bot/elo_history/{ign}.txt', 'r')
+    file1 = open(f'elo_history/{ign}.txt', 'r')
 
     lines = [x.strip() for x in file1.readlines()]
 
@@ -417,4 +417,4 @@ def remove_player(ign, tag):
     return f'{ign}#{tag} has been removed'
 
 if __name__ == '__main__':
-    print(update_database('bhairav'))
+    print(update_database('fakinator'))
