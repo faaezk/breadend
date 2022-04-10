@@ -13,7 +13,7 @@ see crontab logs: tail -f /var/log/syslog
 
 tail -f elo_history/run_check.out
 
-/etc/systemd/system
+/etc/systemd/system (.service file)
 /*
 [Unit]
 Description=Discord Bot
@@ -28,6 +28,8 @@ Restart=always
 [Install]
 WantedBy=multi-user.target
 */
+
+
 
 sudo systemctl enable discordbot.service
 sudo systemctl restart discordbot.service
