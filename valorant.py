@@ -21,7 +21,9 @@ def get_mmr_history(ign, tag=""):
             return False
     
     url = f"https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{ign}/{tag}"
-    r = requests.get(url)
+
+    headers = {'accept': 'application/json'}
+    r = requests.get(url, headers=headers)
 
     if str(r) == "<Response [204]>" or str(r) == "<Response [504]>" or str(r) == "<Response [503]>":
         return False
