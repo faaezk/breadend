@@ -20,10 +20,10 @@ def update_all_elo_history(start=0):
         thing = valorant.update_database(playerList.players[i].ign, playerList.players[i].tag)
 
         if thing == "welp":
+            print("update count: " + str(update_count))
             return ["welp", i]
         if type(thing) != str:
             update_count += int(thing)
-            print('updates: ' + str(update_count))
 
         print("completed " + str(i + 1) + "/" + str(len(playerList.players)))
         graphs.make_graph(playerList.players[i].ign)
