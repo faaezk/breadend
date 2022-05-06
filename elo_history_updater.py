@@ -26,7 +26,7 @@ def update_all_elo_history(start=0):
             update_count += int(thing)
 
         print("completed " + str(i + 1) + "/" + str(len(playerList.players)))
-        graphs.make_graph(playerList.players[i].ign)
+        #graphs.make_graph(playerList.players[i].ign)
 
     return str(update_count) + " updates"
 
@@ -36,7 +36,13 @@ if __name__ == '__main__':
     melb_now = datetime.now()
 
     if updates[0] == "welp":
-        print("welp at " + str(updates[1]) + ": " + melb_now.strftime("%d/%m/%Y") + " at " + melb_now.strftime("%H:%M:%S"))
+        printerz = "welp at " + str(updates[1]) + ": " + melb_now.strftime("%d/%m/%Y") + " at " + melb_now.strftime("%H:%M:%S")
 
     else:
-        print("completed on: " + melb_now.strftime("%d/%m/%Y") + " at " + melb_now.strftime("%H:%M:%S") + " with " + updates)
+        printerz = "completed on: " + melb_now.strftime("%d/%m/%Y") + " at " + melb_now.strftime("%H:%M:%S") + " with " + updates
+    
+    f = open("updater_log-2022.out", "a")
+    f.write(printerz)
+    f.close()
+
+    print(printerz)

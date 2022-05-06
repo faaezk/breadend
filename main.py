@@ -16,7 +16,7 @@ import csv
 
 def get_config():
     c = configparser.ConfigParser()
-    c.read('/home/ubuntu/discord_bot/config.ini')
+    c.read('config.ini')
 
     return c['discord']['token'], c['cat']['api']
 
@@ -194,7 +194,9 @@ async def leaderboard(ctx, options=""):
     
     if options == "":
 
-        log_file = open("/home/ubuntu/discord_bot/updater_log-2022.out",'r')
+        the_message = await ctx.send("fetching leaderboard...")
+
+        log_file = open("updater_log-2022.out",'r')
         lines = log_file.readlines()
         log_file.close()
 
@@ -205,7 +207,7 @@ async def leaderboard(ctx, options=""):
             leaderboard += x
         f.close()
 
-        await ctx.send("```\n" + leaderboard + "\n```")
+        await the_message.edit(content="```\n" + leaderboard + "\n```")
     
     if options == "update":
         the_message = await ctx.send("this is gonna take a while...")
@@ -493,6 +495,31 @@ async def search(ctx, *, anime_title = "", manga_title = "", character = "", ani
             inline=False)
             
             await msg.edit(content="", file=file, embed=embed)
+
+@slash.slash(description="rickies",
+             guild_ids=guild_ids,)
+async def chairmen(ctx):
+    
+    msg = await ctx.send("Getting info")
+    url = "https://rickies.co/api/chairmen.json"
+
+    headers = {'accept': 'application/json'}
+    r = requests.get(url, headers=headers)
+    chairmen = json.loads(r.text)
+
+    keynote = chairmen['keynote_chairman']
+    annual = chairmen['annual_chairman']
+
+
+    embed = discord.Embed(title="The Rickies Chairmen", url="https://rickies.co/")
+
+    #embed.set_image(url=chairmen['keynote_chairman']['memoji'])
+    embed.add_field(name="Keynote Chairman:", value='{} {}'.format(keynote['name'], keynote['last_name']))
+    embed.add_field(name="Keynote Chairman:", value='{} {}'.format(annual['name'], annual['last_name']))
+
+
+    await msg.edit(content="", embed=embed)
+    
 
 @client.event
 async def on_message(message):

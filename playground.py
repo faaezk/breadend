@@ -1,12 +1,11 @@
+import json
+import requests
 
 
-last_file_update = 8391736193721
+url = "https://rickies.co/api/chairmen.json"
 
-last_file_update = str(last_file_update)[:-3]
+headers = {'accept': 'application/json'}
+r = requests.get(url, headers=headers)
+john = json.loads(r.text)
 
-last_num = int(str(last_file_update)[-1])
-last_num += 1
-last_file_update = int(str(last_file_update)[:-1] + str(last_num))
-
-print(last_num)
-print(last_file_update)
+print(john)
