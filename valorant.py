@@ -241,7 +241,9 @@ def local_leaderboard():
 def region_leaderboard(region, length=20):
 
     url = f"https://api.henrikdev.xyz/valorant/v1/leaderboard/{region}"
-    r = requests.get(url)
+    
+    headers = {'accept': 'application/json'}
+    r = requests.get(url, headers=headers)
 
     if str(r) == "<Response [204]>":
         return False
