@@ -421,4 +421,4 @@ def remove_player(ign, tag):
     return f'{ign}#{tag} has been removed'
 
 if __name__ == '__main__':
-    print(update_database('fakinator'))
+    print(get_mmr_history('Luusér', 'OCE'))
