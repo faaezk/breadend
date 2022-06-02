@@ -42,7 +42,7 @@ if __name__ == '__main__':
         printerz = "completed on: " + melb_now.strftime("%d/%m/%Y") + " at " + melb_now.strftime("%H:%M:%S") + " with " + updates
     
     f = open("updater_log-2022.out", "a")
-    f.write(printerz)
+    f.write(printerz + '\n')
     f.close()
 
     print(printerz)

@@ -153,7 +153,7 @@ async def graph(ctx, usernames=""):
             await the_message.edit(content="Not enough data to plot graph")
 
         else:
-            with open(f"/home/ubuntu/discord_bot/elo_graphs/{users[0]}.png", 'rb') as f:
+            with open(f"elo_graphs/{users[0]}.png", 'rb') as f:
                 picture = discord.File(f)
                 await the_message.edit(content= "", file=picture)
 
@@ -174,7 +174,7 @@ async def graph(ctx, usernames=""):
             msg = msg[:-2]
 
         if msg == "":
-            with open("/home/ubuntu/discord_bot/elo_graphs/multigraph.png", 'rb') as f:
+            with open("elo_graphs/multigraph.png", 'rb') as f:
                 picture = discord.File(f)
                 await the_message.edit(content="", file=picture)
         
@@ -459,7 +459,7 @@ async def search(ctx, *, anime_title = "", manga_title = "", character = "", ani
             await ctx.send("Character not found.")
 
         else:
-            file=discord.File(fp="/home/ubuntu/discord_bot/image.png", filename='image.png')
+            file=discord.File(fp="image.png", filename='image.png')
             embed = discord.Embed(title=anime['title'], url=anime['url'])
 
             embed.set_image(url="attachment://image.png")
@@ -483,7 +483,7 @@ async def search(ctx, *, anime_title = "", manga_title = "", character = "", ani
             await ctx.send("Character not found.")
 
         else:
-            file=discord.File(fp="/home/ubuntu/discord_bot/image.png", filename='image.png')
+            file=discord.File(fp="image.png", filename='image.png')
             embed = discord.Embed(title=manga['title'], url=manga['url'])
 
             embed.set_image(url="attachment://image.png")
@@ -533,7 +533,7 @@ async def on_message(message):
         await message.add_reaction("<:stevens:785800069957943306>")
 
     if message.content.lower().startswith('$lastupdate'):
-        f = open("/home/ubuntu/discord_bot/updater_log-2022.out", "r")
+        f = open("updater_log-2022.out", "r")
         last = f.readlines()[-1]
         f.close()
 
