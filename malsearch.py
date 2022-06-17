@@ -307,7 +307,7 @@ def animeStats(title):
     plt.xticks(x)
     plt.yticks()
     addlabels(x, y)
-    plt.savefig('/home/ubuntu/discord_bot/image.png', bbox_inches='tight')
+    plt.savefig('image.png', bbox_inches='tight')
     plt.clf()
 
     return {"watching":anime["watching"],"completed":anime["completed"],"on_hold":anime["on_hold"],
@@ -371,7 +371,7 @@ def mangaStats(title):
     plt.xticks(x)
     plt.yticks()
     addlabels(x, y)
-    plt.savefig('/home/ubuntu/discord_bot/image.png', bbox_inches='tight')
+    plt.savefig('image.png', bbox_inches='tight')
     plt.clf()
 
     return {"reading":manga["reading"],"completed":manga["completed"],"on_hold":manga["on_hold"],
