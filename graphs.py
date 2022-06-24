@@ -11,7 +11,8 @@ ranks = {
 900 : "Gold 1", 1000 : "Gold 2", 1100 : "Gold 3",
 1200 : "Platinum 1", 1300 : "Platinum 2", 1400 : "Platinum 3",
 1500 : "Diamond 1", 1600 : "Diamond 2", 1700 : "Diamond 3",
-1800 : "Immortal 1", 1900 : "Immortal 2", 2000 : "Immortal 3"
+1800 : "Ascendant 1", 1900 : "Ascendant 2", 2000 : "Ascendant 3",
+2100 : "Immortal 1", 2200 : "Immortal 2", 2300 : "Immortal 3"
 }
 
 def roundup(x):
