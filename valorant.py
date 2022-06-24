@@ -422,3 +422,4 @@ def remove_player(ign, tag):
 
 if __name__ == '__main__':
     print(update_database('Luusér', 'oce'))
+    print(local_leaderboard())
