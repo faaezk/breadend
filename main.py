@@ -11,8 +11,6 @@ from discord_slash import SlashCommand
 from discord_slash.utils.manage_commands import create_option, create_choice
 import random
 import playerclass
-import personClass
-import csv
 
 def get_config():
     c = configparser.ConfigParser()
@@ -362,6 +360,24 @@ async def lineup(ctx, agent="", map=""):
     if agent != "" and map != "":
         await ctx.send(f'https://atomic-potatos.github.io/Valorant-Lineups/agents/{agent}/{map}.html')
 
+@slash.slash(description="Gives a crosshair",
+             guild_ids=guild_ids)
+async def crosshair(ctx):
+
+    name, code = valorant.random_crosshair()
+
+    if type(name) == str:
+        file=discord.File(fp="crosshair.png", filename='crosshair.png')
+        embed = discord.Embed(title=name)
+        embed.add_field(name="Code:", value=code)
+        embed.set_image(url="attachment://crosshair.png")
+        await ctx.send(content="", file=file, embed=embed)
+
+    else:
+        await ctx.send("the thingo failed.")
+
+
+
 @slash.slash(description="Other Commands", guild_ids=guild_ids)
 async def other(ctx):
     msg = "```List of other commands:\n"
@@ -378,7 +394,7 @@ async def other(ctx):
              create_option(name="character", description="Enter a character to search for", option_type=3, required=False),
              create_option(name="anime_stats", description="Enter an anime to get stats for", option_type=3, required=False),
              create_option(name="manga_stats", description="Enter an manga to get stats for", option_type=3, required=False)])
-async def search(ctx, *, anime_title = "", manga_title = "", character = "", anime_stats = "", manga_stats = ""):
+async def MAL(ctx, *, anime_title = "", manga_title = "", character = "", anime_stats = "", manga_stats = ""):
     
     if anime_title != "":
         msg = await ctx.send("Getting info for " + anime_title)
@@ -459,10 +475,10 @@ async def search(ctx, *, anime_title = "", manga_title = "", character = "", ani
             await ctx.send("Character not found.")
 
         else:
-            file=discord.File(fp="image.png", filename='image.png')
+            file=discord.File(fp="bargraph.png", filename='bargraph.png')
             embed = discord.Embed(title=anime['title'], url=anime['url'])
 
-            embed.set_image(url="attachment://image.png")
+            embed.set_image(url="attachment://bargraph.png")
 
             embed.add_field(name="Other stats:", 
             value="Completed: {}\nWatching: {}\nPlan to watch: {}\nDropped: {}\nOn Hold: {}\nTotal: {}".format(
@@ -483,10 +499,10 @@ async def search(ctx, *, anime_title = "", manga_title = "", character = "", ani
             await ctx.send("Character not found.")
 
         else:
-            file=discord.File(fp="image.png", filename='image.png')
+            file=discord.File(fp="bargraph.png", filename='bargraph.png')
             embed = discord.Embed(title=manga['title'], url=manga['url'])
 
-            embed.set_image(url="attachment://image.png")
+            embed.set_image(url="attachment://bargraph.png")
 
             embed.add_field(name="Other stats:", 
             value="Completed: {}\nReading: {}\nPlan to read: {}\nDropped: {}\nOn Hold: {}\nTotal: {}".format(

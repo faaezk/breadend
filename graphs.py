@@ -15,6 +15,16 @@ ranks = {
 2100 : "Immortal 1", 2200 : "Immortal 2", 2300 : "Immortal 3"
 }
 
+old_ranks = {
+0 : "Iron 1", 100 : "Iron 2", 200 : "Iron 3",
+300 : "Bronze 1", 400 : "Bronze 2", 500 : "Bronze 3",
+600 : "Silver 1", 700 : "Silver 2", 800 : "Silver 3",
+900 : "Gold 1", 1000 : "Gold 2", 1100 : "Gold 3",
+1200 : "Platinum 1", 1300 : "Platinum 2", 1400 : "Platinum 3",
+1500 : "Diamond 1", 1600 : "Diamond 2", 1700 : "Diamond 3",
+1800 : "Immortal 1", 1900 : "Immortal 2", 2000 : "Immortal 3"
+}
+
 def roundup(x):
     return int(math.ceil(x / 100.0)) * 100
 
@@ -239,5 +249,5 @@ if __name__ == "__main__":
     #multigraph(['8888','azatory','bento2','crossaxis','fade','fakinator', 'giroud', 'grovyle', 'imabandwagon', 'jokii', 'katchampion',
     # 'yovivels', 'dilka30003', 'slumonaire', 'silentwhispers', 'lmao', 'jack', 'thesugarman', 'hoben222', 'quackinator'])
     #multigraph(['8888', 'yovivels', 'dilka30003', 'slumonaire'])
-    #print(make_graph("fakinator"))
-    update_all_graphs()
+    print(make_graph("fakinator"))
+    #update_all_graphs()
