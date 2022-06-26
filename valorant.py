@@ -2,6 +2,9 @@ import os
 import requests
 import json
 import playerclass
+from PIL import Image
+from io import BytesIO
+import random
 
 def get_tag(ign):
     playerlist = playerclass.PlayerList("playerlist.csv")
@@ -319,7 +322,7 @@ def get_banner(ign, tag):
 
     data = json.loads(r.text)
 
-    if data['status'] == '404' or data['status'] == '500':
+    if data['status'] != '200':
         return "Player not found, check syntax: (ign#tag)"
     
     url = data['data']['card']['large']
@@ -420,6 +423,38 @@ def remove_player(ign, tag):
 
     return f'{ign}#{tag} has been removed'
 
+def crosshair(code):
+    
+    url = f"https://api.henrikdev.xyz/valorant/v1/crosshair/generate?id={code}"
+
+    headers = {'accept': 'application/json'}
+    r = requests.get(url, headers=headers)
+
+    img = Image.open(BytesIO(r.content))
+    img = img.save("crosshair.png")
+
+    return True
+
+def random_crosshair():
+
+    crosshairs = {  "Reyna Flash" : "0;P;c;6;t;6;o;0.3;f;0;0t;1;0l;5;0o;5;0a;1;0f;0;1t;10;1l;4;1o;5;1a;0.5;1m;0;1f;0", 
+                    "Windmill"    : "0;P;c;1;t;6;o;1;d;1;z;6;a;0;f;0;m;1;0t;10;0l;20;0o;20;0a;1;0m;1;0e;0.1;1t;10;1l;10;1o;40;1a;1;1m;0",
+                    "Flappy Bird" : "0;P;c;1;t;3;o;1;f;0;0t;6;0l;20;0o;13;0a;1;0f;0;1t;9;1l;4;1o;9;1a;1;1m;0;1f;0",
+                    "Flower"      : "0;P;c;6;o;1;d;1;z;4;f;0;m;1;0t;8;0l;3;0o;2;0a;0;0f;0;1l;3;1o;3;1a;0;1m;0;1f;0",
+                    "Diamond"     : "0;P;c;5;h;0;f;0;0t;1;0l;3;0o;0;0a;1;0f;0;1t;3;1o;0;1a;1;1m;0;1f;0",
+                    "Smiley"      : "0;P;c;7;t;2;o;1;d;1;z;3;a;0;f;0;0t;10;0l;2;0o;2;0a;1;0f;0;1b;0",
+                    "Globe"       : "0;P;o;1;f;0;0t;10;0l;4;0a;0;0f;0;1t;4;1o;6;1a;0;1m;0;1f;0",
+                    "Shuriken"    : "0;P;c;7;h;0;f;0;0l;4;0o;2;0a;1;0f;0;1t;8;1l;1;1o;1;1a;1;1m;0;1f;0",
+                    "Fishnet"     : "0;P;o;1;d;1;a;0;f;0;0t;8;0l;2;0o;5;0a;0;0f;0;1l;8;1o;2;1a;0;1m;0;1f;0"}
+
+    name, code = random.choice(list(crosshairs.items()))
+
+    if not crosshair(code):
+        return (False, False)
+
+    return (name, code)
+
 if __name__ == '__main__':
-    print(update_database('Luusér', 'oce'))
-    print(local_leaderboard())
+    #print(update_database('Luusér', 'oce'))
+    #print(get_mmr_history("oshawott"))
+    print(crosshair("0;P;c;1;t;6;o;1;d;1;z;6;a;0;f;0;m;1;0t;10;0l;20;0o;20;0a;1;0m;1;0e;0.1;1t;10;1l;10;1o;40;1a;1;1m;0"))
