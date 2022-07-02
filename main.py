@@ -295,7 +295,7 @@ async def banner(ctx, *, username):
         else:
             await ctx.send(file=discord.File('banner.png'))
 
-@slash.slash(description="Changing your in-game name",
+@slash.slash(description="Update database with your new in-game name",
              guild_ids=guild_ids,
              options = [
              create_option(name="old_username", description="enter your old username", option_type=3, required=True),
@@ -304,7 +304,7 @@ async def namechange(ctx, old_username="", new_username=""):
 
     if ctx.author.id == 410771947522359296:
 
-        old = old_username.split('#')[0].lower()
+        old_username = old_username.split('#')
         new_username = new_username.split('#')
 
         if len(new_username) != 2:
@@ -312,18 +312,20 @@ async def namechange(ctx, old_username="", new_username=""):
         
         else:
             the_message = await ctx.send("please wait...")
+            old_ign = old_username[0].lower()
+            old_tag = old_username[1].lower()
             new_ign = new_username[0].lower()
             new_tag = new_username[1].lower()
 
             if valorant.account_check(new_ign, new_tag):
                 playerList = playerclass.PlayerList('playerlist.csv')
                 playerList.load()
-                if playerList.change_ign(old, new_ign, new_tag):
+                if playerList.change_ign(old_ign, new_ign, new_tag):
                     playerList.save()
-                    await the_message.edit(content = f'{old} is now {new_ign}#{new_tag}')
+                    await the_message.edit(content = f'{old_ign}#{old_tag} is now {new_ign}#{new_tag}')
                 
                 else:
-                    await the_message.edit(content = f'{old} not found in database, check player list using `$getcsv`')
+                    await the_message.edit(content = f'{old_ign}#{old_tag} not found in database, check player list using `$getcsv`')
             
             else:
                 await the_message.edit(content = f'{new_ign}#{new_tag} does not exist.')
@@ -360,8 +362,7 @@ async def lineup(ctx, agent="", map=""):
     if agent != "" and map != "":
         await ctx.send(f'https://atomic-potatos.github.io/Valorant-Lineups/agents/{agent}/{map}.html')
 
-@slash.slash(description="Gives a crosshair",
-             guild_ids=guild_ids)
+@slash.slash(description="Gives a crosshair", guild_ids=guild_ids)
 async def crosshair(ctx):
 
     name, code = valorant.random_crosshair()
@@ -378,7 +379,7 @@ async def crosshair(ctx):
 
 
 
-@slash.slash(description="Other Commands", guild_ids=guild_ids)
+@slash.slash(description="List of other Commands", guild_ids=guild_ids)
 async def other(ctx):
     msg = "```List of other commands:\n"
     msg += "$banner ign#tag -> returns your current banner\n"

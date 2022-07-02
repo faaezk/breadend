@@ -1,11 +1,12 @@
-import json
-import requests
+import playerclass
 
 
-url = "https://rickies.co/api/chairmen.json"
+playerlist = playerclass.PlayerList("playerlistb.csv")
+playerlist.load()
 
-headers = {'accept': 'application/json'}
-r = requests.get(url, headers=headers)
-john = json.loads(r.text)
+playerlist.players.sort(key=lambda x: x.priority)
 
-print(john)
+for player in playerlist.players:
+    print(player.ign)
+
+playerlist.save()
