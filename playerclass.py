@@ -1,19 +1,14 @@
 import os
 
 class Player():
-    def __init__(self, ign, tag, name = None, active = True):
+    def __init__(self, ign, tag, priority = None, active = True):
         self.ign = ign
         self.tag = tag
-        
-        if name == None:
-            self.name = ign
-        else:
-            self.name = name
-
+        self.priority = priority
         self.active = active
     
     def getCsv(self) -> str:
-        return f"{self.ign},{self.tag},{self.name},{self.active}\n"
+        return f"{self.ign},{self.tag},{self.priority},{self.active}\n"
 
     def __str__(self) -> str:
         return f"{self.ign}#{self.tag}"
@@ -22,10 +17,6 @@ class Player():
         return str(self) == str(o)
     
     def setUser(self, ign, tag):
-
-        if self.ign == self.name:
-            self.name = ign
-
         self.ign = ign
         self.tag = tag
 
@@ -50,9 +41,12 @@ class PlayerList():
                 playerData = line.split(',')
                 ign = playerData[0]
                 tag = playerData[1]
-                name = playerData[2]
+                priority = playerData[2]
                 active = playerData[3][:-1]
-                self.players.append(Player(ign, tag, name, active))
+                self.players.append(Player(ign, tag, priority, active))
+    
+    def sort(self):
+        self.players.sort(key=lambda x: x.priority)
     
     def getPlayers(self):
         return self.players

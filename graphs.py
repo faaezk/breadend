@@ -31,17 +31,17 @@ def roundup(x):
 def rounddown(x):
     return int(math.floor(x / 100.0)) * 100
 
-def make_graph(ign):
+def make_graph(ign, num=0, update=True):
 
     tag = valorant.get_tag(ign)
     
     if not tag:
         return False
 
-    thing = valorant.update_database(ign, tag)
-
-    if type(thing) == bool and thing == False:
-        return False
+    if update:
+        thing = valorant.update_database(ign, tag)
+        if type(thing) == bool and thing == False:
+            return False
 
     if os.path.isfile(f'elo_history/{ign}.txt') == False:
         return False
@@ -52,11 +52,19 @@ def make_graph(ign):
     if len(y) == 2:
         return None
     y.pop(0)
+    
+    total = len(y)
+    if num > 1 and (num - 1) < len(y):
+        y = y[-num:]
+    else:
+        num = 0
+        total = 0
+
     x = []
 
     for i in range(0, len(y)):
         y[i] = int(y[i])
-        x.append(i + 1)
+        x.append((total - num) + i + 1)
 
     ymin = rounddown(min(y))
     ymax = roundup(max(y))
@@ -103,7 +111,7 @@ def make_graph(ign):
 
     if len(x) < 150:
         while i <= len(x):
-            tickx.append(i)
+            tickx.append((total - num) + i)
             i += j
     
         if x[-1] not in tickx:
@@ -248,6 +256,6 @@ def update_all_graphs():
 if __name__ == "__main__":
     #multigraph(['8888','azatory','bento2','crossaxis','fade','fakinator', 'giroud', 'grovyle', 'imabandwagon', 'jokii', 'katchampion',
     # 'yovivels', 'dilka30003', 'slumonaire', 'silentwhispers', 'lmao', 'jack', 'thesugarman', 'hoben222', 'quackinator'])
-    #multigraph(['8888', 'yovivels', 'dilka30003', 'slumonaire'])
+    #multigraph(['boiwhogotstabbed', 'boiubouttastab', 'boiimbouttastab', 'boishebouttastab'])
     print(make_graph("fakinator"))
     #update_all_graphs()

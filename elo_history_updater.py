@@ -6,27 +6,34 @@ import graphs
 
 def update_all_elo_history(start=0):
     
-    playerList = playerclass.PlayerList('playerlist.csv')
+    playerList = playerclass.PlayerList('playerlistb.csv')
     playerList.load()
+    playerList.sort()
 
     update_count = 0
-    thing = ""
-    
-    for i in range(start, len(playerList.players)):
+    updatedList = []
+    total = str(len(playerList.players) - start)
 
-        if playerList.players[i].active == 'False':
+    for i in range(start, len(playerList.players)):
+        player = playerList.players[i]
+
+        if player.active == 'False':
             continue
 
-        thing = valorant.update_database(playerList.players[i].ign, playerList.players[i].tag)
+        thing = valorant.update_database(player.ign, player.tag)
 
         if thing == "welp":
             print("update count: " + str(update_count))
             return ["welp", i]
+
         if type(thing) != str:
             update_count += int(thing)
 
-        print("completed " + str(i + 1) + "/" + str(len(playerList.players)))
-        #graphs.make_graph(playerList.players[i].ign)
+            if int(thing) > 0:
+                updatedList.append((player.ign, thing))
+                
+        #graphs.make_graph(player.ign, update=False)
+        print("completed " + str(i + 1) + "/" + total)
 
     return str(update_count) + " updates"
 
