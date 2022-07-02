@@ -28,7 +28,7 @@ def get_mmr_history(ign, tag=""):
     headers = {'accept': 'application/json'}
     r = requests.get(url, headers=headers)
 
-    if str(r) == "<Response [204]>" or str(r) == "<Response [504]>" or str(r) == "<Response [503]>":
+    if str(r) != "<Response [200]>":
         return False
 
     john = json.loads(r.text)
@@ -62,7 +62,7 @@ def get_mmr_history(ign, tag=""):
         elif john['statusCode'] != 200:
             return False
 
-    if john['name'] == None or john['tag'] == None:
+    if john['name'] == None or john['tag'] == None or ('error' in john.keys()):
         return False
 
     return john
@@ -105,9 +105,6 @@ def update_database(ign, tag=""):
     if type(player_data) != dict:
         return player_data
     
-    if 'error' in player_data.keys():
-        return False
-
     player_file_path = f'elo_history/{ign}.txt'
 
     if os.path.isfile(player_file_path) == False:
@@ -130,7 +127,6 @@ def update_database(ign, tag=""):
     player_file.close()
 
     new_list = []
-    i = 0
 
     if last_file_update == 0:
         for i in range(0, len(player_data['data'])):
@@ -163,23 +159,24 @@ def update_database(ign, tag=""):
             else:
                 break
     
-    new_list = new_list[::-1]
+    if new_list != []:
+        new_list = new_list[::-1]
 
-    player_file = open(player_file_path, 'a')
-    
-    for elem in range(0, len(new_list)):
-        player_file.writelines(str(new_list[elem]) + '\n')
+        #update timestamp in file
+        with open(player_file_path) as f:
+            lines = f.readlines()
+        
+        lines[0] = str(player_data["data"][0]["date_raw"]) + '\n'
 
-    player_file.close()
+        with open(player_file_path, "w") as f:
+            f.writelines(lines)
 
-    #update timestamp in file
-    with open(player_file_path) as f:
-        lines = f.readlines()
-    
-    lines[0] = str(player_data["data"][0]["date_raw"]) + '\n'
+        player_file = open(player_file_path, 'a')
+        
+        for elem in range(0, len(new_list)):
+            player_file.writelines(str(new_list[elem]) + '\n')
 
-    with open(player_file_path, "w") as f:
-        f.writelines(lines)
+        player_file.close()
     
     return len(new_list)
 
@@ -336,20 +333,19 @@ def account_check(ign, tag):
 
     url = f'https://api.henrikdev.xyz/valorant/v1/account/{ign}/{tag}'
 
-    r = requests.get(url)
+    headers = {'accept': 'application/json'}
+    r = requests.get(url, headers=headers)
 
     if str(r) == "<Response [204]>":
         return False
 
     data = json.loads(r.text)
 
-    if 'status' in data:
-        if data['status'] == '404':
-            return False
+    if 'status' in data and (data['status'] == '404'):
+        return False
     
-    if 'statusCode' in data:
-        if data['statusCode'] != 404:
-            return False
+    if 'statusCode' in data and (data['statusCode'] != 404):
+        return False
 
     return True
 
@@ -363,7 +359,8 @@ def servercheck():
         
         url = f'https://api.henrikdev.xyz/valorant/v1/status/{elem}'
 
-        r = requests.get(url)
+        headers = {'accept': 'application/json'}
+        r = requests.get(url, headers=headers)
 
         if str(r) == "<Response [204]>":
             break
@@ -371,13 +368,20 @@ def servercheck():
         john = json.loads(r.text)
 
         if 'status' in john:
-            if john['status'] != '200':
+            if type(john['status']) == str and john['status'] != '200':
+                break
+            
+            if type(john['status']) == int and john['status'] != 200:
                 break
         
         if 'statusCode' in john:
-            if john['statusCode'] != 200:
+            if type(john['statusCode']) == str and john['statusCode'] != '200':
+                break
+            
+            if type(john['statusCode']) == int and john['statusCode'] != 200:
                 break
         
+
         maintenances = len(john['data']['maintenances'])
         incidents = len(john['data']['incidents'])
         counter += maintenances + incidents
@@ -457,4 +461,4 @@ def random_crosshair():
 if __name__ == '__main__':
     #print(update_database('Luusér', 'oce'))
     #print(get_mmr_history("oshawott"))
-    print(crosshair("0;P;c;1;t;6;o;1;d;1;z;6;a;0;f;0;m;1;0t;10;0l;20;0o;20;0a;1;0m;1;0e;0.1;1t;10;1l;10;1o;40;1a;1;1m;0"))
+    print(account_check("fakinator", "4269"))
