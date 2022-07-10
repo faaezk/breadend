@@ -4,7 +4,7 @@ from datetime import datetime
 import playerclass
 import graphs
 
-def update_all_elo_history(start=0):
+def update_all_elo_history(graph, start=0):
     
     playerList = playerclass.PlayerList('playerlistb.csv')
     playerList.load()
@@ -32,13 +32,16 @@ def update_all_elo_history(start=0):
             if int(thing) > 0:
                 updatedList.append((player.ign, thing))
                 
-        #graphs.make_graph(player.ign, update=False)
+        if graph:
+            graphs.make_graph(player.ign, update=False)
+        
         print("completed " + str(i + 1) + "/" + total)
 
+    print(updatedList)
     return str(update_count) + " updates"
 
-if __name__ == '__main__':
-    updates = update_all_elo_history(0)
+def main(graph):
+    updates = update_all_elo_history(graph)
     #tz = pytz.timezone('Australia/Melbourne')
     melb_now = datetime.now()
 
@@ -52,4 +55,4 @@ if __name__ == '__main__':
     f.write(printerz + '\n')
     f.close()
 
-    print(printerz)
+    return printerz
