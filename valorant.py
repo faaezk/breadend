@@ -82,7 +82,7 @@ def get_file_mmr(ign):
         return False
 
     #return the latest MMR value in file
-    return int(lines[-1])
+    return int(lines[-1].split(',')[0])
 
 def initialise_file(ign):
 
@@ -129,8 +129,11 @@ def update_database(ign, tag=""):
     new_list = []
 
     if last_file_update == 0:
+
         for i in range(0, len(player_data['data'])):
-            new_list.append(player_data['data'][i]['elo'])
+            thedate = player_data['data'][i]['date'].replace(',', '-').replace(' ', '-').replace('--', '-')
+            new_list.append(str(player_data['data'][i]['elo']) + ',' + thedate)
+
 
     elif len(str(last_file_update)) == 13:
         
@@ -145,7 +148,9 @@ def update_database(ign, tag=""):
             date_raw = player_data['data'][i]['date_raw']
 
             if last_file_update < date_raw:
-                new_list.append(player_data['data'][i]['elo'])
+                thedate = player_data['data'][i]['date'].replace(',', '-').replace(' ', '-').replace('--', '-')
+                new_list.append(str(player_data['data'][i]['elo']) + ',' + thedate)
+
             else:
                 break
     
@@ -155,7 +160,9 @@ def update_database(ign, tag=""):
             date_raw = player_data['data'][i]['date_raw']
 
             if last_file_update < date_raw:
-                new_list.append(player_data['data'][i]['elo'])
+                thedate = player_data['data'][i]['date'].replace(',', '-').replace(' ', '-').replace('--', '-')
+                new_list.append(str(player_data['data'][i]['elo']) + ',' + thedate)
+
             else:
                 break
     
@@ -203,7 +210,7 @@ def get_elo_list(ign):
     elolist = ""
 
     for elem in lines:
-        elolist += elem + ", "
+        elolist += elem.split(',')[0] + ", "
 
     return elolist[:-2]
 
@@ -459,6 +466,7 @@ def random_crosshair():
     return (name, code)
 
 if __name__ == '__main__':
-    #print(update_database('Luusér', 'oce'))
+    print(update_database('oshawott'))
+    print(get_elo_list('oshawott'))
     #print(get_mmr_history("oshawott"))
-    print(account_check("fakinator", "4269"))
+    #print(local_leaderboard())

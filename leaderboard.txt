@@ -1,42 +1,43 @@
 Player Leaderboard
-1. oshawott         1556
-2. horus            1460
-3. silentwhispers   1280
-4. windy            1278
-5. vkj              1150
-6. giroud           1085
-7. jack             1082
-8. 8888             1065
-9. dilka30003       1056
-10.azatory           974
-11.grovyle           882
-12.hoben222          878
-13.imabandwagon      860
-14.kyouko            782
-15.fakinator         773
-16.fade              746
-17.bento2            665
-18.lmao              651
-19.therealrobdez     638
-20.kleenexwipes      638
-21.yovivels          637
-22.thesugarman       635
+1. cheffrey         1887
+2. oshawott         1617
+3. horus            1460
+4. silentwhispers   1383
+5. windy            1330
+6. 8888             1210
+7. vkj              1150
+8. dilka30003       1091
+9. giroud           1085
+10.jack             1082
+11.azatory          1000
+12.grovyle           882
+13.hoben222          848
+14.imabandwagon      837
+15.fakinator         798
+16.kyouko            782
+17.fade              746
+18.bento2            665
+19.lmao              651
+20.kleenexwipes      650
+21.therealrobdez     636
+22.thesugarman       632
 23.lol               625
-24.nadizheloof       617
-25.tallewok          617
-26.slumonaire        610
-27.quyteriyaki       600
-28.boiwhogotstabbed  591
-29.gerald            503
-30.dilka40004        481
-31.rustybeef         470
-32.Luus%C3%A9r       450
-33.thomyorke         431
-34.glizzardwizard    429
-35.quackinator       380
-36.katchampion       343
-37.crossaxis         330
-38.jokii             244
-39.boishebouttastab   44
-40.boiimbouttastab    35
-41.boiubouttastab      0
+24.yovivels          622
+25.nadizheloof       617
+26.tallewok          617
+27.slumonaire        610
+28.quyteriyaki       600
+29.boiwhogotstabbed  591
+30.gerald            503
+31.Luus%C3%A9r       500
+32.dilka40004        481
+33.rustybeef         470
+34.thomyorke         431
+35.glizzardwizard    429
+36.quackinator       380
+37.katchampion       343
+38.crossaxis         330
+39.jokii             244
+40.boishebouttastab   44
+41.boiimbouttastab    35
+42.boiubouttastab      0

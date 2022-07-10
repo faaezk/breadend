@@ -1,12 +1,12 @@
-import playerclass
+import malsearch
+import valorant
+import elo_history_updater
 
 
-playerlist = playerclass.PlayerList("playerlistb.csv")
-playerlist.load()
+print(elo_history_updater.main(True))
 
-playerlist.players.sort(key=lambda x: x.priority)
+#print(update_database('Luusér', 'oce'))
 
-for player in playerlist.players:
-    print(player.ign)
+#print(valorant.local_leaderboard())
 
-playerlist.save()
+#malsearch.animeStats('kaguya sama ultra romantic')
