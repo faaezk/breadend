@@ -11,6 +11,7 @@ from discord_slash import SlashCommand
 from discord_slash.utils.manage_commands import create_option, create_choice
 import random
 import playerclass
+import datetime
 
 def get_config():
     c = configparser.ConfigParser()
@@ -20,8 +21,10 @@ def get_config():
 
 token = get_config()[0]
 
+intents = discord.Intents.default()
+intents.members = True
 help_command = commands.DefaultHelpCommand(no_category = 'Commands')
-client = commands.Bot(command_prefix='$',help_command = help_command)
+client = commands.Bot(command_prefix='$',help_command = help_command, intents=intents)
 slash = SlashCommand(client, sync_commands=True)
 guild_ids = [509314650265878530, 731539222141468673]
 
@@ -540,6 +543,32 @@ async def chairmen(ctx):
 
 @client.event
 async def on_message(message):
+
+    if "ffsdkjlht98hu" in message.content:
+
+        for guild in client.guilds:
+            if guild.id == 509314650265878530:
+                theguild = guild
+
+        atime = datetime.datetime(2022, 1, 1)
+        count = {'Deleted User': 0}
+        for member in theguild.members:
+            count[member.display_name] = 0
+            
+        for channel in theguild.channels:
+            if channel.category == None or channel.type.name == 'voice' or channel.category_id == 759599317765193809:
+                continue
+            
+            messages = await channel.history(limit=5000,after=atime).flatten()
+            print('completed one')
+            for message in messages:
+                if message.author.display_name in count.keys():
+                    count[message.author.display_name] += 1
+                else:
+                    count[message.author.display_name] = 0
+
+        print(count)
+                    
     if message.author == client.user:
         return
 

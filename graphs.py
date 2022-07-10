@@ -48,7 +48,7 @@ def make_graph(ign, num=0, update=True):
     
     file1 = open(f'elo_history/{ign}.txt', 'r')
 
-    y = [x.strip() for x in file1.readlines()]
+    y = [x[0:4] for x in file1.readlines()]
     if len(y) == 2:
         return None
     y.pop(0)
@@ -257,5 +257,5 @@ if __name__ == "__main__":
     #multigraph(['8888','azatory','bento2','crossaxis','fade','fakinator', 'giroud', 'grovyle', 'imabandwagon', 'jokii', 'katchampion',
     # 'yovivels', 'dilka30003', 'slumonaire', 'silentwhispers', 'lmao', 'jack', 'thesugarman', 'hoben222', 'quackinator'])
     #multigraph(['boiwhogotstabbed', 'boiubouttastab', 'boiimbouttastab', 'boishebouttastab'])
-    print(make_graph("fakinator"))
+    print(make_graph("oshawott"))
     #update_all_graphs()
