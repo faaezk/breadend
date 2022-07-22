@@ -81,10 +81,12 @@ def make_graph(ign, num=0, update=True):
         ticks.append(i)
         if ranger == 1:
             i += 20
-        elif ranger > 4:
+        elif ranger < 4:
+            i += 25
+        elif ranger < 8:
             i += 50
         else:
-            i += 25
+            i += 100
 
     axes.set_yticks(ticks)
     labely = []
@@ -102,11 +104,11 @@ def make_graph(ign, num=0, update=True):
 
     if len(x) <= 15:
         j = 1
-    elif len(x) > 15 and len(x) < 30:
+    elif len(x) < 30:
         j = 2
-    elif len(x) >= 30 and len(x) < 70:
+    elif len(x) < 70:
         j = 5
-    elif len(x) >= 70 and len(x) < 150:
+    elif len(x) < 150:
         j = 10
 
     if len(x) < 150:
@@ -121,6 +123,9 @@ def make_graph(ign, num=0, update=True):
                 tickx.append(x[-1])
 
         axes.set_xticks(tickx)
+    
+    major = axes.get_xmajorticklabels()
+    print(major[-1].get_text())
 
     axes.set_yticklabels(labely)
     
@@ -133,7 +138,6 @@ def make_graph(ign, num=0, update=True):
     plt.title(ign + '\'s MMR over time')
 
     plt.savefig(f'elo_graphs/{ign}.png', bbox_inches="tight")
-
     file1.close()
     plt.clf()
 
@@ -257,5 +261,5 @@ if __name__ == "__main__":
     #multigraph(['8888','azatory','bento2','crossaxis','fade','fakinator', 'giroud', 'grovyle', 'imabandwagon', 'jokii', 'katchampion',
     # 'yovivels', 'dilka30003', 'slumonaire', 'silentwhispers', 'lmao', 'jack', 'thesugarman', 'hoben222', 'quackinator'])
     #multigraph(['boiwhogotstabbed', 'boiubouttastab', 'boiimbouttastab', 'boishebouttastab'])
-    print(make_graph("oshawott"))
+    print(make_graph("fakinator", update=False))
     #update_all_graphs()

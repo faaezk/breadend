@@ -6,7 +6,7 @@ import graphs
 
 def update_all_elo_history(graph, start=0):
     
-    playerList = playerclass.PlayerList('playerlistb.csv')
+    playerList = playerclass.PlayerList('playerlist.csv')
     playerList.load()
     playerList.sort()
 
@@ -56,3 +56,6 @@ def main(graph):
     f.close()
 
     return printerz
+
+if __name__ == "__main__":
+    print(main(False))

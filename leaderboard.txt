@@ -1,28 +1,28 @@
 Player Leaderboard
-1. cheffrey         1887
-2. oshawott         1617
-3. horus            1460
-4. silentwhispers   1383
-5. windy            1330
-6. 8888             1210
-7. vkj              1150
-8. dilka30003       1091
-9. giroud           1085
-10.jack             1082
-11.azatory          1000
-12.grovyle           882
-13.hoben222          848
-14.imabandwagon      837
-15.fakinator         798
-16.kyouko            782
-17.fade              746
-18.bento2            665
-19.lmao              651
-20.kleenexwipes      650
-21.therealrobdez     636
-22.thesugarman       632
-23.lol               625
-24.yovivels          622
+1. cheffrey         1993
+2. oshawott         1707
+3. silentwhispers   1442
+4. windy            1335
+5. horus            1226
+6. 8888             1176
+7. dilka30003       1171
+8. grovyle          1150
+9. vkj              1150
+10.giroud           1085
+11.jack             1082
+12.azatory          1075
+13.hoben222          931
+14.imabandwagon      881
+15.lol               834
+16.fakinator         798
+17.kyouko            782
+18.fade              746
+19.bento2            665
+20.lmao              651
+21.kleenexwipes      650
+22.therealrobdez     636
+23.thesugarman       633
+24.yovivels          632
 25.nadizheloof       617
 26.tallewok          617
 27.slumonaire        610

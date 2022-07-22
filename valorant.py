@@ -466,7 +466,7 @@ def random_crosshair():
     return (name, code)
 
 if __name__ == '__main__':
-    print(update_database('oshawott'))
-    print(get_elo_list('oshawott'))
+    print(update_database('lol'))
+    #print(get_elo_list('oshawott'))
     #print(get_mmr_history("oshawott"))
     #print(local_leaderboard())
