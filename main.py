@@ -380,8 +380,6 @@ async def crosshair(ctx):
     else:
         await ctx.send("the thingo failed.")
 
-
-
 @slash.slash(description="List of other Commands", guild_ids=guild_ids)
 async def other(ctx):
     msg = "```List of other commands:\n"
