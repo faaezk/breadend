@@ -5,6 +5,13 @@ import playerclass
 from PIL import Image
 from io import BytesIO
 import random
+import configparser
+
+def get_key():
+    c = configparser.ConfigParser()
+    c.read('config.ini')
+
+    return c['henrik']['key']
 
 def get_tag(ign):
     playerlist = playerclass.PlayerList("playerlist.csv")
@@ -21,51 +28,28 @@ def get_mmr_history(ign, tag=""):
     if tag == "":
         tag = get_tag(ign)
         if not tag:
-            return False
+            return (False, 'tag not found')
     
     url = f"https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{ign}/{tag}"
 
-    headers = {'accept': 'application/json'}
+    key = get_key()
+    headers = {'accept' : 'application/json', 'Authorization' : key}
     r = requests.get(url, headers=headers)
-
-    if str(r) != "<Response [200]>":
-        return False
-
-    john = json.loads(r.text)
-
-    if 'status' in john:
-        if john['status'] == 429:
-            return "welp"
-        
-        elif john['status'] == 404:
-            return "User not found"
-        
-        elif john['status'] == 500:
-            return "No matches available"
-        
-        elif john['status'] == 403:
-            return "riot servers are down at the moment"
-        
-        elif john['status'] != 200:
-            return False
     
-    elif 'statusCode' in john:
-        if john['statusCode'] == 429:
-            return "welp"
-        
-        elif john['statusCode'] == 404:
-            return "User not found"
-        
-        elif john['statusCode'] == 500:
-            return "No matches available"
-        
-        elif john['statusCode'] != 200:
-            return False
+    errors = {429 : 'welp', 403 : 'Forbidden', 404 : 'User not found', 500 : 'No matches available'}
 
-    if john['name'] == None or john['tag'] == None or ('error' in john.keys()):
-        return False
+    if r.status_code in errors.keys():
+        return (False, errors[r.status_code])
+    
+    if r.status_code == 200:
+        john = json.loads(r.text)
 
-    return john
+        if john['name'] == None or john['tag'] == None or ('error' in john.keys()):
+            return (False, 'name/tag error?')
+        
+        return (True, john)
+
+    return (False, 'some error')
 
 def get_file_mmr(ign):
 
@@ -98,18 +82,20 @@ def update_database(ign, tag=""):
     if tag == "":
         tag = get_tag(ign)
         if not tag:
-            return False
+            return (False, 'tag not found')
     
     player_data = get_mmr_history(ign, tag)
 
-    if type(player_data) != dict:
+    if not player_data[0]:
         return player_data
+
+    player_data = player_data[1]
     
     player_file_path = f'elo_history/{ign}.txt'
 
     if os.path.isfile(player_file_path) == False:
         if len(player_data['data']) == 0:
-            return False
+            return (False, 'not enough data')
         else:
             initialise_file(ign)
     
@@ -185,7 +171,7 @@ def update_database(ign, tag=""):
 
         player_file.close()
     
-    return len(new_list)
+    return (True, len(new_list))
 
 def get_elo_list(ign):
     

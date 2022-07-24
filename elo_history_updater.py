@@ -22,18 +22,17 @@ def update_all_elo_history(graph, start=0):
 
         thing = valorant.update_database(player.ign, player.tag)
 
-        if thing == "welp":
-            print("update count: " + str(update_count))
-            return ["welp", i]
+        if not thing[0]:
+            print(f'{thing[1]} at {player.ign}')
 
-        if type(thing) != str:
-            update_count += int(thing)
+        else:
+            update_count += int(thing[1])
 
-            if int(thing) > 0:
-                updatedList.append((player.ign, thing))
+            if int(thing[1]) > 0:
+                updatedList.append((player.ign, thing[1]))
                 
-        if graph:
-            graphs.make_graph(player.ign, update=False)
+            if graph:
+                graphs.make_graph(player.ign, update=False)
         
         print("completed " + str(i + 1) + "/" + total)
 
@@ -45,7 +44,7 @@ def main(graph):
     #tz = pytz.timezone('Australia/Melbourne')
     melb_now = datetime.now()
 
-    if updates[0] == "welp":
+    if updates[0].split(' ')[0] == "welp":
         printerz = "welp at " + str(updates[1]) + ": " + melb_now.strftime("%d/%m/%Y") + " at " + melb_now.strftime("%H:%M:%S")
 
     else:
