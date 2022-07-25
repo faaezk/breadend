@@ -116,7 +116,7 @@ def update_database(ign, tag=""):
 
     if last_file_update == 0:
 
-        for i in range(0, len(player_data['data'])):
+        for i in range(len(player_data['data'])):
             thedate = player_data['data'][i]['date'].replace(',', '-').replace(' ', '-').replace('--', '-')
             new_list.append(str(player_data['data'][i]['elo']) + ',' + thedate)
 
@@ -129,7 +129,7 @@ def update_database(ign, tag=""):
             last_num += 1
             last_file_update = int(str(last_file_update)[:-1] + str(last_num))
 
-        for i in range(0, len(player_data['data'])):
+        for i in range(len(player_data['data'])):
 
             date_raw = player_data['data'][i]['date_raw']
 
@@ -141,7 +141,7 @@ def update_database(ign, tag=""):
                 break
     
     else:
-        for i in range(0, len(player_data['data'])):
+        for i in range(len(player_data['data'])):
 
             date_raw = player_data['data'][i]['date_raw']
 
@@ -166,7 +166,7 @@ def update_database(ign, tag=""):
 
         player_file = open(player_file_path, 'a')
         
-        for elem in range(0, len(new_list)):
+        for elem in range(len(new_list)):
             player_file.writelines(str(new_list[elem]) + '\n')
 
         player_file.close()
@@ -218,7 +218,7 @@ def local_leaderboard():
 
     leaderboard = "Player Leaderboard\n"
 
-    for i in range(0, len(players)):
+    for i in range(len(players)):
 
         ign = players[i][0]
         mmr = players[i][1]
@@ -254,7 +254,7 @@ def region_leaderboard(region, length=20):
 
     leaderboard = f'{regions[region]} Ranked Leaderboard\n'
     
-    for i in range(0, len(players)):
+    for i in range(len(players)):
 
         ign = players[i][0]
         mmr = players[i][1]

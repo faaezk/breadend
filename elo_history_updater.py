@@ -44,12 +44,7 @@ def main(graph):
     #tz = pytz.timezone('Australia/Melbourne')
     melb_now = datetime.now()
 
-    if updates[0].split(' ')[0] == "welp":
-        printerz = "welp at " + str(updates[1]) + ": " + melb_now.strftime("%d/%m/%Y") + " at " + melb_now.strftime("%H:%M:%S")
-
-    else:
-        printerz = "completed on: " + melb_now.strftime("%d/%m/%Y") + " at " + melb_now.strftime("%H:%M:%S") + " with " + updates
-    
+    printerz = "completed on: " + melb_now.strftime("%d/%m/%Y") + " at " + melb_now.strftime("%H:%M:%S") + " with " + updates
     f = open("updater_log-2022.out", "a")
     f.write(printerz + '\n')
     f.close()
