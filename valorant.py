@@ -355,25 +355,10 @@ def servercheck():
         headers = {'accept': 'application/json'}
         r = requests.get(url, headers=headers)
 
-        if str(r) == "<Response [204]>":
+        if r.status_code != 200:
             break
-
+        
         john = json.loads(r.text)
-
-        if 'status' in john:
-            if type(john['status']) == str and john['status'] != '200':
-                break
-            
-            if type(john['status']) == int and john['status'] != 200:
-                break
-        
-        if 'statusCode' in john:
-            if type(john['statusCode']) == str and john['statusCode'] != '200':
-                break
-            
-            if type(john['statusCode']) == int and john['statusCode'] != 200:
-                break
-        
 
         maintenances = len(john['data']['maintenances'])
         incidents = len(john['data']['incidents'])
@@ -452,7 +437,6 @@ def random_crosshair():
     return (name, code)
 
 if __name__ == '__main__':
-    print(update_database('lol'))
+    print(update_database('bingchilling'))
     #print(get_elo_list('oshawott'))
-    #print(get_mmr_history("oshawott"))
-    #print(local_leaderboard())
+    #print(get_mmr_history("BingChilling", '222')) 

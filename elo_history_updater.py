@@ -1,6 +1,5 @@
 import valorant
 from datetime import datetime
-#import pytz
 import playerclass
 import graphs
 
@@ -11,6 +10,7 @@ def update_all_elo_history(graph, start=0):
     playerList.sort()
 
     update_count = 0
+    error_count = 0
     updatedList = []
     total = str(len(playerList.players) - start)
 
@@ -23,6 +23,7 @@ def update_all_elo_history(graph, start=0):
         thing = valorant.update_database(player.ign, player.tag)
 
         if not thing[0]:
+            error_count += 1
             print(f'{thing[1]} at {player.ign}')
 
         else:
@@ -37,14 +38,17 @@ def update_all_elo_history(graph, start=0):
         print("completed " + str(i + 1) + "/" + total)
 
     print(updatedList)
-    return str(update_count) + " updates"
+
+    if error_count == 0:
+        return f'{update_count} updates'
+    else:
+        return f'{update_count} updates, {error_count} errors'
 
 def main(graph):
     updates = update_all_elo_history(graph)
-    #tz = pytz.timezone('Australia/Melbourne')
     melb_now = datetime.now()
 
-    printerz = "completed on: " + melb_now.strftime("%d/%m/%Y") + " at " + melb_now.strftime("%H:%M:%S") + " with " + updates
+    printerz = f'completed on: {melb_now.strftime("%d/%m/%y")} at {melb_now.strftime("%H:%M:%S")} with {updates}'
     f = open("updater_log-2022.out", "a")
     f.write(printerz + '\n')
     f.close()
