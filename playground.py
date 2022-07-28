@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
 from quadClass import Quad
+from adjustText import adjust_text
 
-x = [1, 2, 3]
-y = [1, 2, 3]
+x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+y = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 
 xnorm = [(i*10)/len(x) for i in x]
 ynorm = [(i*10)/len(y) for i in y]
@@ -16,16 +17,21 @@ tr = sq.get_botRight()
 xnorm.append(tr[0])
 ynorm.append(tr[1])
 
-plt.scatter(xnorm, ynorm)
+plt.scatter(x, y)
 
-#a = plt.annotate('13/07/22', xy=(x[0], y[0]), xytext=(x[0], y[0] + 1),arrowprops={'arrowstyle' : '->', 'shrinkA' : 1, 'shrinkB' : 4})
-a = plt.annotate('13/07/22', xy=(xnorm[0], ynorm[0]), xytext=(xnorm[0], ynorm[0] + 1),arrowprops={'arrowstyle' : '->', 'shrinkA' : 1, 'shrinkB' : 4})
+texts = []
+texts.append(plt.text(s='13/07/22', x=6, y=6,
+                            color="red",
+                            bbox=dict(boxstyle="round, pad=0.1", fc="yellow")))
 
-# Adding text on the plot.
-bohn = plt.text(4, 6, 'test', style='italic', bbox={'facecolor': 'white', 'alpha': 0.5, 'pad': 1})
-bohnbox = bohn.get_bbox_patch().get_bbox()
+texts.append(plt.text(s='13/07/22', x=7, y=6,
+                            color="red",
+                            bbox=dict(boxstyle="round, pad=0.1", fc="yellow")))
 
-print(bohnbox)
+
+adjust_text(texts, arrowprops=dict(arrowstyle='->'), force_points=10)
+
+#, x=x, y=y, autoalign='y', only_move={'points':'y', 'text':'y'}, force_points=2, arrowprops={'arrowstyle' : '->', 'shrinkA' : 1, 'shrinkB' : 4}
 
 plt.show()
 
