@@ -44,8 +44,8 @@ def update_all_elo_history(graph, start=0):
     else:
         return f'{update_count} updates, {error_count} errors'
 
-def main(graph):
-    updates = update_all_elo_history(graph)
+def main(graph, start=0):
+    updates = update_all_elo_history(graph, start)
     melb_now = datetime.now()
 
     printerz = f'completed on: {melb_now.strftime("%d/%m/%y")} at {melb_now.strftime("%H:%M:%S")} with {updates}'
