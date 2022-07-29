@@ -7,6 +7,53 @@ from io import BytesIO
 import random
 import configparser
 
+def get_data(category, ign="", tag="", region=""):
+
+    key = get_key()
+    headers = {'accept' : 'application/json', 'Authorization' : key}
+    errors = {429 : 'welp', 403 : 'Forbidden', 404 : 'User not found', 500 : 'No matches available'}
+
+    if region != "":
+        if category == "leaderboard":
+            url = f"https://api.henrikdev.xyz/valorant/v1/leaderboard/{region}"
+        
+        if category == "status":
+            url = f'https://api.henrikdev.xyz/valorant/v1/status/{region}'
+
+    else:
+        if ign == "":
+            return(False, False)
+
+        if tag == "":
+            tag = get_tag(ign)
+            if not tag:
+                return (False, 'tag not found')
+
+        if category == "account":
+            url = f'https://api.henrikdev.xyz/valorant/v1/account/{ign}/{tag}'
+
+        elif category == "mmr":
+            url = f'https://api.henrikdev.xyz/valorant/v2/mmr/ap/{ign}/{tag}'
+        
+        elif category == "mmr history":
+            url = f"https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{ign}/{tag}"
+    
+    r = requests.get(url, headers=headers)
+
+    if r.status_code in errors.keys():
+        return (False, errors[r.status_code])
+    
+    if r.status_code == 200:
+        john = json.loads(r.text)
+
+        if ign != "":
+            if john['name'] == None or john['tag'] == None or ('error' in john.keys()):
+                return (False, 'name/tag error?')
+        
+        return (True, john)
+
+    return (False, 'some error')
+
 def get_key():
     c = configparser.ConfigParser()
     c.read('config.ini')
@@ -22,34 +69,6 @@ def get_tag(ign):
             return player.tag
     
     return False
-
-def get_mmr_history(ign, tag=""):
-
-    if tag == "":
-        tag = get_tag(ign)
-        if not tag:
-            return (False, 'tag not found')
-    
-    url = f"https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{ign}/{tag}"
-
-    key = get_key()
-    headers = {'accept' : 'application/json', 'Authorization' : key}
-    r = requests.get(url, headers=headers)
-    
-    errors = {429 : 'welp', 403 : 'Forbidden', 404 : 'User not found', 500 : 'No matches available'}
-
-    if r.status_code in errors.keys():
-        return (False, errors[r.status_code])
-    
-    if r.status_code == 200:
-        john = json.loads(r.text)
-
-        if john['name'] == None or john['tag'] == None or ('error' in john.keys()):
-            return (False, 'name/tag error?')
-        
-        return (True, john)
-
-    return (False, 'some error')
 
 def get_file_mmr(ign):
 
@@ -79,18 +98,12 @@ def initialise_file(ign):
 
 def update_database(ign, tag=""):
 
-    if tag == "":
-        tag = get_tag(ign)
-        if not tag:
-            return (False, 'tag not found')
-    
-    player_data = get_mmr_history(ign, tag)
-
+    player_data = get_data('mmr history', ign=ign, tag=tag)
     if not player_data[0]:
-        return player_data
+        return player_data[1]
+    else:
+        player_data = player_data[1]
 
-    player_data = player_data[1]
-    
     player_file_path = f'elo_history/{ign}.txt'
 
     if os.path.isfile(player_file_path) == False:
@@ -233,16 +246,13 @@ def local_leaderboard():
 
 def region_leaderboard(region, length=20):
 
-    url = f"https://api.henrikdev.xyz/valorant/v1/leaderboard/{region}"
-    
-    headers = {'accept': 'application/json'}
-    r = requests.get(url, headers=headers)
-
-    if str(r) == "<Response [204]>":
-        return False
+    data = get_data('leaderboard', region=region)
+    if not data[0]:
+        return data[1]
+    else:
+        data = data[1]
 
     regions = {"ap" : "Asia Pacific", "eu" : "Europe", "kr" : "Korea", "na" : "North America"}
-    data = json.loads(r.text)
     players = []
     
     for i in range(length):
@@ -265,24 +275,14 @@ def region_leaderboard(region, length=20):
 
 def stats(ign, tag=""):
 
-    if tag == "":
-        tag = get_tag(ign)
-        if not tag:
-            return "Player not found, check syntax: (username#tag)"
-
-    url = f'https://api.henrikdev.xyz/valorant/v2/mmr/ap/{ign}/{tag}'
-    r = requests.get(url)
-
-    if str(r) == "<Response [204]>":
-        return "Player not found"
-
-    john = json.loads(r.text)
-
-    if john['status'] == '404' or john['status'] == '500':
-        return "Player not found, check syntax: (username#tag)"
+    john = get_data('mmr', ign=ign, tag=tag)
+    if not john[0]:
+        return john[1]
+    else:
+        john = john[1]
     
-    data =  john['data']['by_season']
-
+    
+    data = john['data']['by_season']
     keys = data.keys()
     final = []
 
@@ -295,25 +295,23 @@ def stats(ign, tag=""):
             rank = data[key]['final_rank_patched']
             final.append([f'Episode {key[1]} Act {key[3]}:', f'{rank}\nGames Played: {games}\nWinrate: {round((wins/games) * 100, 2)}%'])
     
-    url = f'https://api.henrikdev.xyz/valorant/v1/account/{ign}/{tag}'
-    r = requests.get(url)
-    john = json.loads(r.text)
+    john = get_data('account', ign=ign, tag=tag)
+    if not john[0]:
+        return john[1]
+    else:
+        john = john[1]
+
     card = john['data']['card']['small']
 
     return [final, card]
 
 def get_banner(ign, tag):
 
-    url = f'https://api.henrikdev.xyz/valorant/v1/account/{ign}/{tag}'
-    r = requests.get(url)
-
-    if str(r) == "<Response [204]>":
-        return "Player not found"
-
-    data = json.loads(r.text)
-
-    if data['status'] != '200':
-        return "Player not found, check syntax: (ign#tag)"
+    data = get_data('account', ign=ign, tag=tag)
+    if not data[0]:
+        return data[1]
+    else:
+        data = data[1]
     
     url = data['data']['card']['large']
     r = requests.get(url, allow_redirects=True)
@@ -322,46 +320,21 @@ def get_banner(ign, tag):
 
     return True
 
-def account_check(ign, tag):
-
-    url = f'https://api.henrikdev.xyz/valorant/v1/account/{ign}/{tag}'
-
-    headers = {'accept': 'application/json'}
-    r = requests.get(url, headers=headers)
-
-    if str(r) == "<Response [204]>":
-        return False
-
-    data = json.loads(r.text)
-
-    if 'status' in data and (data['status'] == '404'):
-        return False
-    
-    if 'statusCode' in data and (data['statusCode'] != 404):
-        return False
-
-    return True
-
 def servercheck():
-
     counter = 0
     report = ""
     regions = {"ap" : "Asia Pacific", "eu" : "Europe", "kr" : "Korea", "na" : "North America"}
 
     for elem in regions.keys():
         
-        url = f'https://api.henrikdev.xyz/valorant/v1/status/{elem}'
+        data = get_data('status', region=elem)
+        if not data[0]:
+            return data[1]
+        else:
+            data = data[1]
 
-        headers = {'accept': 'application/json'}
-        r = requests.get(url, headers=headers)
-
-        if r.status_code != 200:
-            break
-        
-        john = json.loads(r.text)
-
-        maintenances = len(john['data']['maintenances'])
-        incidents = len(john['data']['incidents'])
+        maintenances = len(data['data']['maintenances'])
+        incidents = len(data['data']['incidents'])
         counter += maintenances + incidents
 
         report += f'{regions[elem]}:\nMaintenances - {maintenances}\nIncidents - {incidents}\n'
@@ -377,7 +350,7 @@ def add_player(ign, tag):
     playerlist = playerclass.PlayerList("playerlist.csv")
     playerlist.load()
 
-    if not account_check(ign, tag):
+    if not get_data('account', ign=ign, tag=tag)[0]:
         return "Account does not exist"
 
     player = playerclass.Player(ign.lower(), tag.lower())
@@ -409,7 +382,8 @@ def crosshair(code):
     
     url = f"https://api.henrikdev.xyz/valorant/v1/crosshair/generate?id={code}"
 
-    headers = {'accept': 'application/json'}
+    key = get_key()
+    headers = {'accept' : 'application/json', 'Authorization' : key}
     r = requests.get(url, headers=headers)
 
     img = Image.open(BytesIO(r.content))
@@ -418,7 +392,6 @@ def crosshair(code):
     return True
 
 def random_crosshair():
-
     crosshairs = {  "Reyna Flash" : "0;P;c;6;t;6;o;0.3;f;0;0t;1;0l;5;0o;5;0a;1;0f;0;1t;10;1l;4;1o;5;1a;0.5;1m;0;1f;0", 
                     "Windmill"    : "0;P;c;1;t;6;o;1;d;1;z;6;a;0;f;0;m;1;0t;10;0l;20;0o;20;0a;1;0m;1;0e;0.1;1t;10;1l;10;1o;40;1a;1;1m;0",
                     "Flappy Bird" : "0;P;c;1;t;3;o;1;f;0;0t;6;0l;20;0o;13;0a;1;0f;0;1t;9;1l;4;1o;9;1a;1;1m;0;1f;0",
@@ -437,6 +410,4 @@ def random_crosshair():
     return (name, code)
 
 if __name__ == '__main__':
-    print(update_database('bingchilling'))
-    #print(get_elo_list('oshawott'))
-    #print(get_mmr_history("BingChilling", '222')) 
+    print(servercheck())
