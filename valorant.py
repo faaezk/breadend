@@ -7,7 +7,7 @@ from io import BytesIO
 import random
 import configparser
 
-def get_data(category, ign="", tag="", region=""):
+def get_data(category, ign="", tag="", region="", crosshair_code=""):
 
     key = get_key()
     headers = {'accept' : 'application/json', 'Authorization' : key}
@@ -19,6 +19,10 @@ def get_data(category, ign="", tag="", region=""):
         
         if category == "status":
             url = f'https://api.henrikdev.xyz/valorant/v1/status/{region}'
+
+    elif category == "crosshair":
+        url = f"https://api.henrikdev.xyz/valorant/v1/crosshair/generate?id={crosshair_code}"
+        return requests.get(url, headers=headers)
 
     else:
         if ign == "":
@@ -100,7 +104,7 @@ def update_database(ign, tag=""):
 
     player_data = get_data('mmr history', ign=ign, tag=tag)
     if not player_data[0]:
-        return player_data[1]
+        return player_data
     else:
         player_data = player_data[1]
 
@@ -379,13 +383,7 @@ def remove_player(ign, tag):
     return f'{ign}#{tag} has been removed'
 
 def crosshair(code):
-    
-    url = f"https://api.henrikdev.xyz/valorant/v1/crosshair/generate?id={code}"
-
-    key = get_key()
-    headers = {'accept' : 'application/json', 'Authorization' : key}
-    r = requests.get(url, headers=headers)
-
+    r = get_data("crosshair", crosshair_code=code)
     img = Image.open(BytesIO(r.content))
     img = img.save("crosshair.png")
 
