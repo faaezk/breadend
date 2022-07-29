@@ -204,20 +204,11 @@ def agraph():
     plt.title('MMR over tie')
     plt.savefig('date-graph.png', bbox_inches="tight")
 
+def mark_grapha(texts, x, yint, ydates, i):
+    texts.append(plt.text(s=ydates[i], x=x[i], y=yint[i], bbox=dict(boxstyle="round, pad=0.2", fc="cyan"), size=8.0))
+    return texts
 
-texts = []
-
-def mark_grapha(marked, x, yint, ydates, i):
-
-    global texts
-    texts.append(plt.text(s=ydates[i], x=x[i], y=yint[i]))
-
-    # , bbox=dict(boxstyle="square, pad=0.25", fc="yellow"), size='small')
-
-    marked.append(i)
-    return marked
-
-def bgraph():
+def cgraph():
     y = ["1724,Sunday-July-10-2022-7:42-AM", "1707,Sunday-July-10-2022-8:18-AM", "1700,Sunday-July-10-2022-9:14-AM", "1721,Sunday-July-10-2022-9:52-AM", 
         "1710,Sunday-July-10-2022-12:22-PM", "1723,Sunday-July-10-2022-1:07-PM", "1712,Sunday-July-10-2022-1:55-PM", "1700,Monday-July-11-2022-12:28-PM",
         "1720,Monday-July-11-2022-1:19-PM",  "1736,Monday-July-11-2022-2:08-PM", "1750,Monday-July-11-2022-2:54-PM", "1736,Monday-July-11-2022-4:52-PM", 
@@ -321,41 +312,49 @@ def bgraph():
         axes.set_xticks(tickx)
 
     axes.set_yticklabels(labely)
-    p = plt.plot(x, yint, 'bx-')
+    p = plt.plot(x, yint, 'b-')
+    
     marked = []
+    texts = []
 
     peakMMRIndex = get_index(yint, max(yint))
     bottomMMRIndex = get_index(yint, min(yint))
-    marked = mark_grapha(marked, x, yint, ydates, peakMMRIndex)
-    marked = mark_grapha(marked, x, yint, ydates, bottomMMRIndex)
-    marked = mark_grapha(marked, x, yint, ydates, 0)
-    marked = mark_grapha(marked, x, yint, ydates, -1)
+    texts = mark_grapha(texts, x, yint, ydates, peakMMRIndex)
+    texts = mark_grapha(texts, x, yint, ydates, bottomMMRIndex)
+    texts = mark_grapha(texts, x, yint, ydates, 0)
+    texts = mark_grapha(texts, x, yint, ydates, -1)
+    
+    marked.append(peakMMRIndex)
+    marked.append(bottomMMRIndex)
+    marked.append(0)
+    marked.append(-1)
 
-    i = 0
-    while i < len(yint):
+    i = 5
+    while i < len(ydates):
         mark = True
-        for j in range((i - 3), (i + 3)):
+        for j in range((i - 5), (i + 5)):
             if j in marked:
                 mark = False
                 break
             
         if mark:
-            marked = mark_grapha(marked, x, yint, ydates, i)
+            texts = mark_grapha(texts, x, yint, ydates, i)
+            marked.append(i)
         
         i += 10
 
     for year in years:
         plt.vlines(year[1], ymin, ymax, linestyles ="dotted", colors ="k", label=f'20{year[0]}')
 
-    global texts
     adjust_text(texts, arrowprops=dict(arrowstyle='->'), force_points=30)
 
     colour = p[0].get_color()
     plt.axhline(y=y[-1], color=colour, linestyle='dotted')
     plt.xlabel('Games played')
     plt.ylabel('MMR')
-    plt.title('MMR over tie')
+    plt.title('MMR over time')
     plt.legend(loc='upper left')
     plt.savefig('date-graph.png', bbox_inches="tight")
 
-bgraph()
+
+cgraph()
