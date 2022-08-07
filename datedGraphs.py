@@ -1,3 +1,4 @@
+from turtle import left
 import matplotlib.pyplot as plt
 import math
 from adjustText import adjust_text
@@ -44,9 +45,22 @@ def roundup(x):
 def rounddown(x):
     return int(math.floor(x / 100.0)) * 100
 
-def mark_graph(texts, x, yint, ydates, i):
-    texts.append(plt.text(s=ydates[i], x=x[i], y=yint[i], bbox=dict(boxstyle="round, pad=0.2", fc="cyan"), size=8.0))
-    return texts
+def mark_graph(texts, x, yint, ydates, i, marked, r):
+
+    if i < 0:
+        i = len(yint) - 1
+
+    if i not in marked:
+        texts.append(plt.text(s=ydates[i], x=x[i], y=yint[i], bbox=dict(boxstyle="round, pad=0.2", fc="cyan"), size=8.0))
+
+        for j in range(i - r, i + r):
+            if j >= 0 and j not in marked:
+                if j == len(yint):
+                    break
+                marked.append(j)
+        
+
+    return marked, texts
 
 def graph():
     y = ["1724,Sunday-July-10-2022-7:42-AM", "1707,Sunday-July-10-2022-8:18-AM", "1700,Sunday-July-10-2022-9:14-AM", "1721,Sunday-July-10-2022-9:52-AM", 
@@ -163,47 +177,62 @@ def graph():
     axes.set_yticklabels(labely)
     p = plt.plot(x, yint, 'b-')
     
+    r = math.floor(len(yint)/7.0)
     marked = []
-    texts = []
+    topRightTexts = []
+    botRightTexts = []
+    topLeftTexts = []
+    botLeftTexts = []
 
     peakMMRIndex = get_index(yint, max(yint))
     bottomMMRIndex = get_index(yint, min(yint))
-    texts = mark_graph(texts, x, yint, ydates, peakMMRIndex)
-    texts = mark_graph(texts, x, yint, ydates, bottomMMRIndex)
-    texts = mark_graph(texts, x, yint, ydates, 0)
-    texts = mark_graph(texts, x, yint, ydates, -1)
-    
-    marked.append(peakMMRIndex)
-    marked.append(bottomMMRIndex)
-    marked.append(0)
-    marked.append(-1)
 
-    rohn = math.floor(len(y)/7)
-    i = rohn
-    while i < len(ydates):
-        mark = True
-        for j in range((i - rohn), (i + rohn)):
-            if j in marked:
-                mark = False
-                break
+    if peakMMRIndex != 0 and yint[peakMMRIndex] != yint[-1] and yint[peakMMRIndex - 1] > yint[peakMMRIndex + 1]:
+        marked, topLeftTexts = mark_graph(topLeftTexts, x, yint, ydates, peakMMRIndex, marked, r)
+    else:
+        marked, topLeftTexts = mark_graph(topLeftTexts, x, yint, ydates, peakMMRIndex, marked, r)
+
+    if bottomMMRIndex != 0 and yint[bottomMMRIndex] != yint[-1] and yint[bottomMMRIndex - 1] > yint[bottomMMRIndex + 1]:
+        marked, botLeftTexts = mark_graph(botLeftTexts, x, yint, ydates, bottomMMRIndex, marked, r)
+    else:
+        marked, botRightTexts = mark_graph(botRightTexts, x, yint, ydates, bottomMMRIndex, marked, r)
+
+    if yint[0] < yint[1]:
+        marked, botRightTexts = mark_graph(botRightTexts, x, yint, ydates, 0, marked, r)
+    else:
+        marked, topRightTexts = mark_graph(topRightTexts, x, yint, ydates, 0, marked, r)
+
+    if yint[-1] < yint[-2]:
+        marked, botLeftTexts = mark_graph(botLeftTexts, x, yint, ydates, -1, marked, r)
+    else:
+        marked, topLeftTexts = mark_graph(topLeftTexts, x, yint, ydates, -1, marked, r)
+
+    for i in range(len(yint)):
+        if i not in marked:
+            if yint[i - 2] < yint[i] and yint[i - 1] < yint[i]:
+                marked, topLeftTexts = mark_graph(topLeftTexts, x, yint, ydates, i, marked, r)
+            elif yint[i - 2] > yint[i] and yint[i - 1] > yint[i]:
+                marked, botLeftTexts = mark_graph(botLeftTexts, x, yint, ydates, -1, marked, r)
             
-        if mark:
-            texts = mark_graph(texts, x, yint, ydates, i)
-            marked.append(i)
-        
-        i += rohn
+            elif yint[i + 2] < yint[i] and yint[i + 1] < yint[i]:
+                marked, topRightTexts = mark_graph(topRightTexts, x, yint, ydates, 0, marked, r)
+            elif yint[i + 2] > yint[i] and yint[i + 1] > yint[i]:
+                marked, botRightTexts = mark_graph(botRightTexts, x, yint, ydates, 0, marked, r)
 
     for year in years:
-        #plt.vlines(year[1], ymin, ymax, linestyles ="dotted", colors ="k", label=year[0])
         plt.axvline(year[1], linestyle="dotted", color="k", label=year[0])
 
-    adjust_text(texts, arrowprops=dict(arrowstyle='->'), force_points=30)
+    adjust_text(topRightTexts, arrowprops=dict(arrowstyle='->'), force_points=(20, 30), force_text=(30, 30))
+    adjust_text(botRightTexts, arrowprops=dict(arrowstyle='->'), force_points=(20, -40), force_text=(30, 30))
+
+    adjust_text(botLeftTexts, arrowprops=dict(arrowstyle='->'), force_points=(-70, -40), force_text=(30, 30))
+    adjust_text(topLeftTexts, arrowprops=dict(arrowstyle='->'), force_points=(-70, 30), force_text=(30, 30))
 
     colour = p[0].get_color()
     plt.axhline(yint[-1], linestyle="dashed", color=colour, label='Current MMR')
     plt.xlabel('Games played')
     plt.ylabel('MMR')
-    plt.title('MMR over time')
+    plt.title('MMR over tifme')
     plt.legend(loc='upper left')
     plt.savefig('date-graph.png', bbox_inches="tight")
 
