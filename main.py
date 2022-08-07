@@ -136,8 +136,12 @@ async def stats(ctx, username=""):
 @slash.slash(description="graph",
              guild_ids=guild_ids,
              options = [
-             create_option(name="usernames", description="Enter username(s), seperate with commas for more than one", option_type=3, required=True)])
-async def graph(ctx, usernames=""):
+             create_option(name="usernames", description="Enter username(s), seperate with commas for more than one", option_type=3, required=True),
+             create_option(name="update", description="Force update to latest MMR", option_type=3, required=True, 
+             choices=[create_choice(name="Yes",value="yes"), create_choice(name="No",value="no")]),
+             create_option(name="type", description="Select type of graph", option_type=3, required=False, 
+             choices=[create_choice(name="Basic",value="basic"), create_choice(name="With Acts",value="acts")])])
+async def graph(ctx, usernames="", type="", update=""):
     users = usernames.split(',')
     
     for i in range(0, len(users)):
@@ -146,7 +150,15 @@ async def graph(ctx, usernames=""):
     if len(users) == 1:
         the_message = await ctx.send("please wait...")
         msg = ""
-        flag = graphs.make_graph(users[0])
+
+        acts = False
+        updates = False
+        if update == 'yes':
+            updates = True
+        if type == 'acts':
+            acts = True
+
+        flag = graphs.make_graph(users[0], update=updates, acts=acts)
         if flag == False:
             await the_message.edit(content="Player not found or api being stupid, or it might even be aws :(")
 

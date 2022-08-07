@@ -31,7 +31,7 @@ def roundup(x):
 def rounddown(x):
     return int(math.floor(x / 100.0)) * 100
 
-def make_graph(ign, num=0, update=True):
+def make_graph(ign, num=0, update=True, acts=False):
 
     tag = valorant.get_tag(ign)
     
@@ -47,8 +47,9 @@ def make_graph(ign, num=0, update=True):
         return False
     
     file1 = open(f'elo_history/{ign}.txt', 'r')
+    y = [x.split(',')[0] for x in file1.readlines()]
+    file1.close()
 
-    y = [x[0:4] for x in file1.readlines()]
     if len(y) == 2:
         return None
     y.pop(0)
@@ -69,7 +70,8 @@ def make_graph(ign, num=0, update=True):
     ymin = rounddown(min(y))
     ymax = roundup(max(y))
 
-    axes = plt.gca()
+    fig, ax = plt.subplots()
+    axes = fig.gca()
     axes.set_ylim([ymin,ymax])
     
     ticks = []
@@ -94,7 +96,6 @@ def make_graph(ign, num=0, update=True):
     for value in ticks:
         if value % 100 != 0:
             labely.append(str(value))
-
         else:
             labely.append(ranks[value])
 
@@ -128,18 +129,42 @@ def make_graph(ign, num=0, update=True):
     print(major[-1].get_text())
 
     axes.set_yticklabels(labely)
-    
 
-    p = plt.plot(x, y)
+    p = ax.plot(x, y)
     colour = p[0].get_color()
-    plt.axhline(y=y[-1], color=colour, linestyle='--')
-    plt.xlabel('Games played')
-    plt.ylabel('MMR')
-    plt.title(ign + '\'s MMR over time')
+    plt.axhline(y=y[-1], color=colour, linestyle=':', label='Cuurent MMR')
+    plt.axhline(y=max(y), color=colour, linestyle='--', label='peak MMR')
+    ax.set(xlabel='Games played', ylabel='MMR')
+    ax.set_title(ign + '\'s MMR over time')
 
-    plt.savefig(f'elo_graphs/{ign}.png', bbox_inches="tight")
-    file1.close()
-    plt.clf()
+    if acts:
+        act_data = valorant.get_data('mmr', ign, tag)
+        if not act_data[0]:
+            return False
+        
+        act_data = act_data[1]['data']['by_season']
+        act_games = []
+
+        for act in act_data.keys():
+            if 'error' not in act_data[act].keys():
+                act_games.append((act, act_data[act]['number_of_games']))
+
+        temp = len(x)
+        i = 0
+        colours = ['b', 'r', 'g', 'k', 'c', 'm', 'y', 'darkgreen', 'peru']
+        while temp > 0:
+            plt.axvline(temp, linestyle="dotted", color=colours[i], label=act_games[i][0])
+            temp -= act_games[i][1]
+            i += 1
+
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+        ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    else:
+        ax.legend(loc='lower right')
+    
+    fig.savefig(f'elo_graphs/{ign}.png', bbox_inches="tight")
+    fig.clf()
 
     return True
 
@@ -169,7 +194,7 @@ def multigraph(players):
         
         file1 = open(f'elo_history/{ign}.txt', 'r')
 
-        y = [x.strip() for x in file1.readlines()]
+        y = [x.split(',')[0] for x in file1.readlines()]
         if len(y) == 2:
             fail[1].append(ign)
             continue
@@ -261,5 +286,5 @@ if __name__ == "__main__":
     #multigraph(['8888','azatory','bento2','crossaxis','fade','fakinator', 'giroud', 'grovyle', 'imabandwagon', 'jokii', 'katchampion',
     # 'yovivels', 'dilka30003', 'slumonaire', 'silentwhispers', 'lmao', 'jack', 'thesugarman', 'hoben222', 'quackinator'])
     #multigraph(['boiwhogotstabbed', 'boiubouttastab', 'boiimbouttastab', 'boishebouttastab'])
-    print(make_graph("fakinator", update=False))
+    print(make_graph("kyouko", update=False, acts=False))
     #update_all_graphs()

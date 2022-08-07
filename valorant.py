@@ -51,7 +51,12 @@ def get_data(category, ign="", tag="", region="", crosshair_code=""):
         john = json.loads(r.text)
 
         if ign != "":
-            if john['name'] == None or john['tag'] == None or ('error' in john.keys()):
+
+            if category == 'mmr history':
+                if john['name'] == None or john['tag'] == None or ('error' in john.keys()):
+                    return (False, 'name/tag error?')
+            
+            elif john['data']['name'] == None or john['data']['tag'] == None or ('error' in john.keys()):
                 return (False, 'name/tag error?')
         
         return (True, john)
