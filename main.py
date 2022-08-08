@@ -97,8 +97,12 @@ async def cat(ctx):
              create_option(name="username", description="enter username (ign#tag)", option_type=3, required=True)])
 async def elolist(ctx, username=""):
     
-    username = username.split('#')[0].lower()
-    elolist = valorant.get_elo_list(username)
+    ign = username.split('#')[0].lower()
+    playerList = playerclass.playerList('playerlistb.csv')
+    playerList.load()
+    puuid = playerList.get_puuid_by_ign(ign)
+
+    elolist = valorant.get_elo_list(ign, puuid)
     await ctx.send("```\n" + elolist + "\n```")
 
 @slash.slash(description="Ranked statistics for all acts",
@@ -112,12 +116,19 @@ async def stats(ctx, username=""):
 
     ign = username[0].lower()
 
-    if len(username) == 2:
-        tag = username[1].lower()
-    else:
-        tag = ""
+    playerList = playerclass.playerList('playerlistb.csv')
+    playerList.load()
 
-    fields = valorant.stats(ign, tag)
+    puuid = playerList.get_puuid_by_ign(ign)
+
+    if puuid != "None":
+        fields = valorant.stats(puuid=puuid)
+    else:
+        if len(username) == 2:
+            tag = username[1].lower()
+        else:
+            tag = ""
+        fields = valorant.stats(ign=ign, tag=tag)
 
     if type(fields) == str:
         await the_message.edit(content=fields)
@@ -290,25 +301,28 @@ async def gettag(ctx, *, user):
 @client.command()
 async def banner(ctx, *, username):
 
-    username = username.split('#')
     ign = username[0].lower()
 
-    if len(username) == 2:
-        tag = username[1].lower()
-    else:
-        tag = valorant.get_tag(ign)
+    playerList = playerclass.playerList('playerlistb.csv')
+    playerList.load()
 
-    if not tag:
-        await ctx.send("Player not found, check syntax: (ign#tag)")
+    puuid = playerList.get_puuid_by_ign(ign)
+
+    if puuid != "None":
+        msg = valorant.get_banner(puuid=puuid)
+    else:
+        if len(username) == 2:
+            tag = username[1].lower()
+        else:
+            tag = ""
+        
+        msg = valorant.get_banner(ign=ign, tag=tag)
+
+    if type(msg) == str:
+        await ctx.send(msg)
     
     else:
-        msg = valorant.get_banner(ign, tag)
-
-        if type(msg) == str:
-            await ctx.send(msg)
-        
-        else:
-            await ctx.send(file=discord.File('banner.png'))
+        await ctx.send(file=discord.File('banner.png'))
 
 @slash.slash(description="Update database with your new in-game name",
              guild_ids=guild_ids,
