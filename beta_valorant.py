@@ -1,7 +1,7 @@
 import os
 import requests
 import json
-import betaPlayerClass
+import beta_playerclass
 from PIL import Image
 from io import BytesIO
 import random
@@ -47,7 +47,7 @@ def get_data(category, puuid="None", ign="", tag="", region="", crosshair_code="
 
         else:
             if ign == "":
-                return(False, False)
+                return (False, 'no ign or puuid given/player not in database')
 
             if tag == "":
                 tag = get_tag(ign)
@@ -83,18 +83,18 @@ def get_data(category, puuid="None", ign="", tag="", region="", crosshair_code="
     return (False, 'some error')
 
 def get_tag(ign):
-    playerlist = betaPlayerClass.PlayerList("playerlist.csv")
+    playerlist = beta_playerclass.PlayerList("playerlistb.csv")
     playerlist.load()
 
     for player in playerlist.players:
         if ign == player.ign:
             return player.tag
     
-    return False
+    return "False"
 
 def get_file_mmr(puuid):
 
-    file_path = f'elo_history/{puuid}.txt'
+    file_path = f'mmr_history/{puuid}.txt'
 
     if os.path.isfile(file_path) == False:
         return False
@@ -111,12 +111,18 @@ def get_file_mmr(puuid):
 
 def initialise_file(puuid):
 
-    f = open(f'elo_history/{puuid}.txt', "x")
+    f = open(f'mmr_history/{puuid}.txt', "x")
     f.close()
 
-    f = open(f'elo_history/{puuid}.txt', "w")
-    f.writelines('\n')
+    f = open(f'mmr_history/{puuid}.txt', "w")
+    f.write('\n')
     f.close()
+
+def replace_all(string: str, oldValues, newValue):
+    for value in oldValues:
+        string = string.replace(value, newValue)
+    
+    return string
 
 def update_database(puuid):
 
@@ -125,8 +131,7 @@ def update_database(puuid):
         return player_data
 
     player_data = player_data[1]
-
-    player_file_path = f'elo_history/{puuid}.txt'
+    player_file_path = f'mmr_history/{puuid}.txt'
 
     if os.path.isfile(player_file_path) == False:
         if len(player_data['data']) == 0:
@@ -136,28 +141,25 @@ def update_database(puuid):
     
     # Dates of last update
     date_raw = player_data["data"][0]["date_raw"]
+    lines = []
 
-    player_file = open(player_file_path, 'r')
-    first_line = player_file.readline()
+    with open(player_file_path, 'r') as f:
+        for line in f:
+            lines.append(line)
     
-    if first_line == '\n':
+    if lines[0] == '\n':
         last_file_update = 0
     else:
-        last_file_update = int(first_line)
+        last_file_update = int(lines[0])
     
-    player_file.close()
-
     new_list = []
 
     if last_file_update == 0:
-
         for i in range(len(player_data['data'])):
-            thedate = player_data['data'][i]['date'].replace(',', '-').replace(' ', '-').replace('--', '-')
-            new_list.append(str(player_data['data'][i]['elo']) + ',' + thedate)
-
+            thedate = replace_all(player_data['data'][i]['date'], [', ', ' '], '-')
+            new_list.append(f"{player_data['data'][i]['elo']},{thedate}\n")
 
     elif len(str(last_file_update)) == 13:
-        
         if (len(str(date_raw)) == 10):
             last_file_update = int(str(last_file_update)[:-3])
             last_num = int(str(last_file_update)[-1])
@@ -165,79 +167,60 @@ def update_database(puuid):
             last_file_update = int(str(last_file_update)[:-1] + str(last_num))
 
         for i in range(len(player_data['data'])):
-
             date_raw = player_data['data'][i]['date_raw']
-
             if last_file_update < date_raw:
-                thedate = player_data['data'][i]['date'].replace(',', '-').replace(' ', '-').replace('--', '-')
-                new_list.append(str(player_data['data'][i]['elo']) + ',' + thedate)
-
+                thedate = replace_all(player_data['data'][i]['date'], [', ', ' '], '-')
+                new_list.append(f"{player_data['data'][i]['elo']},{thedate}\n")
             else:
                 break
     
     else:
         for i in range(len(player_data['data'])):
-
             date_raw = player_data['data'][i]['date_raw']
-
             if last_file_update < date_raw:
-                thedate = player_data['data'][i]['date'].replace(',', '-').replace(' ', '-').replace('--', '-')
-                new_list.append(str(player_data['data'][i]['elo']) + ',' + thedate)
-
+                thedate = replace_all(player_data['data'][i]['date'], [', ', ' '], '-')
+                new_list.append(f"{player_data['data'][i]['elo']},{thedate}\n")
             else:
                 break
     
     if new_list != []:
-        new_list = new_list[::-1]
-
-        #update timestamp in file
-        with open(player_file_path) as f:
-            lines = f.readlines()
-        
         lines[0] = str(player_data["data"][0]["date_raw"]) + '\n'
+        lines += new_list[::-1]
 
         with open(player_file_path, "w") as f:
             f.writelines(lines)
-
-        player_file = open(player_file_path, 'a')
-        
-        for elem in range(len(new_list)):
-            player_file.writelines(str(new_list[elem]) + '\n')
-
-        player_file.close()
     
     return (True, len(new_list))
 
 def get_elo_list(puuid):
-
-    check = update_database(puuid)
     
+    check = update_database(puuid)
     if not check[0]:
-        return check[1]
+        return check
 
     if not get_file_mmr(puuid):
-        return "Player not found"
+        return (False, "Player not found")
     
-    file1 = open(f'elo_history/{puuid}.txt', 'r')
-
-    lines = [x.strip() for x in file1.readlines()]
+    lines = []
+    with open(f'mmr_history/{puuid}.txt', 'r') as f:
+        for line in f:
+            lines.append(line.strip())
 
     if len(lines) == 1:
-        return "No comp games recorded"
+        return (False, "No comp games recorded")
         
     lines.pop(0)
-    
     elolist = ""
 
     for elem in lines:
-        elolist += elem.split(',')[0] + ", "
+        elolist += f"{elem.split(',')[0]}, "
 
-    return elolist[:-2]
+    return (True, elolist[:-2])
 
 def leaderboard(region, length=20):
 
     if region == 'local':
-        playerlist = betaPlayerClass.PlayerList('playerlistb.csv')
+        playerlist = beta_playerclass.PlayerList('playerlistb.csv')
         playerlist.load()
         players = []
 
@@ -268,26 +251,24 @@ def leaderboard(region, length=20):
 
         leaderboard = f'{regions[region]} Ranked Leaderboard\n'
 
-
     for i in range(len(players)):
         rank = i + 1
         leaderboard += (str(rank) + '.').ljust(3) + str(players[i][0]).ljust(16) + str(players[i][1]).rjust(5) + '\n'
 
     if region == 'local':
-        f = open("leaderboard.txt", "w")
-        f.write(leaderboard)
-        f.close()
+        with open("leaderboard.txt", "w") as f:
+            f.write(leaderboard)
 
     return leaderboard
 
 def stats(ign="", tag="", puuid="None"):
 
     if ign == "" and puuid == "None":
-        return False
+        return (False, False)
 
     john = get_data('mmr', puuid=puuid, ign=ign, tag=tag)
     if not john[0]:
-        return john[1]
+        return john
     else:
         john = john[1]
     
@@ -306,13 +287,12 @@ def stats(ign="", tag="", puuid="None"):
     
     john = get_data('account', puuid=puuid, ign=ign, tag=tag)
     if not john[0]:
-        return john[1]
+        return john
     else:
         john = john[1]
 
     card = john['data']['card']['small']
-
-    return [final, card]
+    return (True, [final, card])
 
 def get_banner(ign="", tag="", puuid="None"):
 
@@ -327,9 +307,7 @@ def get_banner(ign="", tag="", puuid="None"):
     
     url = data['data']['card']['large']
     r = requests.get(url, allow_redirects=True)
-
     open('banner.png', 'wb').write(r.content)
-
     return (True, True)
 
 def servercheck():
@@ -359,7 +337,7 @@ def servercheck():
 
 def add_player(ign, tag):
 
-    playerlist = betaPlayerClass.PlayerList("playerlist.csv")
+    playerlist = beta_playerclass.PlayerList("playerlistb.csv")
     playerlist.load()
 
     data = get_data('account', ign=ign, tag=tag)
@@ -369,9 +347,7 @@ def add_player(ign, tag):
         data = data[1]
 
     puuid = data['puuid']
-
-    player = betaPlayerClass.Player(ign.lower(), tag.lower(), puuid)
-
+    player = beta_playerclass.Player(ign.lower(), tag.lower(), puuid)
     if playerlist.inList(player):
         return "Account already added"
     
@@ -380,14 +356,15 @@ def add_player(ign, tag):
 
     return f'{ign}#{tag} successfully added'
 
-def remove_player(ign, tag):
+def remove_player(ign):
 
-    playerlist = betaPlayerClass.PlayerList("playerlist.csv")
+    playerlist = beta_playerclass.PlayerList("playerlistb.csv")
     playerlist.load()
+    tag = get_tag(ign)
+    puuid = playerlist.get_puuid_by_ign(ign)
+    player = beta_playerclass.Player(ign.lower(), tag, puuid)
 
-    player = betaPlayerClass.Player(ign.lower(), tag.lower())
-
-    if not playerlist.inList(player):
+    if puuid == "None" or not tag or not playerlist.inList(player):
         return "Player not in list"
         
     playerlist.remove(player)
@@ -414,11 +391,10 @@ def random_crosshair():
                     "Fishnet"     : "0;P;o;1;d;1;a;0;f;0;0t;8;0l;2;0o;5;0a;0;0f;0;1l;8;1o;2;1a;0;1m;0;1f;0"}
 
     name, code = random.choice(list(crosshairs.items()))
-
     if not crosshair(code):
         return (False, False)
 
     return (name, code)
 
 if __name__ == '__main__':
-    print(leaderboard('local'))
+    print(update_database('3919c964-bd90-5c65-81d8-90b3f655f1a8'))

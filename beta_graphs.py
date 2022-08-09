@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import os
-import betaValorant
-import betaPlayerClass
+import beta_valorant
+import beta_playerclass
 import math
 from adjustText import adjust_text
 
@@ -38,26 +38,30 @@ def make_graph(puuid="None", ign="", num=0, update=True, acts=False):
         return (False, 'no ign or puuid given')
 
     if puuid == "None" and ign != "":
-        playerList = betaPlayerClass.playerList('playerlistb.csv')
+        playerList = beta_playerclass.playerList('playerlistb.csv')
         playerList.load()
         puuid = playerList.get_puuid_by_ign(ign)
 
     if puuid != "None" and ign == "":
-        playerList = betaPlayerClass.playerList('playerlistb.csv')
+        playerList = beta_playerclass.playerList('playerlistb.csv')
         playerList.load()
-        puuid = playerList.get_puuid_by_ign(puuid)    
+        ign = playerList.get_ign_by_puuid(puuid)
+
+    if puuid == "None" or ign == "":
+        return (False, 'player not in database')
 
     if update:
-        thing = betaValorant.update_database(puuid=puuid)
+        thing = beta_valorant.update_database(puuid=puuid)
         if thing[0] == False:
             return thing
     
-    file1 = open(f'elo_history/{puuid}.txt', 'r')
-    y = [x.split(',')[0] for x in file1.readlines()]
-    file1.close()
+    y = []
+    with open(f'mmr_history/{puuid}.txt', 'r') as f:
+        for line in f:
+            y.append(line.split(',')[0])
 
     if len(y) == 2:
-        return None
+        return (False, 'not enough data')
     y.pop(0)
     
     total = len(y)
@@ -82,7 +86,6 @@ def make_graph(puuid="None", ign="", num=0, update=True, acts=False):
     
     ticks = []
     i = int(math.floor(ymin / 50.0)) * 50
-
     ranger = int((ymax-ymin)/100)
 
     while i <= int(math.ceil(ymax / 50.0)) * 50:
@@ -144,9 +147,9 @@ def make_graph(puuid="None", ign="", num=0, update=True, acts=False):
     ax.set_title(ign + '\'s MMR over time')
 
     if acts:
-        act_data = betaValorant.get_data('mmr', puuid=puuid)
+        act_data = beta_valorant.get_data('mmr', puuid=puuid)
         if not act_data[0]:
-            return False
+            return act_data
         
         act_data = act_data[1]['data']['by_season']
         act_games = []
@@ -181,28 +184,35 @@ def multigraph(players):
     mostGames = 0
     yvalues = []
     xvalues = []
-    fail = [[], []]
+    fails = []
+
+    playerList = beta_playerclass.playerList('playerlistb.csv')
+    playerList.load()
 
     for ign in players:
 
-        if os.path.isfile(f'elo_history/{ign}.txt') == False:
-            fail[0].append(ign)
-            continue
-        
-
-        tag = betaValorant.get_tag(ign)
-
-        if not tag:
-            fail[0].append(ign)
+        puuid = playerList.get_puuid_by_ign(ign)
+        if puuid == "None":
+            fails.append((ign, "Player not in database"))
             continue
 
-        betaValorant.update_database(ign, tag)
-        
-        file1 = open(f'elo_history/{ign}.txt', 'r')
+        if os.path.isfile(f'mmr_history/{puuid}.txt') == False:
+            fails.append((ign, "Player not in database"))
+            continue
 
-        y = [x.split(',')[0] for x in file1.readlines()]
+        flag = beta_valorant.update_database(puuid)
+
+        if not flag[0]:
+            fails.append((ign, flag[1]))
+            continue
+
+        y = []
+        with open(f'mmr_history/{puuid}.txt', 'r') as f:
+            for line in f:
+                y.append(line.split(',')[0])
+
         if len(y) == 2:
-            fail[1].append(ign)
+            fails.append(ign, "Not enough data")
             continue
         y.pop(0)
         
@@ -223,10 +233,8 @@ def multigraph(players):
         if (len(y) > mostGames) and mostGames != 0:
             mostGames = len(y)
 
-        file1.close()
-
-    if len(fail[0]) + len(fail[1]) > 0:
-        return fail
+    if len(fails) == len(players):
+        return (False, fails)
 
     axes = plt.gca()
     axes.set_ylim([ymin,ymax])
@@ -251,13 +259,12 @@ def multigraph(players):
     for value in ticks:
         if value % 100 != 0:
             labely.append(str(value))
-
         else:
             labely.append(ranks[value])
 
     axes.set_yticklabels(labely)
 
-    for i in range(0, len(players)):
+    for i in range(len(players)):
         p = plt.plot(xvalues[i], yvalues[i], label=players[i])
         colour = p[0].get_color()
         plt.axhline(y=yvalues[i][-1], color=colour, linestyle='--')
@@ -266,13 +273,10 @@ def multigraph(players):
     plt.ylabel("MMR")
     plt.title("change in MMR over time")
     plt.legend()
-
     plt.savefig(f'elo_graphs/multigraph.png', bbox_inches="tight")
-
-    file1.close()
     plt.clf()
 
-    return fail
+    return (True, fails)
 
 def get_index(y:list, value:int):
     for i in range(0, len(y)):
@@ -441,7 +445,7 @@ def date_graph():
 
 def update_all_graphs():
     
-    playerList = betaPlayerClass.PlayerList('playerlist.csv')
+    playerList = beta_playerclass.PlayerList('playerlistb.csv')
     playerList.load()
 
     for i in range(0, len(playerList.players)):
