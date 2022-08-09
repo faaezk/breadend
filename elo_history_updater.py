@@ -5,7 +5,7 @@ import graphs
 
 def update_all_elo_history(graph, start=0):
     
-    playerList = playerclass.PlayerList('playerlistb.csv')
+    playerList = playerclass.PlayerList('playerlist.csv')
     playerList.load()
     playerList.sort()
 
@@ -20,7 +20,7 @@ def update_all_elo_history(graph, start=0):
         if player.active == 'False':
             continue
 
-        thing = valorant.update_database(player.ign, player.puuid)
+        thing = valorant.update_database(player.ign, player.tag)
 
         if not thing[0]:
             error_count += 1
