@@ -1,5 +1,3 @@
-import os
-
 class Player():
     def __init__(self, ign, tag, puuid, priority = None, active = True):
         self.ign = ign
@@ -12,7 +10,7 @@ class Player():
         return f"{self.ign},{self.tag},{self.puuid},{self.priority},{self.active}\n"
 
     def __str__(self) -> str:
-        return f"{self.ign}#{self.tag}"
+        return f"{self.ign}#{self.tag},{self.puuid}"
 
     def __eq__(self, o: object) -> bool:
         return str(self) == str(o)
@@ -61,8 +59,8 @@ class PlayerList():
         return False
 
     def change_ign(self, old_ign, new_ign, tag):
-        player = None
 
+        player = None
         for elem in self.players:
             if elem.ign == old_ign:
                 player = elem
@@ -71,11 +69,7 @@ class PlayerList():
         if player == None:
             return False
 
-        player.setUser(new_ign, tag)
-
-        if os.path.isfile(f'elo_history/{old_ign}.txt'):
-            os.rename(f'elo_history/{old_ign}.txt', f'elo_history/{new_ign}.txt')
-        
+        player.setUser(new_ign, tag)        
         self.save()
 
         return True
