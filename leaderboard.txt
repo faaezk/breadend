@@ -1,43 +1,42 @@
 Player Leaderboard
-1. cheffrey         1993
-2. oshawott         1707
-3. silentwhispers   1442
-4. windy            1335
-5. horus            1226
-6. 8888             1176
-7. dilka30003       1171
-8. grovyle          1150
-9. vkj              1150
-10.giroud           1085
-11.jack             1082
-12.azatory          1075
-13.hoben222          931
-14.imabandwagon      881
-15.lol               834
-16.fakinator         798
-17.kyouko            782
-18.fade              746
-19.bento2            665
-20.lmao              651
-21.kleenexwipes      650
-22.therealrobdez     636
-23.thesugarman       633
-24.yovivels          632
+1. cheffrey         2208
+2. oshawott         1841
+3. silentwhispers   1461
+4. kuriboh          1456
+5. windy            1427
+6. giroud           1350
+7. horus            1269
+8. dilka30003       1227
+9. azatory          1185
+10.8888             1182
+11.grovyle          1150
+12.kyouko           1150
+13.vkj              1150
+14.jack             1082
+15.imabandwagon      942
+16.lol               919
+17.hoben222          900
+18.yovivels          822
+19.fakinator         787
+20.fade              746
+21.thesugarman       689
+22.lmao              651
+23.kleenexwipes      650
+24.therealrobdez     643
 25.nadizheloof       617
 26.tallewok          617
 27.slumonaire        610
 28.quyteriyaki       600
-29.boiwhogotstabbed  591
-30.gerald            503
-31.Luus%C3%A9r       500
-32.dilka40004        481
-33.rustybeef         470
-34.thomyorke         431
-35.glizzardwizard    429
-36.quackinator       380
-37.katchampion       343
-38.crossaxis         330
-39.jokii             244
-40.boishebouttastab   44
+29.bingchilling      598
+30.Luus%C3%A9r       515
+31.dilka40004        481
+32.rustybeef         470
+33.thomyorke         431
+34.glizzardwizard    429
+35.quackinator       380
+36.katchampion       343
+37.crossaxis         330
+38.boishebouttastab  298
+39.boiubouttastab    277
+40.jokii             244
 41.boiimbouttastab    35
-42.boiubouttastab      0

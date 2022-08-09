@@ -3,7 +3,7 @@ from discord.ext import commands
 import configparser
 import beta_graphs
 import beta_valorant
-import elo_history_updater
+import mmr_history_updater
 import requests
 import json
 import malsearch
@@ -140,44 +140,43 @@ async def stats(ctx, username=""):
              guild_ids=guild_ids,
              options = [
              create_option(name="usernames", description="Enter username(s), seperate with commas for more than one", option_type=3, required=True),
-             create_option(name="update", description="Force update to latest MMR", option_type=3, required=True, 
-             choices=[create_choice(name="Yes",value="yes"), create_choice(name="No",value="no")]),
              create_option(name="type", description="Select type of graph", option_type=3, required=False, 
-             choices=[create_choice(name="Basic",value="basic"), create_choice(name="With Acts",value="acts")])])
+             choices=[create_choice(name="Basic",value="basic"), create_choice(name="With Acts",value="acts")]),
+             create_option(name="update", description="Force update to latest MMR", option_type=3, required=False, 
+             choices=[create_choice(name="No",value="no"), create_choice(name="Yes",value="yes")])])
 async def graph(ctx, usernames="", type="", update=""):
     
     users = usernames.split(',')
     for i in range(len(users)):
         users[i] = users[i].split('#')[0].lower().strip()
 
+    updates = True if update == 'yes' else False
+    acts = True if type == 'acts' else False
+
     if len(users) == 1:
         the_message = await ctx.send("please wait...")
         msg = ""
 
-        updates = True if update == 'yes' else False
-        acts = True if type == 'yes' else False
-
-        flag = beta_graphs.make_graph(users[0], update=updates, acts=acts)
+        flag = beta_graphs.make_graph(ign=users[0], update=updates, acts=acts)
         if not flag[0]:
             await the_message.edit(content=flag[1])
         else:
             with open(f"elo_graphs/{users[0]}.png", 'rb') as f:
                 picture = discord.File(f)
                 await the_message.edit(content= "", file=picture)
-
     else:
         the_message = await ctx.send("please wait...")
-        flag = beta_graphs.multigraph(users)
+        flag = beta_graphs.multigraph(users, updates)
         msg = ""
-
+        for fail in flag[1]:
+            msg += f'{fail[0]} - {fail[1]}\n'
         if not flag[0]:
-            for fail in flag[1]:
-                msg += f'{fail[0]} - {fail[1]}\n'
             await the_message.edit(content=msg)
         else:
             with open("elo_graphs/multigraph.png", 'rb') as f:
                 picture = discord.File(f)
-                await the_message.edit(content=msg, file=picture)
+            
+            await the_message.edit(content=msg, file=picture)
 
 @slash.slash(description="Valorant Leaderboards",
              guild_ids=guild_ids,
@@ -203,11 +202,12 @@ async def leaderboard(ctx, options=""):
                 for lastLine in f:
                     pass
 
-            leaderboard = f"Last updated at {lastLine.split(' ')[4]}, {lastLine.split(' ')[2]}'\n'"
+            leaderboard = f"Last updated at {lastLine.split(' ')[4]}, {lastLine.split(' ')[2]}\n"
         
         if options == "update":
             the_message = await ctx.send("this is gonna take a while...")
-            elo_history_updater.update_all_elo_history()
+            mmr_history_updater.update_all(False, printer=False)
+            leaderboard = ""
             
         beta_valorant.leaderboard('local')
         with open("leaderboard.txt", 'r') as f:
@@ -219,16 +219,12 @@ async def leaderboard(ctx, options=""):
 @slash.slash(description="Add player to database for leaderboard and stuff",
              guild_ids=guild_ids,
              options = [
-             create_option(name="username", description="enter username (ign#tag)", option_type=3, required=True)])
-async def add(ctx, username=""):
-
-    username = username.split('#')
-    if len(username) == 2:
-        the_message = await ctx.send("please wait...")
-        msg = beta_valorant.add_player(username[0].lower(), username[1].lower())
-        await the_message.edit(content=msg)
-    else:
-        await ctx.send("check syntax: (ign#tag)")
+             create_option(name="ign", description="enter in game name", option_type=3, required=True), 
+             create_option(name="tag", description="enter tag", option_type=3, required=True)])
+async def add(ctx, ign="", tag=""):
+    the_message = await ctx.send("please wait...")
+    msg = beta_valorant.add_player(ign.lower(), tag.lower())
+    await the_message.edit(content=msg)
 
 @slash.slash(description="Remove player from list",
              guild_ids=guild_ids,
@@ -242,6 +238,29 @@ async def remove(ctx, username=""):
         await ctx.send(msg)
     else:
         await ctx.send("no.")
+
+@slash.slash(description="Update priority in database",
+             guild_ids=guild_ids,
+             options = [create_option(name="username", description="enter username", option_type=3, required=True),
+             create_option(name="priority", description="Select type of graph", option_type=3, required=True, 
+             choices=[create_choice(name="1",value="1"), create_choice(name="2",value="2"), create_choice(name="3",value="3")])])
+async def updatePriority(ctx, username="", priority=""):
+
+    if ctx.author.id == 410771947522359296:
+        username = username.split('#')
+        ign = username[0].lower()
+        playerList = beta_playerclass.PlayerList('playerlistb.csv')
+        playerList.load()
+
+        found = playerList.change_priority(ign, int(priority))
+
+        if found:
+            await ctx.send(f"{ign}'s priority has been updated to {priority}")
+        else:
+            await ctx.send(f"{ign} not found in database")
+    else:
+        await ctx.send("no.")
+
 
 @client.command()
 async def gettag(ctx, *, user):
@@ -277,42 +296,31 @@ async def banner(ctx, username=""):
 @slash.slash(description="Update database with your new in-game name",
              guild_ids=guild_ids,
              options = [
-             create_option(name="old_username", description="enter your old username", option_type=3, required=True),
-             create_option(name="new_username", description="enter your new username (ign#tag)", option_type=3, required=True)])
-async def namechange(ctx, old_username="", new_username=""):
+             create_option(name="old_ign", description="enter your old ign", option_type=3, required=True),
+             create_option(name="old_tag", description="enter your old tag", option_type=3, required=True),
+             create_option(name="new_ign", description="enter your new ign", option_type=3, required=True),
+             create_option(name="new_tag", description="enter your new tag", option_type=3, required=True)])
+async def namechange(ctx, old_ign="", old_tag="", new_ign="", new_tag=""):
 
     if ctx.author.id == 410771947522359296:
-        old_username = old_username.split('#')
-        new_username = new_username.split('#')
+        the_message = await ctx.send("please wait...")
 
-        if len(new_username) != 2:
-            await ctx.send("check syntax: ign#tag")
-        
+        playerList = beta_playerclass.PlayerList('playerlistb.csv')
+        playerList.load()
+        puuid = playerList.get_puuid_by_ign(old_ign)
+
+        if puuid == "None":
+            await the_message.edit(content = f'{old_ign}#{old_tag} not found in database')
         else:
-            the_message = await ctx.send("please wait...")
-            oldIgn = old_username[0].lower()
-            oldTag = old_username[1].lower()
-            newIgn = new_username[0].lower()
-            newTag = new_username[1].lower()
-
-            playerList = beta_playerclass.PlayerList('playerlistb.csv')
-            playerList.load()
-            puuid = playerList.get_puuid_by_ign(oldIgn)
-            player = beta_playerclass.Player(oldIgn.lower(), oldTag.lower(), puuid)
+            check = beta_valorant.get_data('account', ign=new_ign, tag=new_tag)
+            if not check[0]:
+                await the_message.edit(content = f'{new_ign}#{new_tag} does not exist.')
             
-            if not playerList.inList(player):
-                await the_message.edit(content = f'{str(player)} not found in database')
-
             else:
-                check = beta_valorant.get_data('account', ign=newIgn, tag=newTag)
-                if not check[0]:
-                    await the_message.edit(content = f'{newIgn}#{newTag} does not exist.')
-                
+                if playerList.change_ign(old_ign, new_ign, new_tag):
+                    await the_message.edit(content = f'{old_ign}#{old_tag} is now {new_ign}#{new_tag}')
                 else:
-                    if playerList.change_ign(oldIgn, newIgn, newTag):
-                        await the_message.edit(content = f'{oldIgn}#{oldTag} is now {newIgn}#{newTag}')
-                    else:
-                        await the_message.edit(content = "something went wrong")            
+                    await the_message.edit(content = "something went wrong")            
     else:
         await ctx.send("no.")
 
