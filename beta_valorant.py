@@ -71,12 +71,19 @@ def get_data(category, puuid="None", ign="", tag="", region="", crosshair_code="
     if r.status_code == 200:
         john = json.loads(r.text)
 
+        if category == 'leaderboard':
+            return (True, john)
+
+        if 'error' in john.keys() and john['error'] != None:
+            return (False, john['error']['message'])
+
         if category == 'mmr history':
-            if john['name'] == None or john['tag'] == None or ('error' in john.keys()):
+            if john['name'] == None or john['tag'] == None:
                 return (False, 'name/tag error?')
         
-        elif john['data']['name'] == None or john['data']['tag'] == None or ('error' in john.keys()):
-            return (False, 'name/tag error?')
+        elif category != 'status':
+            if john['data']['name'] == None or john['data']['tag'] == None:
+                return (False, 'name/tag error?')
         
         return (True, john)
 
@@ -346,7 +353,7 @@ def add_player(ign, tag):
     else:
         data = data[1]
 
-    puuid = data['puuid']
+    puuid = data['data']['puuid']
     player = beta_playerclass.Player(ign.lower(), tag.lower(), puuid)
     if playerlist.inList(player):
         return "Account already added"
