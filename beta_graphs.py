@@ -275,8 +275,8 @@ def multigraph(players: list, update):
     plt.ylabel("MMR")
     plt.title("change in MMR over time")
     plt.legend()
-    plt.savefig(f'elo_graphs/multigraph.png', bbox_inches="tight")
-    plt.clf()
+    plt.savefig(f'mmr_graphs/multigraph.png', bbox_inches="tight")
+    plt.close()
 
     return (True, fails)
 
