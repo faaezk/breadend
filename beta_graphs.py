@@ -13,7 +13,8 @@ ranks = {
 1200 : "Platinum 1", 1300 : "Platinum 2", 1400 : "Platinum 3",
 1500 : "Diamond 1", 1600 : "Diamond 2", 1700 : "Diamond 3",
 1800 : "Ascendant 1", 1900 : "Ascendant 2", 2000 : "Ascendant 3",
-2100 : "Immortal 1", 2200 : "Immortal 2", 2300 : "Immortal 3"
+2100 : "Immortal 1", 2200 : "Immortal 2", 2300 : "Immortal 3",
+2400 : "Radiant"
 }
 
 old_ranks = {
@@ -38,12 +39,12 @@ def make_graph(puuid="None", ign="", num=0, update=True, acts=False):
         return (False, 'no ign or puuid given')
 
     if puuid == "None" and ign != "":
-        playerList = beta_playerclass.playerList('playerlistb.csv')
+        playerList = beta_playerclass.PlayerList('playerlistb.csv')
         playerList.load()
         puuid = playerList.get_puuid_by_ign(ign)
 
     if puuid != "None" and ign == "":
-        playerList = beta_playerclass.playerList('playerlistb.csv')
+        playerList = beta_playerclass.PlayerList('playerlistb.csv')
         playerList.load()
         ign = playerList.get_ign_by_puuid(puuid)
 
@@ -103,7 +104,7 @@ def make_graph(puuid="None", ign="", num=0, update=True, acts=False):
     labely = []
 
     for value in ticks:
-        if value % 100 != 0:
+        if value % 100 != 0 and not value in ranks.keys():
             labely.append(str(value))
         else:
             labely.append(ranks[value])
@@ -134,9 +135,6 @@ def make_graph(puuid="None", ign="", num=0, update=True, acts=False):
 
         axes.set_xticks(tickx)
     
-    major = axes.get_xmajorticklabels()
-    print(major[-1].get_text())
-
     axes.set_yticklabels(labely)
 
     p = ax.plot(x, y)
@@ -172,12 +170,12 @@ def make_graph(puuid="None", ign="", num=0, update=True, acts=False):
     else:
         ax.legend(loc='lower right')
     
-    fig.savefig(f'elo_graphs/{ign}.png', bbox_inches="tight")
-    fig.clf()
+    fig.savefig(f'mmr_graphs/{puuid}.png', bbox_inches="tight")
+    plt.close(fig)
 
-    return True
+    return (True, True)
 
-def multigraph(players):
+def multigraph(players: list, update):
 
     ymin = 10000
     ymax = 0
@@ -186,7 +184,7 @@ def multigraph(players):
     xvalues = []
     fails = []
 
-    playerList = beta_playerclass.playerList('playerlistb.csv')
+    playerList = beta_playerclass.PlayerList('playerlistb.csv')
     playerList.load()
 
     for ign in players:
@@ -199,17 +197,18 @@ def multigraph(players):
         if os.path.isfile(f'mmr_history/{puuid}.txt') == False:
             fails.append((ign, "Player not in database"))
             continue
+        
+        if update:
+            flag = beta_valorant.update_database(puuid)
 
-        flag = beta_valorant.update_database(puuid)
-
-        if not flag[0]:
-            fails.append((ign, flag[1]))
-            continue
+            if not flag[0]:
+                fails.append((ign, flag[1]))
+                continue
 
         y = []
         with open(f'mmr_history/{puuid}.txt', 'r') as f:
             for line in f:
-                y.append(line.split(',')[0])
+                y.append(line.split(',')[0].strip())
 
         if len(y) == 2:
             fails.append(ign, "Not enough data")
@@ -235,6 +234,9 @@ def multigraph(players):
 
     if len(fails) == len(players):
         return (False, fails)
+    
+    for failure in fails:
+        players.remove(failure[0])
 
     axes = plt.gca()
     axes.set_ylim([ymin,ymax])
@@ -448,12 +450,11 @@ def update_all_graphs():
     playerList = beta_playerclass.PlayerList('playerlistb.csv')
     playerList.load()
 
-    for i in range(0, len(playerList.players)):
-
+    for i in range(len(playerList.players)):
         if playerList.players[i].active == 'False':
             continue
 
-        print(make_graph(playerList.players[i].ign))
+        print(make_graph(puuid=playerList.players[i].puuid, update=False))
 
     return
 
@@ -461,5 +462,5 @@ if __name__ == "__main__":
     #multigraph(['8888','azatory','bento2','crossaxis','fade','fakinator', 'giroud', 'grovyle', 'imabandwagon', 'jokii', 'katchampion',
     # 'yovivels', 'dilka30003', 'slumonaire', 'silentwhispers', 'lmao', 'jack', 'thesugarman', 'hoben222', 'quackinator'])
     #multigraph(['boiwhogotstabbed', 'boiubouttastab', 'boiimbouttastab', 'boishebouttastab'])
-    print(make_graph("kyouko", update=False, acts=False))
-    #update_all_graphs()
+    #print(make_graph("kyouko", update=False, acts=False))
+    update_all_graphs()
