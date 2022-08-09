@@ -7,7 +7,7 @@ from io import BytesIO
 import random
 import configparser
 
-def get_data(category, puuid="None", ign="", tag="", region="", crosshair_code=""):
+def get_data(category, ign="", tag="", region="", crosshair_code=""):
 
     key = get_key()
     headers = {'accept' : 'application/json', 'Authorization' : key}
@@ -30,33 +30,22 @@ def get_data(category, puuid="None", ign="", tag="", region="", crosshair_code="
         return requests.get(url, headers=headers)
 
     else:
-        if puuid != "None":
-            if category == "account":
-                url = f'https://api.henrikdev.xyz/valorant/v1/by-puuid/account/{puuid}'
+        if ign == "":
+            return(False, False)
 
-            elif category == "mmr":
-                url = f'https://api.henrikdev.xyz/valorant/v2/by-puuid/mmr/ap/{puuid}'
+        if tag == "":
+            tag = get_tag(ign)
+            if not tag:
+                return (False, 'tag not found')
 
-            elif category == "mmr history":
-                url = f'https://api.henrikdev.xyz/valorant/v1/by-puuid/mmr-history/ap/{puuid}'
+        if category == "account":
+            url = f'https://api.henrikdev.xyz/valorant/v1/account/{ign}/{tag}'
 
-        else:
-            if ign == "":
-                return(False, False)
-
-            if tag == "":
-                tag = get_tag(ign)
-                if not tag:
-                    return (False, 'tag not found')
-
-            if category == "account":
-                url = f'https://api.henrikdev.xyz/valorant/v1/account/{ign}/{tag}'
-
-            elif category == "mmr":
-                url = f'https://api.henrikdev.xyz/valorant/v2/mmr/ap/{ign}/{tag}'
-            
-            elif category == "mmr history":
-                url = f"https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{ign}/{tag}"
+        elif category == "mmr":
+            url = f'https://api.henrikdev.xyz/valorant/v2/mmr/ap/{ign}/{tag}'
+        
+        elif category == "mmr history":
+            url = f"https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{ign}/{tag}"
     
     r = requests.get(url, headers=headers)
 
@@ -66,12 +55,14 @@ def get_data(category, puuid="None", ign="", tag="", region="", crosshair_code="
     if r.status_code == 200:
         john = json.loads(r.text)
 
-        if category == 'mmr history':
-            if john['name'] == None or john['tag'] == None or ('error' in john.keys()):
+        if ign != "":
+
+            if category == 'mmr history':
+                if john['name'] == None or john['tag'] == None or ('error' in john.keys()):
+                    return (False, 'name/tag error?')
+            
+            elif john['data']['name'] == None or john['data']['tag'] == None or ('error' in john.keys()):
                 return (False, 'name/tag error?')
-        
-        elif john['data']['name'] == None or john['data']['tag'] == None or ('error' in john.keys()):
-            return (False, 'name/tag error?')
         
         return (True, john)
 
@@ -119,9 +110,9 @@ def initialise_file(ign):
     f.writelines('\n')
     f.close()
 
-def update_database(ign, puuid):
+def update_database(ign, tag=""):
 
-    player_data = get_data('mmr history', puuid=puuid)
+    player_data = get_data('mmr history', ign=ign, tag=tag)
     if not player_data[0]:
         return player_data
     else:
@@ -209,10 +200,13 @@ def update_database(ign, puuid):
     
     return (True, len(new_list))
 
-def get_elo_list(ign, puuid):
-
-    if not update_database(ign, puuid)[0]:
+def get_elo_list(ign):
+    
+    tag = get_tag(ign)
+    if not tag:
         return "Player not found"
+
+    update_database(ign, tag)
 
     if not get_file_mmr(ign):
         return "Player not found"
@@ -293,13 +287,14 @@ def region_leaderboard(region, length=20):
 
     return leaderboard    
 
-def stats(puuid="None", ign="", tag=""):
+def stats(ign, tag=""):
 
-    john = get_data('mmr', puuid=puuid, ign=ign, tag=tag)
+    john = get_data('mmr', ign=ign, tag=tag)
     if not john[0]:
         return john[1]
     else:
         john = john[1]
+    
     
     data = john['data']['by_season']
     keys = data.keys()
@@ -314,7 +309,7 @@ def stats(puuid="None", ign="", tag=""):
             rank = data[key]['final_rank_patched']
             final.append([f'Episode {key[1]} Act {key[3]}:', f'{rank}\nGames Played: {games}\nWinrate: {round((wins/games) * 100, 2)}%'])
     
-    john = get_data('account', puuid)
+    john = get_data('account', ign=ign, tag=tag)
     if not john[0]:
         return john[1]
     else:
@@ -324,9 +319,9 @@ def stats(puuid="None", ign="", tag=""):
 
     return [final, card]
 
-def get_banner(puuid="None", ign="", tag=""):
+def get_banner(ign, tag):
 
-    data = get_data('account', puuid=puuid, ign=ign, tag=tag)
+    data = get_data('account', ign=ign, tag=tag)
     if not data[0]:
         return data[1]
     else:
@@ -364,15 +359,15 @@ def servercheck():
         
     return report
 
-def add_player(ign, tag, puuid):
+def add_player(ign, tag):
 
     playerlist = playerclass.PlayerList("playerlist.csv")
     playerlist.load()
 
-    if not get_data('account', puuid=puuid)[0]:
+    if not get_data('account', ign=ign, tag=tag)[0]:
         return "Account does not exist"
 
-    player = playerclass.Player(ign.lower(), tag.lower(), puuid)
+    player = playerclass.Player(ign.lower(), tag.lower())
 
     if playerlist.inList(player):
         return "Account already added"
@@ -423,4 +418,4 @@ def random_crosshair():
     return (name, code)
 
 if __name__ == '__main__':
-    print(update_database("bingchilling", "25998089-7e7a-5f13-b332-7c47f8250ba3"))
+    print(servercheck())
