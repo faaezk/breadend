@@ -58,4 +58,4 @@ def update_all(graph, printer=True,start=0):
     return printerz
 
 if __name__ == "__main__":
-    update_all(True)
+    update_all(False)

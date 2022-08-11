@@ -459,8 +459,4 @@ def update_all_graphs():
     return
 
 if __name__ == "__main__":
-    #multigraph(['8888','azatory','bento2','crossaxis','fade','fakinator', 'giroud', 'grovyle', 'imabandwagon', 'jokii', 'katchampion',
-    # 'yovivels', 'dilka30003', 'slumonaire', 'silentwhispers', 'lmao', 'jack', 'thesugarman', 'hoben222', 'quackinator'])
-    #multigraph(['boiwhogotstabbed', 'boiubouttastab', 'boiimbouttastab', 'boishebouttastab'])
-    #print(make_graph("kyouko", update=False, acts=False))
-    update_all_graphs()
+    print(date_graph())

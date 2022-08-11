@@ -1,3 +1,4 @@
+import math
 import os
 import requests
 import json
@@ -154,11 +155,7 @@ def update_database(puuid):
         for line in f:
             lines.append(line)
     
-    if lines[0] == '\n':
-        last_file_update = 0
-    else:
-        last_file_update = int(lines[0])
-    
+    last_file_update = 0 if lines[0] == '\n' else int(lines[0])
     new_list = []
 
     if last_file_update == 0:
@@ -168,10 +165,10 @@ def update_database(puuid):
 
     elif len(str(last_file_update)) == 13:
         if (len(str(date_raw)) == 10):
-            last_file_update = int(str(last_file_update)[:-3])
-            last_num = int(str(last_file_update)[-1])
+            last_file_update = math.floor(last_file_update/1000)
+            last_num = last_file_update // 10**0 % 10
             last_num += 1
-            last_file_update = int(str(last_file_update)[:-1] + str(last_num))
+            last_file_update = math.floor(last_file_update/10) + last_num
 
         for i in range(len(player_data['data'])):
             date_raw = player_data['data'][i]['date_raw']
@@ -234,7 +231,7 @@ def leaderboard(region, length=20):
         for player in playerlist.players:
             mmr = get_file_mmr(player.puuid)
 
-            if type(mmr) == int:
+            if mmr:
                 players.append((player.ign, mmr))
             
         players.sort(key=lambda x:x[1], reverse=True)
@@ -404,4 +401,6 @@ def random_crosshair():
     return (name, code)
 
 if __name__ == '__main__':
-    print(update_database('3919c964-bd90-5c65-81d8-90b3f655f1a8'))
+    playerList = beta_playerclass.PlayerList('playerlistb.csv')
+    playerList.load()
+    print(update_database(playerList.get_puuid_by_ign('oshawott')))
