@@ -3,6 +3,8 @@ import os
 import beta_valorant
 import beta_playerclass
 import math
+import pandas as pd
+import numpy as np
 from adjustText import adjust_text
 
 ranks = {
@@ -39,14 +41,14 @@ def make_graph(puuid="None", ign="", num=0, update=True, acts=False):
         return (False, 'no ign or puuid given')
 
     if puuid == "None" and ign != "":
-        playerList = beta_playerclass.PlayerList('playerlistb.csv')
-        playerList.load()
-        puuid = playerList.get_puuid_by_ign(ign)
+        playerlist = beta_playerclass.PlayerList('playerlistb.csv')
+        playerlist.load()
+        puuid = playerlist.get_puuid_by_ign(ign)
 
     if puuid != "None" and ign == "":
-        playerList = beta_playerclass.PlayerList('playerlistb.csv')
-        playerList.load()
-        ign = playerList.get_ign_by_puuid(puuid)
+        playerlist = beta_playerclass.PlayerList('playerlistb.csv')
+        playerlist.load()
+        ign = playerlist.get_ign_by_puuid(puuid)
 
     if puuid == "None" or ign == "":
         return (False, 'player not in database')
@@ -175,21 +177,18 @@ def make_graph(puuid="None", ign="", num=0, update=True, acts=False):
 
     return (True, True)
 
-def multigraph(players: list, update):
+def multigraph(players: list, update=False):
 
     ymin = 10000
     ymax = 0
-    mostGames = 0
-    yvalues = []
-    xvalues = []
-    fails = []
+    most_games = 0
+    x_values, y_values, fails = [], [], []
 
-    playerList = beta_playerclass.PlayerList('playerlistb.csv')
-    playerList.load()
+    playerlist = beta_playerclass.PlayerList('playerlistb.csv')
+    playerlist.load()
 
     for ign in players:
-
-        puuid = playerList.get_puuid_by_ign(ign)
+        puuid = playerlist.get_puuid_by_ign(ign)
         if puuid == "None":
             fails.append((ign, "Player not in database"))
             continue
@@ -200,7 +199,6 @@ def multigraph(players: list, update):
         
         if update:
             flag = beta_valorant.update_database(puuid)
-
             if not flag[0]:
                 fails.append((ign, flag[1]))
                 continue
@@ -220,8 +218,8 @@ def multigraph(players: list, update):
             y[i] = int(y[i])
             x.append(i + 1)
 
-        xvalues.append(x)
-        yvalues.append(y)
+        x_values.append(x)
+        y_values.append(y)
 
         if (rounddown(min(y)) < ymin):
             ymin = rounddown(min(y))
@@ -229,8 +227,8 @@ def multigraph(players: list, update):
         if (roundup(max(y)) > ymax):
             ymax = roundup(max(y))
 
-        if (len(y) > mostGames) and mostGames != 0:
-            mostGames = len(y)
+        if (len(y) > most_games) and most_games != 0:
+            most_games = len(y)
 
     if len(fails) == len(players):
         return (False, fails)
@@ -267,9 +265,9 @@ def multigraph(players: list, update):
     axes.set_yticklabels(labely)
 
     for i in range(len(players)):
-        p = plt.plot(xvalues[i], yvalues[i], label=players[i])
+        p = plt.plot(x_values[i], y_values[i], label=players[i])
         colour = p[0].get_color()
-        plt.axhline(y=yvalues[i][-1], color=colour, linestyle='--')
+        plt.axhline(y=y_values[i][-1], color=colour, linestyle='--')
 
     plt.xlabel("Games played")
     plt.ylabel("MMR")
@@ -279,11 +277,6 @@ def multigraph(players: list, update):
     plt.close()
 
     return (True, fails)
-
-def get_index(y:list, value:int):
-    for i in range(0, len(y)):
-        if y[i] == value:
-            return i
 
 def mark_graph(texts, x, yint, ydates, i, marked, r):
     if i < 0:
@@ -305,7 +298,7 @@ def date_graph():
             "July" : 7, "August" : 8, "September" : 9, 
             "October" : 10, "November" : 11, "December" : 12}
 
-    y = ["1724,Sunday-July-10-2022-7:42-AM", "1707,Sunday-July-10-2022-8:18-AM", "1700,Sunday-July-10-2022-9:14-AM", "1721,Sunday-July-10-2022-9:52-AM", 
+    data = ["1724,Sunday-July-10-2022-7:42-AM", "1707,Sunday-July-10-2022-8:18-AM", "1700,Sunday-July-10-2022-9:14-AM", "1721,Sunday-July-10-2022-9:52-AM", 
         "1710,Sunday-July-10-2022-12:22-PM", "1723,Sunday-July-10-2022-1:07-PM", "1712,Sunday-July-10-2022-1:55-PM", "1700,Monday-July-11-2022-12:28-PM",
         "1720,Monday-July-11-2022-1:19-PM",  "1736,Monday-July-11-2022-2:08-PM", "1750,Monday-July-11-2022-2:54-PM", "1736,Monday-July-11-2022-4:52-PM", 
         "1755,Tuesday-July-12-2022-9:51-AM", "1741,Tuesday-July-12-2022-2:05-PM", "1755,Tuesday-July-12-2022-2:54-PM","1771,Tuesday-July-12-2022-3:59-PM",
@@ -330,47 +323,41 @@ def date_graph():
         "1905,Thursday-July-28-2022-9:45-AM", "1924,Thursday-July-28-2022-2:33-PM", "1910,Thursday-July-28-2022-4:01-PM", "1900,Friday-July-29-2022-12:06-PM", 
         "1914,Friday-July-29-2022-1:47-PM", "1900,Friday-July-29-2022-2:23-PM", "1919,Saturday-July-30-2022-6:14-AM", "1940,Saturday-July-30-2022-7:03-AM", 
         "1917,Saturday-July-30-2022-7:36-AM", "1900,Saturday-July-30-2022-8:00-AM"]
-    x = list(range(1, len(y) + 1))
-    total = len(y)
-    num = 0
 
-    if num > 1 and (num - 1) < len(y):
-        y = y[-num:]
-    else:
-        num = 0
-        total = 0
+    num_points = len(data)
+    rows_list, years = [], []
 
-    yint = []
-    ydates = []
-    years = []
-    for i in range(len(y)):
-        yint.append(int(y[i].split(',')[0]))
-        ts = y[i].split(',')[1].split('-')
-        ydates.append(f'{ts[2]}/{months[ts[1]]}')
-        
-        added = False
-        for year in years:
-            if ts[3] == year[0]:
-                added = True
-                if x[i] > year[1]:
-                    year[1] = x[i]
-            
-        if not added:
-            years.append([ts[3], i])
+    for i in range(num_points):
+            temp = data[i].split(',')
+            ts = temp[1].split('-')
+            dict1 = {'x' : i + 1, 'MMR' : int(temp[0]), 'dates' : f"{ts[2]}/{months[ts[1]]}"}
+            dict1.update()
+            rows_list.append(dict1)
 
-    ymin = rounddown(min(yint) - 1) + 50
-    ymax = roundup(max(yint) + 1) + 25
+            added = False
+            for year in years:
+                if ts[3] == year[0]:
+                    added = True
+                    if (i + 1) > year[1]:
+                        year[1] = (i + 1)
+                
+            if not added:
+                years.append([ts[3], i])
 
-    axes = plt.gca()
-    axes.set_ylim([ymin,ymax])
-
-    ticks = []
+    df = pd.DataFrame(rows_list)
+    y_labels, y_ticks, x_ticks = [], [], []
+    ymin = rounddown(min(df['MMR']) - 1) + 50
+    ymax = roundup(max(df['MMR']) + 1) + 25
     i = int(math.floor((ymin) / 50.0)) * 50
-
-    ranger = int((ymax-ymin)/100)
+    ranger = int((ymax - ymin)/100)
 
     while i <= int(math.ceil(ymax / 25.0)) * 25:
-        ticks.append(i)
+        y_ticks.append(i)
+        if i % 100 == 0:
+            y_labels.append(ranks[i])
+        else:
+            y_labels.append(str(i))
+
         if ranger == 1:
             i += 20
         elif ranger < 4:
@@ -380,65 +367,58 @@ def date_graph():
         else:
             i += 100
 
-    axes.set_yticks(ticks)
-    labely = []
+    axes = plt.gca()
+    axes.set_ylim([ymin,ymax])
+    axes.set_yticks(y_ticks)
+    axes.set_yticklabels(y_labels)
 
-    for value in ticks:
-        if value % 100 != 0:
-            labely.append(str(value))
-
+    if num_points < 300:
+        i = 0
+        if num_points <= 15:
+            j = 1
+        elif num_points < 30:
+            j = 2
+        elif num_points < 70:
+            j = 5
+        elif num_points < 150:
+            j = 10
         else:
-            labely.append(ranks[value])
+            j = 20
 
-    tickx = []  
-    i = 0
-    j = 0
-
-    if len(x) <= 15:
-        j = 1
-    elif len(x) < 30:
-        j = 2
-    elif len(x) < 70:
-        j = 5
-    elif len(x) < 150:
-        j = 10
-
-    if len(x) < 150:
-        while i <= len(x):
-            tickx.append((total - num) + i)
+        while i <= num_points:
+            x_ticks.append(i)
             i += j
 
-        if x[-1] not in tickx:
-            if (x[-1] - tickx[-1]) < 4:
-                tickx[-1] = x[-1]
+        if (num_points - 1) not in x_ticks:
+            if ((num_points - 1) - x_ticks[-1]) < 5:
+                x_ticks[-1] = (num_points - 1)
             else:
-                tickx.append(x[-1])
+                x_ticks.append((num_points - 1))
 
-        axes.set_xticks(tickx)
+        axes.set_xticks(x_ticks)
 
-    axes.set_yticklabels(labely)
-    p = plt.plot(x, yint, 'b-')
+    p = plt.plot(df['x'], df['MMR'], 'b-')
     
-    r = math.floor(len(yint)/7.0)
-    marked = []
-    topRightTexts = []
-    botRightTexts = []
-    topLeftTexts = []
-    botLeftTexts = []
+    r = math.floor(num_points/7.0)
+    minIndex = df.loc[df['MMR'] == min(df['MMR'])].index[0]
+    maxIndex = df.loc[df['MMR'] == max(df['MMR'])].index[0]
+    mark = [0, -1, minIndex, maxIndex]
+    topRightTexts, botRightTexts, topLeftTexts, botLeftTexts = [], [], [], []
 
-    # get all to be marked first?
+    diffed = np.diff(df['MMR'].to_numpy())
 
+    print(diffed)
+    
     for year in years:
         plt.axvline(year[1], linestyle="dotted", color="k", label=year[0])
 
     adjust_text(topRightTexts, arrowprops=dict(arrowstyle='->'), force_points=(20, 30), force_text=(30, 30))
     adjust_text(botRightTexts, arrowprops=dict(arrowstyle='->'), force_points=(20, -40), force_text=(30, 30))
-
     adjust_text(botLeftTexts, arrowprops=dict(arrowstyle='->'), force_points=(-70, -40), force_text=(30, 30))
     adjust_text(topLeftTexts, arrowprops=dict(arrowstyle='->'), force_points=(-70, 30), force_text=(30, 30))
 
     colour = p[0].get_color()
-    plt.axhline(yint[-1], linestyle="dashed", color=colour, label='Current MMR')
+    plt.axhline(df['MMR'].iloc[num_points - 1], linestyle="dashed", color=colour, label='Current MMR')
     plt.xlabel('Games played')
     plt.ylabel('MMR')
     plt.title('MMR over tifme')
@@ -446,16 +426,12 @@ def date_graph():
     plt.savefig('date-graph.png', bbox_inches="tight")
 
 def update_all_graphs():
-    
-    playerList = beta_playerclass.PlayerList('playerlistb.csv')
-    playerList.load()
+    playerlist = beta_playerclass.PlayerList('playerlistb.csv')
+    playerlist.load()
 
-    for i in range(len(playerList.players)):
-        if playerList.players[i].active == 'False':
-            continue
-
-        print(make_graph(puuid=playerList.players[i].puuid, update=False))
-
+    for i in range(len(playerlist.players)):
+        if playerlist.players[i].active != 'False':
+            print(make_graph(puuid=playerlist.players[i].puuid, update=False))
     return
 
 if __name__ == "__main__":

@@ -77,6 +77,14 @@ def get_data(category, puuid="None", ign="", tag="", region="", crosshair_code="
 
         if 'error' in john.keys() and john['error'] != None:
             return (False, john['error']['message'])
+        
+        if 'errors' in john.keys():
+            errs = ""
+            for error in john['errors']:
+                errs += f'{error}, '
+            
+            if errs != "":
+                return (False, errs[:-2])
 
         if category == 'mmr history':
             if john['name'] == None or john['tag'] == None:
@@ -102,20 +110,18 @@ def get_tag(ign):
 
 def get_file_mmr(puuid):
 
-    file_path = f'mmr_history/{puuid}.txt'
-
-    if os.path.isfile(file_path) == False:
+    if os.path.isfile(f'mmr_history/{puuid}.txt') == False:
         return False
+    
+    with open(f'mmr_history/{puuid}.txt', 'r') as f:
+        for line in f:
+            pass
 
-    f = open(file_path, 'r')
-    lines = f.readlines()
-    f.close()
-
-    if lines[-1] == '\n':
+    if line == '\n':
         return False
 
     #return the latest MMR value in file
-    return int(lines[-1].split(',')[0])
+    return int(line.split(',')[0])
 
 def initialise_file(puuid):
 
@@ -134,24 +140,23 @@ def replace_all(string: str, oldValues, newValue):
 
 def update_database(puuid):
 
-    player_data = get_data('mmr history', puuid=puuid)
-    if not player_data[0]:
-        return player_data
+    data = get_data('mmr history', puuid=puuid)
+    if not data[0]:
+        return data
 
-    player_data = player_data[1]
-    player_file_path = f'mmr_history/{puuid}.txt'
+    data = data[1]['data']
 
-    if os.path.isfile(player_file_path) == False:
-        if len(player_data['data']) == 0:
+    if os.path.isfile(f'mmr_history/{puuid}.txt') == False:
+        if len(data) == 0:
             return (False, 'not enough data')
         else:
             initialise_file(puuid)
     
     # Dates of last update
-    date_raw = player_data["data"][0]["date_raw"]
+    date_raw = data[0]['date_raw']
     lines = []
 
-    with open(player_file_path, 'r') as f:
+    with open(f'mmr_history/{puuid}.txt', 'r') as f:
         for line in f:
             lines.append(line)
     
@@ -159,9 +164,9 @@ def update_database(puuid):
     new_list = []
 
     if last_file_update == 0:
-        for i in range(len(player_data['data'])):
-            thedate = replace_all(player_data['data'][i]['date'], [', ', ' '], '-')
-            new_list.append(f"{player_data['data'][i]['elo']},{thedate}\n")
+        for i in range(len(data)):
+            thedate = replace_all(data[i]['date'], [', ', ' '], '-')
+            new_list.append(f"{data[i]['elo']},{thedate}\n")
 
     elif len(str(last_file_update)) == 13:
         if (len(str(date_raw)) == 10):
@@ -170,28 +175,28 @@ def update_database(puuid):
             last_num += 1
             last_file_update = math.floor(last_file_update/10) + last_num
 
-        for i in range(len(player_data['data'])):
-            date_raw = player_data['data'][i]['date_raw']
+        for i in range(len(data)):
+            date_raw = data[i]['date_raw']
             if last_file_update < date_raw:
-                thedate = replace_all(player_data['data'][i]['date'], [', ', ' '], '-')
-                new_list.append(f"{player_data['data'][i]['elo']},{thedate}\n")
+                thedate = replace_all(data[i]['date'], [', ', ' '], '-')
+                new_list.append(f"{data[i]['elo']},{thedate}\n")
             else:
                 break
     
     else:
-        for i in range(len(player_data['data'])):
-            date_raw = player_data['data'][i]['date_raw']
+        for i in range(len(data)):
+            date_raw = data[i]['date_raw']
             if last_file_update < date_raw:
-                thedate = replace_all(player_data['data'][i]['date'], [', ', ' '], '-')
-                new_list.append(f"{player_data['data'][i]['elo']},{thedate}\n")
+                thedate = replace_all(data[i]['date'], [', ', ' '], '-')
+                new_list.append(f"{data[i]['elo']},{thedate}\n")
             else:
                 break
     
     if new_list != []:
-        lines[0] = str(player_data["data"][0]["date_raw"]) + '\n'
+        lines[0] = f"{data[0]['date_raw']}\n"
         lines += new_list[::-1]
 
-        with open(player_file_path, "w") as f:
+        with open(f'mmr_history/{puuid}.txt', "w") as f:
             f.writelines(lines)
     
     return (True, len(new_list))
@@ -215,7 +220,6 @@ def get_elo_list(puuid):
         
     lines.pop(0)
     elolist = ""
-
     for elem in lines:
         elolist += f"{elem.split(',')[0]}, "
 
@@ -230,7 +234,6 @@ def leaderboard(region, length=20):
 
         for player in playerlist.players:
             mmr = get_file_mmr(player.puuid)
-
             if mmr:
                 players.append((player.ign, mmr))
             
@@ -401,6 +404,6 @@ def random_crosshair():
     return (name, code)
 
 if __name__ == '__main__':
-    playerList = beta_playerclass.PlayerList('playerlistb.csv')
-    playerList.load()
-    print(update_database(playerList.get_puuid_by_ign('oshawott')))
+    playerlist = beta_playerclass.PlayerList('playerlistb.csv')
+    playerlist.load()
+    print(leaderboard('local'))
