@@ -15,7 +15,7 @@ def get_data(category, ign="", tag="", region="", crosshair_code=""):
             102 : "No matches found, can't get puuid", 103 : "Possible name change detected, can't get puuid. Please play one match, wait 1-2 minutes and try it again",
             104 : "Invalid region", 105 : "Invalid filter", 106 : "Invalid gamemode", 107 : "Invalid map", 108 : "Invalid locale",
             109 : "Missing name", 110 : "Missing tag", 111 : "Player not found in leaderboard", 112 : "Invalid raw type",
-            113 : "Invalid match or player id", 114 : "Invalid country code", 115 : "Invalid season", 429 : 'welp', 
+            113 : "Invalid match or player id", 114 : "Invalid country code", 115 : "Invalid season", 408 : "Request timeout", 429 : 'welp', 
             403 : 'Forbidden', 404 : 'User not found', 500 : 'No matches available'}
 
     if region != "":
@@ -418,4 +418,4 @@ def random_crosshair():
     return (name, code)
 
 if __name__ == '__main__':
-    print(servercheck())
+    print(update_database('oshawott'))
