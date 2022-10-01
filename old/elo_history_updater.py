@@ -1,11 +1,11 @@
-import valorant
+import old.old_valorant as old_valorant
 from datetime import datetime
-import playerclass
-import graphs
+import old.old_playerclass as old_playerclass
+import old.old_graphs as oldgraphs
 
 def update_all_elo_history(graph, start=0):
     
-    playerList = playerclass.PlayerList('playerlist.csv')
+    playerList = old_playerclass.PlayerList('playerlist.csv')
     playerList.load()
     playerList.sort()
 
@@ -20,7 +20,7 @@ def update_all_elo_history(graph, start=0):
         if player.active == 'False':
             continue
 
-        thing = valorant.update_database(player.ign, player.tag)
+        thing = old_valorant.update_database(player.ign, player.tag)
 
         if not thing[0]:
             error_count += 1
@@ -33,7 +33,7 @@ def update_all_elo_history(graph, start=0):
                 updatedList.append((player.ign, thing[1]))
                 
             if graph:
-                graphs.make_graph(player.ign, update=False)
+                oldgraphs.make_graph(player.ign, update=False)
         
         print("completed " + str(i + 1) + "/" + total)
 

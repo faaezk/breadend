@@ -1,4 +1,4 @@
-import playerclass
+import old.old_playerclass as old_playerclass
 import json
 import requests
 
@@ -9,7 +9,7 @@ def loadData():
 
     global playerList
     global onlinerz
-    playerList = playerclass.PlayerList("playerlist.csv")
+    playerList = old_playerclass.PlayerList("playerlist.csv")
     playerList.load()
     onlinerz = playerList.getOnlinePlayers()
 
@@ -101,7 +101,7 @@ def main():
     return final
 
 def addPlayer(msg, onliner):
-    playerList = playerclass.PlayerList("playerlist.csv")
+    playerList = old_playerclass.PlayerList("playerlist.csv")
     playerList.load()
     inpot = msg.split(' ')
     user = inpot[0].split('#')
@@ -128,21 +128,21 @@ def addPlayer(msg, onliner):
         return False
     
     if onliner == True:
-        if playerList.inList(playerclass.Player(ignn, tagg)):
-            playerList.remove(playerclass.Player(ignn, tagg))
+        if playerList.inList(old_playerclass.Player(ignn, tagg)):
+            playerList.remove(old_playerclass.Player(ignn, tagg))
         
-        playerList.add(playerclass.Player(ignn, tagg, namee, True))
+        playerList.add(old_playerclass.Player(ignn, tagg, namee, True))
     
     else:
-        if playerList.inList(playerclass.Player(ignn, tagg)):
+        if playerList.inList(old_playerclass.Player(ignn, tagg)):
             return True
         
-        playerList.add(playerclass.Player(ignn, tagg, namee))
+        playerList.add(old_playerclass.Player(ignn, tagg, namee))
         
     playerList.save()
 
 def removePlayer(msg, onliner):
-    playerList = playerclass.PlayerList("playerlist.csv")
+    playerList = old_playerclass.PlayerList("playerlist.csv")
     playerList.load()
     inpot = msg.split(' ')
     user = inpot[0].split('#')
@@ -157,15 +157,15 @@ def removePlayer(msg, onliner):
     else:
         namee = ignn
 
-    if playerList.inList(playerclass.Player(ignn, tagg)) == False:
+    if playerList.inList(old_playerclass.Player(ignn, tagg)) == False:
         return False
 
     if onliner == True:
-        playerList.remove(playerclass.Player(ignn, tagg, namee))
-        playerList.add(playerclass.Player(ignn, tagg, namee))
+        playerList.remove(old_playerclass.Player(ignn, tagg, namee))
+        playerList.add(old_playerclass.Player(ignn, tagg, namee))
 
     else:
-        playerList.remove(playerclass.Player(ignn, tagg, namee))
+        playerList.remove(old_playerclass.Player(ignn, tagg, namee))
     
     playerList.save()
 

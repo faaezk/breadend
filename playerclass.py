@@ -1,17 +1,16 @@
-import os
-
 class Player():
-    def __init__(self, ign, tag, priority = None, active = True):
+    def __init__(self, ign, tag, puuid, priority = 2, active = True):
         self.ign = ign
         self.tag = tag
+        self.puuid = puuid
         self.priority = priority
         self.active = active
     
     def getCsv(self) -> str:
-        return f"{self.ign},{self.tag},{self.priority},{self.active}\n"
+        return f"{self.ign},{self.tag},{self.puuid},{self.priority},{self.active}\n"
 
     def __str__(self) -> str:
-        return f"{self.ign}#{self.tag}"
+        return f"{self.ign}#{self.tag},{self.puuid}"
 
     def __eq__(self, o: object) -> bool:
         return str(self) == str(o)
@@ -19,6 +18,9 @@ class Player():
     def setUser(self, ign, tag):
         self.ign = ign
         self.tag = tag
+    
+    def setPriority(self, priority):
+        self.priority = priority
 
 class PlayerList():
     def __init__(self, filePath):
@@ -37,13 +39,14 @@ class PlayerList():
 
     def load(self):
         with open(self.filePath, 'r') as f:
-            for line in f.readlines():
+            for line in f:
                 playerData = line.split(',')
                 ign = playerData[0]
                 tag = playerData[1]
-                priority = playerData[2]
-                active = playerData[3][:-1]
-                self.players.append(Player(ign, tag, priority, active))
+                puuid = playerData[2]
+                priority = playerData[3]
+                active = playerData[4][:-1]
+                self.players.append(Player(ign, tag, puuid, priority, active))
     
     def sort(self):
         self.players.sort(key=lambda x: x.priority)
@@ -59,8 +62,8 @@ class PlayerList():
         return False
 
     def change_ign(self, old_ign, new_ign, tag):
-        player = None
 
+        player = None
         for elem in self.players:
             if elem.ign == old_ign:
                 player = elem
@@ -69,16 +72,40 @@ class PlayerList():
         if player == None:
             return False
 
-        player.setUser(new_ign, tag)
-
-        if os.path.isfile(f'elo_history/{old_ign}.txt'):
-            os.rename(f'elo_history/{old_ign}.txt', f'elo_history/{new_ign}.txt')
-        
+        player.setUser(new_ign, tag)        
         self.save()
 
         return True
 
+    def change_priority(self, ign, priority):
+
+        player = None
+        for elem in self.players:
+            if elem.ign == ign:
+                player = elem
+                break
+
+        if player == None:
+            return False
+
+        player.setPriority(priority)        
+        self.save()
+
+        return True
+
+    def get_puuid_by_ign(self, ign):
+        for player in self.players:
+            if ign == player.ign:
+                return player.puuid
+        return 'None'
+    
+    def get_ign_by_puuid(self, puuid):
+        for player in self.players:
+            if puuid == player.puuid:
+                return player.ign
+        return ''
+
 if __name__ == '__main__':
-    playerList = PlayerList('playerlist.csv')
+    playerList = PlayerList('playerlistb.csv')
     playerList.load()
     print('yes')
