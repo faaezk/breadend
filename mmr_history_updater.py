@@ -1,11 +1,11 @@
-import beta_valorant
+import valorant
 from datetime import datetime
-import beta_playerclass
-import beta_graphs
+import playerclass
+import graphs
 
 def update_all(graph, printer=True,start=0):
     
-    playerList = beta_playerclass.PlayerList('playerlistb.csv')
+    playerList = playerclass.PlayerList('playerlistb.csv')
     playerList.load()
     playerList.sort()
 
@@ -20,7 +20,7 @@ def update_all(graph, printer=True,start=0):
         if player.active == 'False':
             continue
 
-        thing = beta_valorant.update_database(player.puuid)
+        thing = valorant.update_database(player.puuid)
 
         if not thing[0]:
             error_count += 1
@@ -35,7 +35,7 @@ def update_all(graph, printer=True,start=0):
                 updatedList.append((player.ign, thing[1]))
                 
             if graph:
-                beta_graphs.make_graph(puuid=player.puuid, ign=player.ign, update=False)
+                graphs.make_graph(puuid=player.puuid, ign=player.ign, update=False)
         
         if printer:
             print(f'completed {i+1}/{total}')
