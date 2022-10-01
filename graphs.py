@@ -3,6 +3,9 @@ import os
 import valorant
 import playerclass
 import math
+import pandas as pd
+import numpy as np
+from adjustText import adjust_text
 
 ranks = {
 0 : "Iron 1", 100 : "Iron 2", 200 : "Iron 3",
@@ -12,7 +15,8 @@ ranks = {
 1200 : "Platinum 1", 1300 : "Platinum 2", 1400 : "Platinum 3",
 1500 : "Diamond 1", 1600 : "Diamond 2", 1700 : "Diamond 3",
 1800 : "Ascendant 1", 1900 : "Ascendant 2", 2000 : "Ascendant 3",
-2100 : "Immortal 1", 2200 : "Immortal 2", 2300 : "Immortal 3"
+2100 : "Immortal 1", 2200 : "Immortal 2", 2300 : "Immortal 3",
+2400 : "Radiant"
 }
 
 old_ranks = {
@@ -31,27 +35,36 @@ def roundup(x):
 def rounddown(x):
     return int(math.floor(x / 100.0)) * 100
 
-def make_graph(ign, num=0, update=True, acts=False):
-
-    tag = valorant.get_tag(ign)
+def make_graph(puuid="None", ign="", num=0, update=True, acts=False):
     
-    if not tag:
-        return False
+    if puuid == "None" and ign == "":
+        return (False, 'no ign or puuid given')
+
+    if puuid == "None" and ign != "":
+        playerlist = playerclass.PlayerList('playerlistb.csv')
+        playerlist.load()
+        puuid = playerlist.get_puuid_by_ign(ign)
+
+    if puuid != "None" and ign == "":
+        playerlist = playerclass.PlayerList('playerlistb.csv')
+        playerlist.load()
+        ign = playerlist.get_ign_by_puuid(puuid)
+
+    if puuid == "None" or ign == "":
+        return (False, 'player not in database')
 
     if update:
-        thing = valorant.update_database(ign, tag)
-        if type(thing) == bool and thing == False:
-            return False
-
-    if os.path.isfile(f'elo_history/{ign}.txt') == False:
-        return False
+        thing = valorant.update_database(puuid=puuid)
+        if thing[0] == False:
+            return thing
     
-    file1 = open(f'elo_history/{ign}.txt', 'r')
-    y = [x.split(',')[0] for x in file1.readlines()]
-    file1.close()
+    y = []
+    with open(f'mmr_history/{puuid}.txt', 'r') as f:
+        for line in f:
+            y.append(line.split(',')[0])
 
     if len(y) == 2:
-        return None
+        return (False, 'not enough data')
     y.pop(0)
     
     total = len(y)
@@ -76,7 +89,6 @@ def make_graph(ign, num=0, update=True, acts=False):
     
     ticks = []
     i = int(math.floor(ymin / 50.0)) * 50
-
     ranger = int((ymax-ymin)/100)
 
     while i <= int(math.ceil(ymax / 50.0)) * 50:
@@ -94,7 +106,7 @@ def make_graph(ign, num=0, update=True, acts=False):
     labely = []
 
     for value in ticks:
-        if value % 100 != 0:
+        if value % 100 != 0 and not value in ranks.keys():
             labely.append(str(value))
         else:
             labely.append(ranks[value])
@@ -125,9 +137,6 @@ def make_graph(ign, num=0, update=True, acts=False):
 
         axes.set_xticks(tickx)
     
-    major = axes.get_xmajorticklabels()
-    print(major[-1].get_text())
-
     axes.set_yticklabels(labely)
 
     p = ax.plot(x, y)
@@ -138,9 +147,9 @@ def make_graph(ign, num=0, update=True, acts=False):
     ax.set_title(ign + '\'s MMR over time')
 
     if acts:
-        act_data = valorant.get_data('mmr', ign, tag)
+        act_data = valorant.get_data('mmr', puuid=puuid)
         if not act_data[0]:
-            return False
+            return act_data
         
         act_data = act_data[1]['data']['by_season']
         act_games = []
@@ -163,40 +172,44 @@ def make_graph(ign, num=0, update=True, acts=False):
     else:
         ax.legend(loc='lower right')
     
-    fig.savefig(f'elo_graphs/{ign}.png', bbox_inches="tight")
-    fig.clf()
+    fig.savefig(f'mmr_graphs/{puuid}.png', bbox_inches="tight")
+    plt.close(fig)
 
-    return True
+    return (True, True)
 
-def multigraph(players):
+def multigraph(players: list, update=False):
 
     ymin = 10000
     ymax = 0
-    mostGames = 0
-    yvalues = []
-    xvalues = []
-    fail = [[], []]
+    most_games = 0
+    x_values, y_values, fails = [], [], []
+
+    playerlist = playerclass.PlayerList('playerlistb.csv')
+    playerlist.load()
 
     for ign in players:
-
-        if os.path.isfile(f'elo_history/{ign}.txt') == False:
-            fail[0].append(ign)
-            continue
-        
-
-        tag = valorant.get_tag(ign)
-
-        if not tag:
-            fail[0].append(ign)
+        puuid = playerlist.get_puuid_by_ign(ign)
+        if puuid == "None":
+            fails.append((ign, "Player not in database"))
             continue
 
-        valorant.update_database(ign, tag)
+        if os.path.isfile(f'mmr_history/{puuid}.txt') == False:
+            fails.append((ign, "Player not in database"))
+            continue
         
-        file1 = open(f'elo_history/{ign}.txt', 'r')
+        if update:
+            flag = valorant.update_database(puuid)
+            if not flag[0]:
+                fails.append((ign, flag[1]))
+                continue
 
-        y = [x.split(',')[0] for x in file1.readlines()]
+        y = []
+        with open(f'mmr_history/{puuid}.txt', 'r') as f:
+            for line in f:
+                y.append(line.split(',')[0].strip())
+
         if len(y) == 2:
-            fail[1].append(ign)
+            fails.append(ign, "Not enough data")
             continue
         y.pop(0)
         
@@ -205,8 +218,8 @@ def multigraph(players):
             y[i] = int(y[i])
             x.append(i + 1)
 
-        xvalues.append(x)
-        yvalues.append(y)
+        x_values.append(x)
+        y_values.append(y)
 
         if (rounddown(min(y)) < ymin):
             ymin = rounddown(min(y))
@@ -214,13 +227,14 @@ def multigraph(players):
         if (roundup(max(y)) > ymax):
             ymax = roundup(max(y))
 
-        if (len(y) > mostGames) and mostGames != 0:
-            mostGames = len(y)
+        if (len(y) > most_games) and most_games != 0:
+            most_games = len(y)
 
-        file1.close()
-
-    if len(fail[0]) + len(fail[1]) > 0:
-        return fail
+    if len(fails) == len(players):
+        return (False, fails)
+    
+    for failure in fails:
+        players.remove(failure[0])
 
     axes = plt.gca()
     axes.set_ylim([ymin,ymax])
@@ -245,46 +259,180 @@ def multigraph(players):
     for value in ticks:
         if value % 100 != 0:
             labely.append(str(value))
-
         else:
             labely.append(ranks[value])
 
     axes.set_yticklabels(labely)
 
-    for i in range(0, len(players)):
-        p = plt.plot(xvalues[i], yvalues[i], label=players[i])
+    for i in range(len(players)):
+        p = plt.plot(x_values[i], y_values[i], label=players[i])
         colour = p[0].get_color()
-        plt.axhline(y=yvalues[i][-1], color=colour, linestyle='--')
+        plt.axhline(y=y_values[i][-1], color=colour, linestyle='--')
 
     plt.xlabel("Games played")
     plt.ylabel("MMR")
     plt.title("change in MMR over time")
     plt.legend()
+    plt.savefig(f'mmr_graphs/multigraph.png', bbox_inches="tight")
+    plt.close()
 
-    plt.savefig(f'elo_graphs/multigraph.png', bbox_inches="tight")
+    return (True, fails)
 
-    file1.close()
-    plt.clf()
+def mark_graph(texts, x, yint, ydates, i, marked, r):
+    if i < 0:
+        i = len(yint) + i
 
-    return fail
+    if i not in marked:
+        texts.append(plt.text(s=ydates[i], x=x[i], y=yint[i], bbox=dict(boxstyle="round, pad=0.2", fc="cyan"), size=8.0))
+        for j in range(i - r, i + r):
+            if j >= 0 and j not in marked:
+                if j == len(yint):
+                    break
+                marked.append(j)
+    return marked, texts
+
+def date_graph():
+
+    months = {"January" : 1, "February" : 2, "March" : 3, 
+            "April" : 4, "May" : 5, "June" : 6,
+            "July" : 7, "August" : 8, "September" : 9, 
+            "October" : 10, "November" : 11, "December" : 12}
+
+    data = ["1724,Sunday-July-10-2022-7:42-AM", "1707,Sunday-July-10-2022-8:18-AM", "1700,Sunday-July-10-2022-9:14-AM", "1721,Sunday-July-10-2022-9:52-AM", 
+        "1710,Sunday-July-10-2022-12:22-PM", "1723,Sunday-July-10-2022-1:07-PM", "1712,Sunday-July-10-2022-1:55-PM", "1700,Monday-July-11-2022-12:28-PM",
+        "1720,Monday-July-11-2022-1:19-PM",  "1736,Monday-July-11-2022-2:08-PM", "1750,Monday-July-11-2022-2:54-PM", "1736,Monday-July-11-2022-4:52-PM", 
+        "1755,Tuesday-July-12-2022-9:51-AM", "1741,Tuesday-July-12-2022-2:05-PM", "1755,Tuesday-July-12-2022-2:54-PM","1771,Tuesday-July-12-2022-3:59-PM",
+        "1768,Tuesday-July-12-2022-4:44-PM", "1755,Tuesday-July-12-2022-4:48-PM", "1772,Wednesday-July-13-2022-7:41-AM", "1757,Wednesday-July-13-2022-8:28-AM", 
+        "1774,Wednesday-July-13-2022-9:20-AM", "1796,Wednesday-July-13-2022-12:08-PM" ,"1816,Wednesday-July-13-2022-12:41-PM", "1801,Wednesday-July-13-2022-1:18-PM", 
+        "1800,Wednesday-July-13-2022-4:35-PM", "1785,Thursday-July-14-2022-12:11-PM", "1810,Thursday-July-14-2022-12:58-PM", "1824,Thursday-July-14-2022-3:17-PM", 
+        "1840,Thursday-July-14-2022-4:00-PM", "1861,Friday-July-15-2022-5:33-AM", "1843,Friday-July-15-2022-6:06-AM", "1862,Friday-July-15-2022-6:40-AM", 
+        "1880,Friday-July-15-2022-10:00-AM", "1864,Friday-July-15-2022-12:08-PM", "1848,Friday-July-15-2022-12:50-PM", "1868,Saturday-July-16-2022-1:58-PM", 
+        "1852,Saturday-July-16-2022-2:39-PM", "1840,Saturday-July-16-2022-3:38-PM", "1827,Saturday-July-16-2022-4:27-PM", 
+        "1847,Sunday-July-17-2022-6:52-AM",  "1865,Sunday-July-17-2022-12:17-PM", "1847,Sunday-July-17-2022-1:14-PM", "1831,Sunday-July-17-2022-1:50-PM", 
+        "1846,Sunday-July-17-2022-3:28-PM", "1832,Sunday-July-17-2022-4:07-PM", "1852,Monday-July-18-2022-1:05-PM", "1834,Tuesday-July-19-2022-4:53-AM", 
+        "1854,Tuesday-July-19-2022-5:39-AM", "1837,Tuesday-July-19-2022-12:14-PM", "1823,Tuesday-July-19-2022-1:08-PM", "1808,Tuesday-July-19-2022-3:50-PM", 
+        "1825,Tuesday-July-19-2022-4:23-PM", "1846,Wednesday-July-20-2022-6:14-AM", "1831,Wednesday-July-20-2022-6:52-AM", "1814,Wednesday-July-20-2022-7:38-AM", 
+        "1800,Wednesday-July-20-2022-8:19-AM", "1819,Wednesday-July-20-2022-11:52-AM", "1802,Wednesday-July-20-2022-12:45-PM", "1822,Thursday-July-21-2022-2:17-PM",
+        "1835,Thursday-July-21-2022-3:10-PM", "1817,Friday-July-22-2022-3:40-AM", "1838,Friday-July-22-2022-4:10-AM", "1822,Friday-July-22-2022-1:51-PM", 
+        "1839,Friday-July-22-2022-2:25-PM", "1852,Friday-July-22-2022-2:53-PM", "1874,Saturday-July-23-2022-4:45-AM", "1892,Saturday-July-23-2022-5:40-AM", 
+        "1875,Saturday-July-23-2022-6:39-AM", "1861,Saturday-July-23-2022-12:58-PM", "1881,Saturday-July-23-2022-1:54-PM", "1863,Saturday-July-23-2022-2:35-PM",
+        "1850,Saturday-July-23-2022-3:48-PM", "1864,Saturday-July-23-2022-4:28-PM", "1886,Sunday-July-24-2022-5:39-AM", "1910,Sunday-July-24-2022-6:11-AM", 
+        "1900,Sunday-July-24-2022-7:10-AM", "1884,Monday-July-25-2022-2:10-PM", "1910,Monday-July-25-2022-2:48-PM", "1900,Monday-July-25-2022-3:26-PM", 
+        "1882,Monday-July-25-2022-4:02-PM", "1899,Tuesday-July-26-2022-12:28-PM", "1921,Tuesday-July-26-2022-1:50-PM", "1902,Tuesday-July-26-2022-2:24-PM", 
+        "1914,Wednesday-July-27-2022-1:43-PM", "1928,Wednesday-July-27-2022-2:27-PM", "1910,Thursday-July-28-2022-4:40-AM", "1926,Thursday-July-28-2022-5:39-AM", 
+        "1905,Thursday-July-28-2022-9:45-AM", "1924,Thursday-July-28-2022-2:33-PM", "1910,Thursday-July-28-2022-4:01-PM", "1900,Friday-July-29-2022-12:06-PM", 
+        "1914,Friday-July-29-2022-1:47-PM", "1900,Friday-July-29-2022-2:23-PM", "1919,Saturday-July-30-2022-6:14-AM", "1940,Saturday-July-30-2022-7:03-AM", 
+        "1917,Saturday-July-30-2022-7:36-AM", "1900,Saturday-July-30-2022-8:00-AM"]
+
+    num_points = len(data)
+    rows_list, years = [], []
+
+    for i in range(num_points):
+            temp = data[i].split(',')
+            ts = temp[1].split('-')
+            dict1 = {'x' : i + 1, 'MMR' : int(temp[0]), 'dates' : f"{ts[2]}/{months[ts[1]]}"}
+            dict1.update()
+            rows_list.append(dict1)
+
+            added = False
+            for year in years:
+                if ts[3] == year[0]:
+                    added = True
+                    if (i + 1) > year[1]:
+                        year[1] = (i + 1)
+                
+            if not added:
+                years.append([ts[3], i])
+
+    df = pd.DataFrame(rows_list)
+    y_labels, y_ticks, x_ticks = [], [], []
+    ymin = rounddown(min(df['MMR']) - 1) + 50
+    ymax = roundup(max(df['MMR']) + 1) + 25
+    i = int(math.floor((ymin) / 50.0)) * 50
+    ranger = int((ymax - ymin)/100)
+
+    while i <= int(math.ceil(ymax / 25.0)) * 25:
+        y_ticks.append(i)
+        if i % 100 == 0:
+            y_labels.append(ranks[i])
+        else:
+            y_labels.append(str(i))
+
+        if ranger == 1:
+            i += 20
+        elif ranger < 4:
+            i += 25
+        elif ranger < 8:
+            i += 50
+        else:
+            i += 100
+
+    axes = plt.gca()
+    axes.set_ylim([ymin,ymax])
+    axes.set_yticks(y_ticks)
+    axes.set_yticklabels(y_labels)
+
+    if num_points < 300:
+        i = 0
+        if num_points <= 15:
+            j = 1
+        elif num_points < 30:
+            j = 2
+        elif num_points < 70:
+            j = 5
+        elif num_points < 150:
+            j = 10
+        else:
+            j = 20
+
+        while i <= num_points:
+            x_ticks.append(i)
+            i += j
+
+        if (num_points - 1) not in x_ticks:
+            if ((num_points - 1) - x_ticks[-1]) < 5:
+                x_ticks[-1] = (num_points - 1)
+            else:
+                x_ticks.append((num_points - 1))
+
+        axes.set_xticks(x_ticks)
+
+    p = plt.plot(df['x'], df['MMR'], 'b-')
+    
+    r = math.floor(num_points/7.0)
+    minIndex = df.loc[df['MMR'] == min(df['MMR'])].index[0]
+    maxIndex = df.loc[df['MMR'] == max(df['MMR'])].index[0]
+    mark = [0, -1, minIndex, maxIndex]
+    topRightTexts, botRightTexts, topLeftTexts, botLeftTexts = [], [], [], []
+
+    diffed = np.diff(df['MMR'].to_numpy())
+
+    print(diffed)
+    
+    for year in years:
+        plt.axvline(year[1], linestyle="dotted", color="k", label=year[0])
+
+    adjust_text(topRightTexts, arrowprops=dict(arrowstyle='->'), force_points=(20, 30), force_text=(30, 30))
+    adjust_text(botRightTexts, arrowprops=dict(arrowstyle='->'), force_points=(20, -40), force_text=(30, 30))
+    adjust_text(botLeftTexts, arrowprops=dict(arrowstyle='->'), force_points=(-70, -40), force_text=(30, 30))
+    adjust_text(topLeftTexts, arrowprops=dict(arrowstyle='->'), force_points=(-70, 30), force_text=(30, 30))
+
+    colour = p[0].get_color()
+    plt.axhline(df['MMR'].iloc[num_points - 1], linestyle="dashed", color=colour, label='Current MMR')
+    plt.xlabel('Games played')
+    plt.ylabel('MMR')
+    plt.title('MMR over tifme')
+    plt.legend(loc='upper left')
+    plt.savefig('date-graph.png', bbox_inches="tight")
 
 def update_all_graphs():
-    
-    playerList = playerclass.PlayerList('playerlist.csv')
-    playerList.load()
+    playerlist = playerclass.PlayerList('playerlistb.csv')
+    playerlist.load()
 
-    for i in range(0, len(playerList.players)):
-
-        if playerList.players[i].active == 'False':
-            continue
-
-        print(make_graph(playerList.players[i].ign))
-
+    for i in range(len(playerlist.players)):
+        if playerlist.players[i].active != 'False':
+            print(make_graph(puuid=playerlist.players[i].puuid, update=False))
     return
 
 if __name__ == "__main__":
-    #multigraph(['8888','azatory','bento2','crossaxis','fade','fakinator', 'giroud', 'grovyle', 'imabandwagon', 'jokii', 'katchampion',
-    # 'yovivels', 'dilka30003', 'slumonaire', 'silentwhispers', 'lmao', 'jack', 'thesugarman', 'hoben222', 'quackinator'])
-    #multigraph(['boiwhogotstabbed', 'boiubouttastab', 'boiimbouttastab', 'boishebouttastab'])
-    print(make_graph("kyouko", update=False, acts=False))
-    #update_all_graphs()
+    print(date_graph())

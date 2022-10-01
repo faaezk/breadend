@@ -3,7 +3,7 @@ from discord.ext import commands
 import configparser
 import graphs
 import valorant
-import elo_history_updater
+import mmr_history_updater
 import requests
 import json
 import malsearch
@@ -11,7 +11,6 @@ from discord_slash import SlashCommand
 from discord_slash.utils.manage_commands import create_option, create_choice
 import random
 import playerclass
-import datetime
 
 def get_config():
     c = configparser.ConfigParser()
@@ -75,124 +74,109 @@ async def choice(ctx, randomise="", tactic=""):
 
 @client.command()
 async def cat(ctx):
-    url = "https://api.thecatapi.com/v1/images/search?format=json"
 
+    url = "https://api.thecatapi.com/v1/images/search?format=json"
     payload={}
     files={}
-    headers = {
-    'Content-Type': 'application/json',
-    'x-api-key': get_config()[1]
-    }
+    headers = {'Content-Type': 'application/json', 'x-api-key': get_config()[1]}
 
     response = requests.request("GET", url, headers=headers, data=payload, files=files)
-
     embed = discord.Embed(title="cat")
     embed.set_image(url=json.loads(response.text)[0]['url'])
-
     await ctx.send(embed=embed)
 
 @slash.slash(description="MMR history list",
              guild_ids=guild_ids,
-             options = [
-             create_option(name="username", description="enter username (ign#tag)", option_type=3, required=True)])
+             options = [create_option(name="username", description="enter username", option_type=3, required=True)])
 async def elolist(ctx, username=""):
     
-    username = username.split('#')[0].lower()
-    elolist = valorant.get_elo_list(username)
-    await ctx.send("```\n" + elolist + "\n```")
+    ign = username.split('#')[0].lower()
+    playerList = playerclass.PlayerList('playerlistb.csv')
+    playerList.load()
+    puuid = playerList.get_puuid_by_ign(ign)
+    elolist = valorant.get_elo_list(puuid)
+
+    if elolist:
+        await ctx.send("```\n" + elolist[1] + "\n```")
+    else:
+        await ctx.send(elolist[1])
 
 @slash.slash(description="Ranked statistics for all acts",
              guild_ids=guild_ids,
-             options = [
-             create_option(name="username", description="enter username (ign#tag)", option_type=3, required=True)])
+             options = [create_option(name="username", description="enter username (ign#tag)", option_type=3, required=True)])
 async def stats(ctx, username=""):
 
     the_message = await ctx.send("fetching stats...")
     username = username.split('#')
-
     ign = username[0].lower()
+    tag = ""
+    puuid = "None"
 
     if len(username) == 2:
         tag = username[1].lower()
+        puuid = "None"
     else:
-        tag = ""
+        playerList = playerclass.PlayerList('playerlistb.csv')
+        playerList.load()
+        puuid = playerList.get_puuid_by_ign(ign)
 
-    fields = valorant.stats(ign, tag)
+    data = valorant.stats(ign=ign, tag=tag, puuid=puuid)
 
-    if type(fields) == str:
-        await the_message.edit(content=fields)
+    if not data[0]:
+        await the_message.edit(content=data[1])
     
     else:
-        data = fields[0]
-        card = fields[1]
+        stats = data[1][0]
+        card = data[1][1]
         embed=discord.Embed(title = "Competitive Statistics", description="", color=0x00f900)
         embed.set_author(name=ign, url = "https://youtu.be/MtN1YnoL46Q", icon_url=card)
 
-        for field in data:
-            embed.add_field(name = field[0], value = field[1], inline = True)
+        for field in stats:
+            embed.add_field(name=field[0], value=field[1], inline=True)
 
-        await the_message.edit(contents = "", embed = embed)
+        await the_message.edit(contents = "", embed=embed)
 
 @slash.slash(description="graph",
              guild_ids=guild_ids,
              options = [
              create_option(name="usernames", description="Enter username(s), seperate with commas for more than one", option_type=3, required=True),
-             create_option(name="update", description="Force update to latest MMR", option_type=3, required=True, 
-             choices=[create_choice(name="Yes",value="yes"), create_choice(name="No",value="no")]),
              create_option(name="type", description="Select type of graph", option_type=3, required=False, 
-             choices=[create_choice(name="Basic",value="basic"), create_choice(name="With Acts",value="acts")])])
+             choices=[create_choice(name="Basic",value="basic"), create_choice(name="With Acts",value="acts")]),
+             create_option(name="update", description="Force update to latest MMR", option_type=3, required=False, 
+             choices=[create_choice(name="No",value="no"), create_choice(name="Yes",value="yes")])])
 async def graph(ctx, usernames="", type="", update=""):
-    users = usernames.split(',')
     
-    for i in range(0, len(users)):
+    users = usernames.split(',')
+    for i in range(len(users)):
         users[i] = users[i].split('#')[0].lower().strip()
+
+    updates = True if update == 'yes' else False
+    acts = True if type == 'acts' else False
 
     if len(users) == 1:
         the_message = await ctx.send("please wait...")
         msg = ""
 
-        acts = False
-        updates = False
-        if update == 'yes':
-            updates = True
-        if type == 'acts':
-            acts = True
-
-        flag = graphs.make_graph(users[0], update=updates, acts=acts)
-        if flag == False:
-            await the_message.edit(content="Player not found or api being stupid, or it might even be aws :(")
-
-        elif flag == None:
-            await the_message.edit(content="Not enough data to plot graph")
-
+        flag = graphs.make_graph(ign=users[0], update=updates, acts=acts)
+        if not flag[0]:
+            await the_message.edit(content=flag[1])
         else:
             with open(f"elo_graphs/{users[0]}.png", 'rb') as f:
                 picture = discord.File(f)
                 await the_message.edit(content= "", file=picture)
-
     else:
         the_message = await ctx.send("please wait...")
-        flag = graphs.multigraph(users)
+        flag = graphs.multigraph(users, updates)
         msg = ""
-        if len(flag[0]) > 0:
-            msg = "Players not found: "
-            for elem in flag[0]:
-                msg += elem + ", "
-            msg = msg[:-2]
-
-        if len(flag[1]) > 0:
-            msg += '\n Players with not enough data to plot graph: '
-            for elem in flag[1]:
-                msg += elem + ", "
-            msg = msg[:-2]
-
-        if msg == "":
+        for fail in flag[1]:
+            msg += f'{fail[0]} - {fail[1]}\n'
+        if not flag[0]:
+            await the_message.edit(content=msg)
+        else:
             with open("elo_graphs/multigraph.png", 'rb') as f:
                 picture = discord.File(f)
-                await the_message.edit(content="", file=picture)
-        
-        else:
-            await the_message.edit(content=msg)
+            
+            await the_message.edit(content=msg, file=picture)
 
 @slash.slash(description="Valorant Leaderboards",
              guild_ids=guild_ids,
@@ -204,91 +188,93 @@ async def graph(ctx, usernames="", type="", update=""):
                         create_choice(name="North America",value="na")
                         ])])
 async def leaderboard(ctx, options=""):
-    
-    if options == "":
-
-        the_message = await ctx.send("fetching leaderboard...")
-
-        log_file = open("updater_log-2022.out",'r')
-        lines = log_file.readlines()
-        log_file.close()
-
-        leaderboard = "Last updated at " + lines[-1].split(' ')[4] + ', ' + lines[-1].split(' ')[2] + '\n'
-        valorant.local_leaderboard()
-        f = open("leaderboard.txt", 'r')
-        for x in f:
-            leaderboard += x
-        f.close()
-
-        await the_message.edit(content="```\n" + leaderboard + "\n```")
-    
-    if options == "update":
-        the_message = await ctx.send("this is gonna take a while...")
-        elo_history_updater.update_all_elo_history()
-        valorant.local_leaderboard()
-        leaderboard = ""
-        f = open("leaderboard.txt", "r")
-        for x in f:
-            leaderboard += x
-        f.close()
-        
-        await the_message.edit(content="```\n" + leaderboard + "\n```")
 
     if options == "ap" or options == "eu" or options == "kr" or options == "na":
-        
         the_message = await ctx.send("fetching leaderboard...")
-        rleaderboard = valorant.region_leaderboard(options)
+        rleaderboard = valorant.leaderboard(options)
 
         if rleaderboard:
             await the_message.edit(content="```\n" + rleaderboard + "\n```")
+    else:
+        if options == "":
+            the_message = await ctx.send("fetching leaderboard...")
+            with open("updater_log-2022.out",'r') as f:
+                for lastLine in f:
+                    pass
+
+            leaderboard = f"Last updated at {lastLine.split(' ')[4]}, {lastLine.split(' ')[2]}\n"
+        
+        if options == "update":
+            the_message = await ctx.send("this is gonna take a while...")
+            mmr_history_updater.update_all(False, printer=False)
+            leaderboard = ""
+            
+        valorant.leaderboard('local')
+        with open("leaderboard.txt", 'r') as f:
+            for player in f:
+                leaderboard += player
+
+        await the_message.edit(content="```\n" + leaderboard + "\n```")
 
 @slash.slash(description="Add player to database for leaderboard and stuff",
              guild_ids=guild_ids,
              options = [
-             create_option(name="username", description="enter username (ign#tag)", option_type=3, required=True)])
-async def add(ctx, username=""):
-
-    username = username.split('#')
-
-    if len(username) == 2:
-        the_message = await ctx.send("please wait...")
-        msg = valorant.add_player(username[0].lower(), username[1].lower())
-        await the_message.edit(content=msg)
-
-    else:
-        await ctx.send("Player not found, check syntax: (ign#tag)")
+             create_option(name="ign", description="enter in game name", option_type=3, required=True), 
+             create_option(name="tag", description="enter tag", option_type=3, required=True)])
+async def add(ctx, ign="", tag=""):
+    the_message = await ctx.send("please wait...")
+    msg = valorant.add_player(ign.lower(), tag.lower())
+    await the_message.edit(content=msg)
 
 @slash.slash(description="Remove player from list",
              guild_ids=guild_ids,
-             options = [
-             create_option(name="username", description="enter username (ign#tag)", option_type=3, required=True)])
+             options = [create_option(name="username", description="enter username", option_type=3, required=True)])
 async def remove(ctx, username=""):
 
     if ctx.author.id == 410771947522359296:
         username = username.split('#')
-
         ign = username[0].lower()
-        tag = valorant.get_tag(ign)
-
-        if tag:
-            msg = valorant.remove_player(ign, tag)
-            await ctx.send(msg)
-        else:
-            await ctx.send("Player not found, check syntax: (ign#tag)")
-            
+        msg = valorant.remove_player(ign)
+        await ctx.send(msg)
     else:
         await ctx.send("no.")
 
-@client.command()
-async def gettag(ctx, *, user):
-    user = user.lower()
-    if not valorant.get_tag(user):
-        await ctx.send("Player not in database. add using /add")
+@slash.slash(description="Update priority in database",
+             guild_ids=guild_ids,
+             options = [create_option(name="username", description="enter username", option_type=3, required=True),
+             create_option(name="priority", description="Select type of graph", option_type=3, required=True, 
+             choices=[create_choice(name="1",value="1"), create_choice(name="2",value="2"), create_choice(name="3",value="3")])])
+async def updatePriority(ctx, username="", priority=""):
+
+    if ctx.author.id == 410771947522359296:
+        username = username.split('#')
+        ign = username[0].lower()
+        playerList = playerclass.PlayerList('playerlistb.csv')
+        playerList.load()
+
+        found = playerList.change_priority(ign, int(priority))
+
+        if found:
+            await ctx.send(f"{ign}'s priority has been updated to {priority}")
+        else:
+            await ctx.send(f"{ign} not found in database")
     else:
-        await ctx.send(f'{user}#{valorant.get_tag(user)}')
+        await ctx.send("no.")
+
 
 @client.command()
-async def banner(ctx, *, username):
+async def gettag(ctx, *, user):
+    ign = user.lower()
+    tag = valorant.get_tag(ign)
+    if not valorant.get_tag(ign):
+        await ctx.send("Player not in database")
+    else:
+        await ctx.send(f'{user}#{tag}')
+
+@slash.slash(description="Get players banner",
+             guild_ids=guild_ids,
+             options = [create_option(name="username", description="enter username (ign#tag)", option_type=3, required=True)])
+async def banner(ctx, username=""):
 
     username = username.split('#')
     ign = username[0].lower()
@@ -296,62 +282,52 @@ async def banner(ctx, *, username):
     if len(username) == 2:
         tag = username[1].lower()
     else:
-        tag = valorant.get_tag(ign)
+        playerList = playerclass.PlayerList('playerlistb.csv')
+        playerList.load()
+        puuid = playerList.get_puuid_by_ign(ign)
 
-    if not tag:
-        await ctx.send("Player not found, check syntax: (ign#tag)")
-    
+    data = valorant.get_banner(ign=ign, tag=tag, puuid=puuid)
+
+    if not data[0]:
+        await ctx.send(data[1])    
     else:
-        msg = valorant.get_banner(ign, tag)
-
-        if type(msg) == str:
-            await ctx.send(msg)
-        
-        else:
-            await ctx.send(file=discord.File('banner.png'))
+        await ctx.send(file=discord.File('banner.png'))
 
 @slash.slash(description="Update database with your new in-game name",
              guild_ids=guild_ids,
              options = [
-             create_option(name="old_username", description="enter your old username", option_type=3, required=True),
-             create_option(name="new_username", description="enter your new username (user#tag)", option_type=3, required=True)])
-async def namechange(ctx, old_username="", new_username=""):
+             create_option(name="old_ign", description="enter your old ign", option_type=3, required=True),
+             create_option(name="old_tag", description="enter your old tag", option_type=3, required=True),
+             create_option(name="new_ign", description="enter your new ign", option_type=3, required=True),
+             create_option(name="new_tag", description="enter your new tag", option_type=3, required=True)])
+async def namechange(ctx, old_ign="", old_tag="", new_ign="", new_tag=""):
 
     if ctx.author.id == 410771947522359296:
+        the_message = await ctx.send("please wait...")
 
-        old_username = old_username.split('#')
-        new_username = new_username.split('#')
+        playerList = playerclass.PlayerList('playerlistb.csv')
+        playerList.load()
+        puuid = playerList.get_puuid_by_ign(old_ign)
 
-        if len(new_username) != 2:
-            await ctx.send("check syntax: (ign#tag)")
-        
+        if puuid == "None":
+            await the_message.edit(content = f'{old_ign}#{old_tag} not found in database')
         else:
-            the_message = await ctx.send("please wait...")
-            old_ign = old_username[0].lower()
-            old_tag = old_username[1].lower()
-            new_ign = new_username[0].lower()
-            new_tag = new_username[1].lower()
-
-            if valorant.account_check(new_ign, new_tag):
-                playerList = playerclass.PlayerList('playerlist.csv')
-                playerList.load()
-                if playerList.change_ign(old_ign, new_ign, new_tag):
-                    playerList.save()
-                    await the_message.edit(content = f'{old_ign}#{old_tag} is now {new_ign}#{new_tag}')
-                
-                else:
-                    await the_message.edit(content = f'{old_ign}#{old_tag} not found in database, check player list using `$getcsv`')
-            
-            else:
+            check = valorant.get_data('account', ign=new_ign, tag=new_tag)
+            if not check[0]:
                 await the_message.edit(content = f'{new_ign}#{new_tag} does not exist.')
             
+            else:
+                if playerList.change_ign(old_ign, new_ign, new_tag):
+                    await the_message.edit(content = f'{old_ign}#{old_tag} is now {new_ign}#{new_tag}')
+                else:
+                    await the_message.edit(content = "something went wrong")            
     else:
-        await ctx.send("ask faaez to do it.")
+        await ctx.send("no.")
 
 @client.command()
 async def getcsv(ctx):
 
-    playerList = playerclass.PlayerList('playerlist.csv')
+    playerList = playerclass.PlayerList('playerlistb.csv')
     playerList.load()
     msg = ""
 
@@ -381,14 +357,12 @@ async def lineup(ctx, agent="", map=""):
 async def crosshair(ctx):
 
     name, code = valorant.random_crosshair()
-
-    if type(name) == str:
+    if name:
         file=discord.File(fp="crosshair.png", filename='crosshair.png')
         embed = discord.Embed(title=name)
         embed.add_field(name="Code:", value=code)
         embed.set_image(url="attachment://crosshair.png")
         await ctx.send(content="", file=file, embed=embed)
-
     else:
         await ctx.send("the thingo failed.")
 
@@ -550,34 +524,8 @@ async def chairmen(ctx):
 
     await msg.edit(content="", embed=embed)
     
-
 @client.event
 async def on_message(message):
-
-    if "ffsdkjlht98hu" in message.content:
-
-        for guild in client.guilds:
-            if guild.id == 509314650265878530:
-                theguild = guild
-
-        atime = datetime.datetime(2022, 1, 1)
-        count = {'Deleted User': 0}
-        for member in theguild.members:
-            count[member.display_name] = 0
-            
-        for channel in theguild.channels:
-            if channel.category == None or channel.type.name == 'voice' or channel.category_id == 759599317765193809:
-                continue
-            
-            messages = await channel.history(limit=5000,after=atime).flatten()
-            print('completed one')
-            for message in messages:
-                if message.author.display_name in count.keys():
-                    count[message.author.display_name] += 1
-                else:
-                    count[message.author.display_name] = 0
-
-        print(count)
                     
     if message.author == client.user:
         return
@@ -589,13 +537,12 @@ async def on_message(message):
         await message.add_reaction("<:stevens:785800069957943306>")
 
     if message.content.lower().startswith('$lastupdate'):
-        f = open("updater_log-2022.out", "r")
-        last = f.readlines()[-1]
-        f.close()
+        with open("updater_log-2022.out",'r') as f:
+            for lastLine in f:
+                pass
 
-        await message.channel.send(last)
+        await message.channel.send(lastLine)
 
     await client.process_commands(message)
-
 
 client.run(token)
