@@ -91,7 +91,7 @@ async def cat(ctx):
 async def elolist(ctx, username=""):
     
     ign = username.split('#')[0].lower()
-    playerList = playerclass.PlayerList('playerlistb.csv')
+    playerList = playerclass.PlayerList('playerlist.csv')
     playerList.load()
     puuid = playerList.get_puuid_by_ign(ign)
     elolist = valorant.get_elo_list(puuid)
@@ -116,7 +116,7 @@ async def stats(ctx, username=""):
         tag = username[1].lower()
         puuid = "None"
     else:
-        playerList = playerclass.PlayerList('playerlistb.csv')
+        playerList = playerclass.PlayerList('playerlist.csv')
         playerList.load()
         puuid = playerList.get_puuid_by_ign(ign)
 
@@ -249,7 +249,7 @@ async def updatePriority(ctx, username="", priority=""):
     if ctx.author.id == 410771947522359296:
         username = username.split('#')
         ign = username[0].lower()
-        playerList = playerclass.PlayerList('playerlistb.csv')
+        playerList = playerclass.PlayerList('playerlist.csv')
         playerList.load()
 
         found = playerList.change_priority(ign, int(priority))
@@ -282,7 +282,7 @@ async def banner(ctx, username=""):
     if len(username) == 2:
         tag = username[1].lower()
     else:
-        playerList = playerclass.PlayerList('playerlistb.csv')
+        playerList = playerclass.PlayerList('playerlist.csv')
         playerList.load()
         puuid = playerList.get_puuid_by_ign(ign)
 
@@ -305,7 +305,7 @@ async def namechange(ctx, old_ign="", old_tag="", new_ign="", new_tag=""):
     if ctx.author.id == 410771947522359296:
         the_message = await ctx.send("please wait...")
 
-        playerList = playerclass.PlayerList('playerlistb.csv')
+        playerList = playerclass.PlayerList('playerlist.csv')
         playerList.load()
         puuid = playerList.get_puuid_by_ign(old_ign)
 
@@ -327,7 +327,7 @@ async def namechange(ctx, old_ign="", old_tag="", new_ign="", new_tag=""):
 @client.command()
 async def getcsv(ctx):
 
-    playerList = playerclass.PlayerList('playerlistb.csv')
+    playerList = playerclass.PlayerList('playerlist.csv')
     playerList.load()
     msg = ""
 

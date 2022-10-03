@@ -106,6 +106,6 @@ class PlayerList():
         return ''
 
 if __name__ == '__main__':
-    playerList = PlayerList('playerlistb.csv')
+    playerList = PlayerList('playerlist.csv')
     playerList.load()
     print('yes')

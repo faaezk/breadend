@@ -99,7 +99,7 @@ def get_data(category, puuid="None", ign="", tag="", region="", crosshair_code="
     return (False, 'some error')
 
 def get_tag(ign):
-    playerlist = playerclass.PlayerList("playerlistb.csv")
+    playerlist = playerclass.PlayerList("playerlist.csv")
     playerlist.load()
 
     for player in playerlist.players:
@@ -228,7 +228,7 @@ def get_elo_list(puuid):
 def leaderboard(region, length=20):
 
     if region == 'local':
-        playerlist = playerclass.PlayerList('playerlistb.csv')
+        playerlist = playerclass.PlayerList('playerlist.csv')
         playerlist.load()
         players = []
 
@@ -344,7 +344,7 @@ def servercheck():
 
 def add_player(ign, tag):
 
-    playerlist = playerclass.PlayerList("playerlistb.csv")
+    playerlist = playerclass.PlayerList("playerlist.csv")
     playerlist.load()
 
     data = get_data('account', ign=ign, tag=tag)
@@ -365,7 +365,7 @@ def add_player(ign, tag):
 
 def remove_player(ign):
 
-    playerlist = playerclass.PlayerList("playerlistb.csv")
+    playerlist = playerclass.PlayerList("playerlist.csv")
     playerlist.load()
     tag = get_tag(ign)
     puuid = playerlist.get_puuid_by_ign(ign)
@@ -404,6 +404,6 @@ def random_crosshair():
     return (name, code)
 
 if __name__ == '__main__':
-    playerlist = playerclass.PlayerList('playerlistb.csv')
+    playerlist = playerclass.PlayerList('playerlist.csv')
     playerlist.load()
     print(update_database(playerlist.get_puuid_by_ign('oshawott')))
