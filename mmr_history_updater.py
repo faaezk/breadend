@@ -5,7 +5,7 @@ import graphs
 
 def update_all(graph, printer=True,start=0):
     
-    playerList = playerclass.PlayerList('playerlistb.csv')
+    playerList = playerclass.PlayerList('playerlist.csv')
     playerList.load()
     playerList.sort()
 
