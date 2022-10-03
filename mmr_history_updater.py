@@ -25,8 +25,9 @@ def update_all(graph, printer=True,start=0):
 
         if not thing[0]:
 
-            retry.append(player)
-
+            if player.priority == '1':
+                retry.append(player)
+            
             error_count += 1
 
             if printer:
@@ -43,6 +44,35 @@ def update_all(graph, printer=True,start=0):
         
         if printer:
             print(f'completed {i+1}/{total}')
+    
+    i = 0
+    total = len(retry)
+    for player in retry:
+        i += 1
+        if player.active == 'False':
+            continue
+
+        thing = valorant.update_database(player.puuid)
+
+        if not thing[0]:
+            error_count += 1
+
+            if printer:
+                print(f'{thing[1]} at {player.ign}')
+
+        else:
+            error_count -= 1
+            update_count += int(thing[1])
+
+            if int(thing[1]) > 0:
+                updatedList.append((player.ign, thing[1]))
+                
+            if graph:
+                graphs.make_graph(puuid=player.puuid, ign=player.ign, update=False)
+        
+        if printer:
+            print(f'completed retry {i+1}/{total}')
+
 
     if printer:
         print(updatedList)
