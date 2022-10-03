@@ -41,12 +41,12 @@ def make_graph(puuid="None", ign="", num=0, update=True, acts=False):
         return (False, 'no ign or puuid given')
 
     if puuid == "None" and ign != "":
-        playerlist = playerclass.PlayerList('playerlistb.csv')
+        playerlist = playerclass.PlayerList('playerlist.csv')
         playerlist.load()
         puuid = playerlist.get_puuid_by_ign(ign)
 
     if puuid != "None" and ign == "":
-        playerlist = playerclass.PlayerList('playerlistb.csv')
+        playerlist = playerclass.PlayerList('playerlist.csv')
         playerlist.load()
         ign = playerlist.get_ign_by_puuid(puuid)
 
@@ -184,7 +184,7 @@ def multigraph(players: list, update=False):
     most_games = 0
     x_values, y_values, fails = [], [], []
 
-    playerlist = playerclass.PlayerList('playerlistb.csv')
+    playerlist = playerclass.PlayerList('playerlist.csv')
     playerlist.load()
 
     for ign in players:
@@ -426,7 +426,7 @@ def date_graph():
     plt.savefig('date-graph.png', bbox_inches="tight")
 
 def update_all_graphs():
-    playerlist = playerclass.PlayerList('playerlistb.csv')
+    playerlist = playerclass.PlayerList('playerlist.csv')
     playerlist.load()
 
     for i in range(len(playerlist.players)):
