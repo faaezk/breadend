@@ -12,6 +12,7 @@ def update_all(graph, printer=True,start=0):
     update_count = 0
     error_count = 0
     updatedList = []
+    retry = []
     total = str(len(playerList.players) - start)
 
     for i in range(start, len(playerList.players)):
@@ -23,6 +24,9 @@ def update_all(graph, printer=True,start=0):
         thing = valorant.update_database(player.puuid)
 
         if not thing[0]:
+
+            retry.append(player)
+
             error_count += 1
 
             if printer:
