@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import configparser
 from discord_slash import SlashCommand
-import personClass
+import old.personClass as personClass
 import csv
 
 def get_config():
