@@ -161,7 +161,7 @@ async def graph(ctx, usernames="", type="", update=""):
         if not flag[0]:
             await the_message.edit(content=flag[1])
         else:
-            with open(f"elo_graphs/{users[0]}.png", 'rb') as f:
+            with open(f"mmr_graphs/{users[0]}.png", 'rb') as f:
                 picture = discord.File(f)
                 await the_message.edit(content= "", file=picture)
     else:
@@ -173,7 +173,7 @@ async def graph(ctx, usernames="", type="", update=""):
         if not flag[0]:
             await the_message.edit(content=msg)
         else:
-            with open("elo_graphs/multigraph.png", 'rb') as f:
+            with open("mmr_graphs/multigraph.png", 'rb') as f:
                 picture = discord.File(f)
             
             await the_message.edit(content=msg, file=picture)
@@ -261,7 +261,6 @@ async def updatePriority(ctx, username="", priority=""):
     else:
         await ctx.send("no.")
 
-
 @client.command()
 async def gettag(ctx, *, user):
     ign = user.lower()
@@ -278,7 +277,7 @@ async def banner(ctx, username=""):
 
     username = username.split('#')
     ign = username[0].lower()
-
+    puuid = "None"
     if len(username) == 2:
         tag = username[1].lower()
     else:
@@ -291,7 +290,7 @@ async def banner(ctx, username=""):
     if not data[0]:
         await ctx.send(data[1])    
     else:
-        await ctx.send(file=discord.File('banner.png'))
+        await ctx.send(file=discord.File(fp="banner.png", filename='banner.png'))
 
 @slash.slash(description="Update database with your new in-game name",
              guild_ids=guild_ids,
@@ -463,10 +462,10 @@ async def MAL(ctx, *, anime_title = "", manga_title = "", character = "", anime_
             await ctx.send("Character not found.")
 
         else:
-            file=discord.File(fp="bargraph.png", filename='bargraph.png')
+            file=discord.File(fp="stats.png", filename='stats.png')
             embed = discord.Embed(title=anime['title'], url=anime['url'])
 
-            embed.set_image(url="attachment://bargraph.png")
+            embed.set_image(url="attachment://stats.png")
 
             embed.add_field(name="Other stats:", 
             value="Completed: {}\nWatching: {}\nPlan to watch: {}\nDropped: {}\nOn Hold: {}\nTotal: {}".format(
@@ -487,10 +486,10 @@ async def MAL(ctx, *, anime_title = "", manga_title = "", character = "", anime_
             await ctx.send("Character not found.")
 
         else:
-            file=discord.File(fp="bargraph.png", filename='bargraph.png')
+            file=discord.File(fp="stats.png", filename='stats.png')
             embed = discord.Embed(title=manga['title'], url=manga['url'])
 
-            embed.set_image(url="attachment://bargraph.png")
+            embed.set_image(url="attachment://stats.png")
 
             embed.add_field(name="Other stats:", 
             value="Completed: {}\nReading: {}\nPlan to read: {}\nDropped: {}\nOn Hold: {}\nTotal: {}".format(
