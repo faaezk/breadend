@@ -307,7 +307,7 @@ def animeStats(title):
     plt.xticks(x)
     plt.yticks()
     addlabels(x, y)
-    plt.savefig('bargraph.png', bbox_inches='tight')
+    plt.savefig('stats.png', bbox_inches='tight')
     plt.clf()
 
     return {"watching":anime["watching"],"completed":anime["completed"],"on_hold":anime["on_hold"],
@@ -334,7 +334,6 @@ def mangaStats(title):
         id = id['results'][0]['mal_id']
     else:
         return None
-
 
     try:
         response = requests.get(f'https://api.jikan.moe/v3/manga/{id}/stats', timeout=4)
@@ -371,7 +370,7 @@ def mangaStats(title):
     plt.xticks(x)
     plt.yticks()
     addlabels(x, y)
-    plt.savefig('bargraph.png', bbox_inches='tight')
+    plt.savefig('stats.png', bbox_inches='tight')
     plt.clf()
 
     return {"reading":manga["reading"],"completed":manga["completed"],"on_hold":manga["on_hold"],
