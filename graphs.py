@@ -35,6 +35,98 @@ def roundup(x):
 def rounddown(x):
     return int(math.floor(x / 100.0)) * 100
 
+def generate_ticks(puuid):
+    
+    y = []
+    with open(f'mmr_history/{puuid}.txt', 'r') as f:
+        for line in f:
+            y.append(int(line.split(',')[0]))
+
+    if len(y) == 2:
+        return (False, 'not enough data')
+    y.pop(0)
+
+    x = range(1, len(y) + 1)
+
+    ymin = rounddown(min(y))
+    ymax = roundup(max(y))
+
+    ticks = []
+    i = math.floor(ymin / 50.0) * 50
+    y_range_len = int((ymax-ymin)/100)
+
+    while i <= math.ceil(ymax / 50.0) * 50:
+        ticks.append(i)
+        if y_range_len == 1:
+            i += 20
+        elif y_range_len < 4:
+            i += 25
+        elif y_range_len < 8:
+            i += 50
+        else:
+            i += 100
+
+    y_labels = []
+
+    for value in ticks:
+        if value in ranks.keys():
+            y_labels.append(ranks[value])
+        else:
+            y_labels.append(str(value))
+
+    x_ticks = []  
+    i = 0
+    jump = 0
+
+    if len(x) <= 15:
+        jump = 1
+    elif len(x) < 30:
+        jump = 2
+    elif len(x) < 70:
+        jump = 5
+    elif len(x) < 150:
+        jump = 10
+
+    if len(x) < 150:
+        while i <= len(x):
+            x_ticks.append(i)
+            i += jump
+    
+        if x[-1] not in x_ticks:
+            if (x[-1] - x_ticks[-1]) < 4:
+                x_ticks[-1] = x[-1]
+            else:
+                x_ticks.append(x[-1])
+
+
+
+
+
+
+def graph(puuid="None", ign="", update=True, acts=False):
+
+    if puuid == "None" and ign == "":
+        return (False, 'no ign or puuid given')
+
+    if puuid == "None" and ign != "":
+        playerlist = playerclass.PlayerList('playerlist.csv')
+        playerlist.load()
+        puuid = playerlist.get_puuid_by_ign(ign)
+
+    if puuid != "None" and ign == "":
+        playerlist = playerclass.PlayerList('playerlist.csv')
+        playerlist.load()
+        ign = playerlist.get_ign_by_puuid(puuid)
+
+    if puuid == "None" or ign == "":
+        return (False, 'player not in database')
+
+    if update:
+        thing = valorant.update_database(puuid=puuid)
+        if thing[0] == False:
+            return thing
+
+
 def make_graph(puuid="None", ign="", num=0, update=True, acts=False):
     
     if puuid == "None" and ign == "":
