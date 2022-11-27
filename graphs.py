@@ -19,44 +19,39 @@ ranks = {
 2400 : "Radiant"
 }
 
-old_ranks = {
-0 : "Iron 1", 100 : "Iron 2", 200 : "Iron 3",
-300 : "Bronze 1", 400 : "Bronze 2", 500 : "Bronze 3",
-600 : "Silver 1", 700 : "Silver 2", 800 : "Silver 3",
-900 : "Gold 1", 1000 : "Gold 2", 1100 : "Gold 3",
-1200 : "Platinum 1", 1300 : "Platinum 2", 1400 : "Platinum 3",
-1500 : "Diamond 1", 1600 : "Diamond 2", 1700 : "Diamond 3",
-1800 : "Immortal 1", 1900 : "Immortal 2", 2000 : "Immortal 3"
-}
-
 def roundup(x):
     return int(math.ceil(x / 100.0)) * 100
 
 def rounddown(x):
     return int(math.floor(x / 100.0)) * 100
 
-def generate_ticks(puuid):
-    
+def get_mmr_list(puuid):
     y = []
     with open(f'mmr_history/{puuid}.txt', 'r') as f:
         for line in f:
-            y.append(int(line.split(',')[0]))
+            y.append(int(line.split(',')[0].strip()))
 
     if len(y) == 2:
-        return (False, 'not enough data')
+        return False, False
+    
     y.pop(0)
+    return range(1, len(y) + 1), y
 
-    x = range(1, len(y) + 1)
+def generate_ticks(puuid):
+    
+    x, y = get_mmr_list(puuid)
+    if not x:
+        return(False, 'not enough data')
 
-    ymin = rounddown(min(y))
-    ymax = roundup(max(y))
+    y_min = rounddown(min(y))
+    y_max = roundup(max(y))
 
-    ticks = []
-    i = math.floor(ymin / 50.0) * 50
-    y_range_len = int((ymax-ymin)/100)
+    y_ticks = []
+    i = math.floor(y_min / 50.0) * 50
+    y_range_len = int((y_max-y_min)/100)
 
-    while i <= math.ceil(ymax / 50.0) * 50:
-        ticks.append(i)
+    while i <= math.ceil(y_max / 50.0) * 50:
+        y_ticks.append(i)
         if y_range_len == 1:
             i += 20
         elif y_range_len < 4:
@@ -68,7 +63,7 @@ def generate_ticks(puuid):
 
     y_labels = []
 
-    for value in ticks:
+    for value in y_ticks:
         if value in ranks.keys():
             y_labels.append(ranks[value])
         else:
@@ -98,10 +93,7 @@ def generate_ticks(puuid):
             else:
                 x_ticks.append(x[-1])
 
-
-
-
-
+    return  x, y, x_ticks, y_ticks, y_labels, [y_min,y_max]
 
 def graph(puuid="None", ign="", update=True, acts=False):
 
@@ -125,111 +117,16 @@ def graph(puuid="None", ign="", update=True, acts=False):
         thing = valorant.update_database(puuid=puuid)
         if thing[0] == False:
             return thing
-
-
-def make_graph(puuid="None", ign="", num=0, update=True, acts=False):
     
-    if puuid == "None" and ign == "":
-        return (False, 'no ign or puuid given')
-
-    if puuid == "None" and ign != "":
-        playerlist = playerclass.PlayerList('playerlist.csv')
-        playerlist.load()
-        puuid = playerlist.get_puuid_by_ign(ign)
-
-    if puuid != "None" and ign == "":
-        playerlist = playerclass.PlayerList('playerlist.csv')
-        playerlist.load()
-        ign = playerlist.get_ign_by_puuid(puuid)
-
-    if puuid == "None" or ign == "":
-        return (False, 'player not in database')
-
-    if update:
-        thing = valorant.update_database(puuid=puuid)
-        if thing[0] == False:
-            return thing
-    
-    y = []
-    with open(f'mmr_history/{puuid}.txt', 'r') as f:
-        for line in f:
-            y.append(line.split(',')[0])
-
-    if len(y) == 2:
-        return (False, 'not enough data')
-    y.pop(0)
-    
-    total = len(y)
-    if num > 1 and (num - 1) < len(y):
-        y = y[-num:]
-    else:
-        num = 0
-        total = 0
-
-    x = []
-
-    for i in range(0, len(y)):
-        y[i] = int(y[i])
-        x.append((total - num) + i + 1)
-
-    ymin = rounddown(min(y))
-    ymax = roundup(max(y))
+    x, y, x_ticks, y_ticks, y_labels, y_range = generate_ticks(puuid)
 
     fig, ax = plt.subplots()
     axes = fig.gca()
-    axes.set_ylim([ymin,ymax])
-    
-    ticks = []
-    i = int(math.floor(ymin / 50.0)) * 50
-    ranger = int((ymax-ymin)/100)
+    axes.set_ylim(y_range)
 
-    while i <= int(math.ceil(ymax / 50.0)) * 50:
-        ticks.append(i)
-        if ranger == 1:
-            i += 20
-        elif ranger < 4:
-            i += 25
-        elif ranger < 8:
-            i += 50
-        else:
-            i += 100
-
-    axes.set_yticks(ticks)
-    labely = []
-
-    for value in ticks:
-        if value % 100 != 0 and not value in ranks.keys():
-            labely.append(str(value))
-        else:
-            labely.append(ranks[value])
-
-    tickx = []  
-    i = 0
-    j = 0
-
-    if len(x) <= 15:
-        j = 1
-    elif len(x) < 30:
-        j = 2
-    elif len(x) < 70:
-        j = 5
-    elif len(x) < 150:
-        j = 10
-
-    if len(x) < 150:
-        while i <= len(x):
-            tickx.append((total - num) + i)
-            i += j
-    
-        if x[-1] not in tickx:
-            if (x[-1] - tickx[-1]) < 4:
-                tickx[-1] = x[-1]
-            else:
-                tickx.append(x[-1])
-
-        axes.set_xticks(tickx)
-    
-    axes.set_yticklabels(labely)
+    axes.set_yticks(y_ticks)
+    axes.set_xticks(x_ticks)
+    axes.set_yticklabels(y_labels)
 
     p = ax.plot(x, y)
     colour = p[0].get_color()
@@ -295,20 +192,9 @@ def multigraph(players: list, update=False):
                 fails.append((ign, flag[1]))
                 continue
 
-        y = []
-        with open(f'mmr_history/{puuid}.txt', 'r') as f:
-            for line in f:
-                y.append(line.split(',')[0].strip())
-
-        if len(y) == 2:
-            fails.append(ign, "Not enough data")
-            continue
-        y.pop(0)
-        
-        x = []
-        for i in range(0, len(y)):
-            y[i] = int(y[i])
-            x.append(i + 1)
+        x, y = get_mmr_list(puuid)
+        if not x:
+            return(False, 'not enough data')
 
         x_values.append(x)
         y_values.append(y)
@@ -319,7 +205,7 @@ def multigraph(players: list, update=False):
         if (roundup(max(y)) > ymax):
             ymax = roundup(max(y))
 
-        if (len(y) > most_games) and most_games != 0:
+        if (len(y) > most_games):
             most_games = len(y)
 
     if len(fails) == len(players):
@@ -331,13 +217,12 @@ def multigraph(players: list, update=False):
     axes = plt.gca()
     axes.set_ylim([ymin,ymax])
     
-    ticks = []
+    y_ticks = []
     i = int(math.floor(ymin / 50.0)) * 50
-
     ranger = int((ymax-ymin)/100)
 
     while i <= int(math.ceil(ymax / 50.0)) * 50:
-        ticks.append(i)
+        y_ticks.append(i)
         if ranger == 1:
             i += 20
         elif ranger > 4:
@@ -345,16 +230,16 @@ def multigraph(players: list, update=False):
         else:
             i += 25
 
-    axes.set_yticks(ticks)
-    labely = []
+    axes.set_yticks(y_ticks)
+    y_labels = []
 
-    for value in ticks:
+    for value in y_ticks:
         if value % 100 != 0:
-            labely.append(str(value))
+            y_labels.append(str(value))
         else:
-            labely.append(ranks[value])
+            y_labels.append(ranks[value])
 
-    axes.set_yticklabels(labely)
+    axes.set_yticklabels(y_labels)
 
     for i in range(len(players)):
         p = plt.plot(x_values[i], y_values[i], label=players[i])
@@ -523,8 +408,8 @@ def update_all_graphs():
 
     for i in range(len(playerlist.players)):
         if playerlist.players[i].active != 'False':
-            print(make_graph(puuid=playerlist.players[i].puuid, update=False))
+            print(graph(puuid=playerlist.players[i].puuid, update=False))
     return
 
 if __name__ == "__main__":
-    print(date_graph())
+    print(graph(ign='fakinator'))
