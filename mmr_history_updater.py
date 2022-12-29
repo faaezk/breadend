@@ -73,6 +73,8 @@ def update_all(graph, printer=True,start=0):
         if printer:
             print(f'completed retry {i+1}/{total}')
 
+    with open('ztemp.txt','w') as f:
+        f.write(str(updatedList))
 
     if printer:
         print(updatedList)
@@ -92,4 +94,4 @@ def update_all(graph, printer=True,start=0):
     return printerz
 
 if __name__ == "__main__":
-    update_all(False)
+    update_all(False)   

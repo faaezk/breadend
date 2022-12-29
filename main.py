@@ -43,7 +43,7 @@ async def on_ready():
 async def choice(ctx, randomise="", tactic=""):
     
     if randomise == "account":
-        await ctx.send(random.choice(['Smurfs', 'Smurfs', 'Smurfs', 'Smurfs', 'Mains', 'Mains', 'Mains', 'Mains', 'Mains', 'Mains']))
+        await ctx.send(random.choices(['Smurfs', 'Mains'], weights=[40, 60], k=1)[0])
     
     if randomise == "gamemode":
         await ctx.send(random.choice(['Unrated', 'Competitive']))
