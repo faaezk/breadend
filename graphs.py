@@ -92,6 +92,8 @@ def generate_ticks(puuid):
                 x_ticks[-1] = x[-1]
             else:
                 x_ticks.append(x[-1])
+    else:
+        x_ticks = False
 
     return  x, y, x_ticks, y_ticks, y_labels, [y_min,y_max]
 
@@ -125,7 +127,8 @@ def graph(puuid="None", ign="", update=True, acts=False):
     axes.set_ylim(y_range)
 
     axes.set_yticks(y_ticks)
-    axes.set_xticks(x_ticks)
+    if x_ticks:
+        axes.set_xticks(x_ticks)
     axes.set_yticklabels(y_labels)
 
     p = ax.plot(x, y)
@@ -412,4 +415,5 @@ def update_all_graphs():
     return
 
 if __name__ == "__main__":
-    print(graph(ign='fakinator'))
+    print(graph(ign='fakinator', update=False, acts=True))
+    print(graph(ign='oshawott', update=False, acts=True))
