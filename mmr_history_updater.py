@@ -87,7 +87,7 @@ def update_all(graph, printer=True,start=0):
     melb_now = datetime.now()
     
     printerz = f'completed on: {melb_now.strftime("%d/%m/%y")} at {melb_now.strftime("%H:%M:%S")} with {updates}'
-    f = open("updater_log-2022.out", "a")
+    f = open("updater_log-2023.out", "a")
     f.write(printerz + '\n')
     f.close()
 
