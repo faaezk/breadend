@@ -415,5 +415,4 @@ def update_all_graphs():
     return
 
 if __name__ == "__main__":
-    print(graph(ign='fakinator', update=False, acts=True))
-    print(graph(ign='oshawott', update=False, acts=True))
+    print(graph(ign='fakinator', update=False, acts=False))
