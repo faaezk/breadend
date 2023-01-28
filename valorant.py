@@ -406,4 +406,4 @@ def random_crosshair():
 if __name__ == '__main__':
     playerlist = playerclass.PlayerList('playerlist.csv')
     playerlist.load()
-    print(update_database(playerlist.get_puuid_by_ign('oshawott')))
+    print(update_database(playerlist.get_puuid_by_ign('fakinator')))
