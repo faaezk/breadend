@@ -1,8 +1,4 @@
-<<<<<<< main
-1675091443
-=======
 1675519035
->>>>>>> origin/main
 810
 826
 843
@@ -457,10 +453,7 @@
 1004,Monday-January-30-2023-2:41-PM
 1000,Monday-January-30-2023-3:23-PM
 1013,Monday-January-30-2023-4:10-PM
-<<<<<<< main
-=======
 1002,Tuesday-January-31-2023-2:06-PM
 1028,Wednesday-February-1-2023-2:22-PM
 1044,Saturday-February-4-2023-2:11-PM
 1027,Saturday-February-4-2023-2:57-PM
->>>>>>> origin/main
