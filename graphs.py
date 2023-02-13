@@ -403,7 +403,7 @@ def date_graph():
     plt.ylabel('MMR')
     plt.title('MMR over tifme')
     plt.legend(loc='upper left')
-    plt.savefig('date-graph.png', bbox_inches="tight")
+    plt.savefig('stuff/date-graph.png', bbox_inches="tight")
 
 def update_all_graphs():
     playerlist = playerclass.PlayerList('playerlist.csv')
@@ -415,4 +415,4 @@ def update_all_graphs():
     return
 
 if __name__ == "__main__":
-    print(graph(ign='fakinator', update=False, acts=False))
+    print(graph(ign='fakinator', update=True, acts=False))

@@ -263,7 +263,7 @@ def leaderboard(region, length=20):
         leaderboard += (str(rank) + '.').ljust(3) + str(players[i][0]).ljust(16) + str(players[i][1]).rjust(5) + '\n'
 
     if region == 'local':
-        with open("leaderboard.txt", "w") as f:
+        with open("stuff/leaderboard.txt", "w") as f:
             f.write(leaderboard)
 
     return leaderboard
@@ -314,7 +314,7 @@ def get_banner(ign="", tag="", puuid="None"):
     
     url = data['data']['card']['large']
     r = requests.get(url, allow_redirects=True)
-    open('banner.png', 'wb').write(r.content)
+    open('stuff/banner.png', 'wb').write(r.content)
     return (True, True)
 
 def servercheck():
@@ -382,7 +382,7 @@ def remove_player(ign):
 def crosshair(code):
     r = get_data("crosshair", crosshair_code=code)
     img = Image.open(BytesIO(r.content))
-    img = img.save("crosshair.png")
+    img = img.save("stuff/crosshair.png")
 
     return True
 
