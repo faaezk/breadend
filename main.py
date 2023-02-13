@@ -210,7 +210,7 @@ async def leaderboard(ctx, options=""):
             leaderboard = ""
             
         valorant.leaderboard('local')
-        with open("leaderboard.txt", 'r') as f:
+        with open("stuff/leaderboard.txt", 'r') as f:
             for player in f:
                 leaderboard += player
 
@@ -290,7 +290,7 @@ async def banner(ctx, username=""):
     if not data[0]:
         await ctx.send(data[1])    
     else:
-        await ctx.send(file=discord.File(fp="banner.png", filename='banner.png'))
+        await ctx.send(file=discord.File(fp="stuff/banner.png", filename='stuff/banner.png'))
 
 @slash.slash(description="Update database with your new in-game name",
              guild_ids=guild_ids,
@@ -357,10 +357,10 @@ async def crosshair(ctx):
 
     name, code = valorant.random_crosshair()
     if name:
-        file=discord.File(fp="crosshair.png", filename='crosshair.png')
+        file=discord.File(fp="stuff/crosshair.png", filename='stuff/crosshair.png')
         embed = discord.Embed(title=name)
         embed.add_field(name="Code:", value=code)
-        embed.set_image(url="attachment://crosshair.png")
+        embed.set_image(url="attachment://stuff/crosshair.png")
         await ctx.send(content="", file=file, embed=embed)
     else:
         await ctx.send("the thingo failed.")
@@ -486,10 +486,10 @@ async def MAL(ctx, *, anime_title = "", manga_title = "", character = "", anime_
             await ctx.send("Character not found.")
 
         else:
-            file=discord.File(fp="stats.png", filename='stats.png')
+            file=discord.File(fp="stuff/stats.png", filename='stuff/stats.png')
             embed = discord.Embed(title=manga['title'], url=manga['url'])
 
-            embed.set_image(url="attachment://stats.png")
+            embed.set_image(url="attachment://stuff/stats.png")
 
             embed.add_field(name="Other stats:", 
             value="Completed: {}\nReading: {}\nPlan to read: {}\nDropped: {}\nOn Hold: {}\nTotal: {}".format(
@@ -530,13 +530,13 @@ async def on_message(message):
         return
 
     if message.content.lower().startswith('good evening'):
-        await message.channel.send(file=discord.File('good_evening.mp4'))
+        await message.channel.send(file=discord.File('stuff/good_evening.mp4'))
     
     if "wow" in message.content.lower() and message.author.id == 897988862658367549:
         await message.add_reaction("<:stevens:785800069957943306>")
 
     if message.content.lower().startswith('$lastupdate'):
-        with open("updater_log-2022.out",'r') as f:
+        with open("updater_log-2023.out",'r') as f:
             for lastLine in f:
                 pass
 
