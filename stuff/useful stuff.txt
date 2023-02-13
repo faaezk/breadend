@@ -1,0 +1,86 @@
+
+
+status codes:
+200 - it works
+403 - server down
+404 - user doesnt exist
+429 - calling the api too much
+500 - No matches available, can't get puuid
+
+* 0 * * * cd /home/ubuntu/discord_bot && /usr/bin/python3.8 elo_history.py >> elo_history/run_check.out
+
+see crontab logs: tail -f /var/log/syslog
+
+tail -f elo_history/run_check.out
+
+/etc/systemd/system (.service file)
+/*
+[Unit]
+Description=Discord Bot
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/That-Discord-Bot
+ExecStart=/usr/bin/python3 /home/ubuntu/That-Discord-Bot/main.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+*/
+
+
+
+sudo systemctl enable discordbot.service
+sudo systemctl restart discordbot.service
+sudo systemctl stop discordbot.service
+
+sudo systemctl enable ritsubot.service
+sudo systemctl restart ritsubot.service
+sudo systemctl stop ritsubot.service
+
+sudo systemctl enable stickerbot.service
+sudo systemctl restart stickerbot.service
+sudo systemctl stop stickerbot.service
+
+git add .
+git commit -m "insert message" -a
+git push
+
+
+{'status': '200', 'data': {'custom_game': False, 'gamemode': 'unrated', 'current_state': 'INGAME', 
+'party_accessibility': 'CLOSED', 'client_version': 'release-02.11-shipping-9-567060', 
+'map': 'Icebox', 'score_ally_team': 12, 'score_enemy_team': 10, 
+'queue_entry_time': '2021.06.11-10.18.58', 'party_id': '23736d32-2c4b-4d26-8fde-17bde7c4e8a3'}}
+
+{'status': '200', 'data': {'current_selected_gamemode': 'unrated', 'current_state': 'MENUS', 
+'party_accessibility': 'CLOSED', 'client_version': 'release-02.11-shipping-9-567060', 
+'party_size': 4, 'party_id': '23736d32-2c4b-4d26-8fde-17bde7c4e8a3'}}
+
+{"status":"200","data":{"custom_game":false,"gamemode":"unrated","current_state":"PREGAME",
+"party_accessibility":"CLOSED","client_version":"release-02.11-shipping-9-567060","map":"Ascent",
+"score_ally_team":0,"score_enemy_team":0,"queue_entry_time":"2021.06.11-11.13.51",
+"party_id":"23736d32-2c4b-4d26-8fde-17bde7c4e8a3"}}
+
+{'status': '500', 'message': "User is playing league_of_legends, can't track live game data"}
+{'status': '500', 'message': "User offline, can't track live game data"}
+
+{'status': '200', 'data': 
+[{'currenttier': 7, 'currenttierpatched': 'Bronze 2', 'ranking_in_tier': 9, 'mmr_change_to_last_game': -26, 
+'elo': 409, 'date': 'Friday, June 11, 2021 2:33 PM', 'date_raw': 1623436405919}, 
+{'currenttier': 7, 'currenttierpatched': 'Bronze 2', 'ranking_in_tier': 35, 'mmr_change_to_last_game': 14, 
+'elo': 435, 'date': 'Wednesday, June 9, 2021 7:40 AM', 'date_raw': 1623238803153}, 
+{'currenttier': 7, 'currenttierpatched': 'Bronze 2', 'ranking_in_tier': 21, 'mmr_change_to_last_game': -28, 
+'elo': 421, 'date': 'Saturday, June 5, 2021 3:07 AM', 'date_raw': 1622876870696}]}
+
+
+@slash.slash(description="Information on last 5 games",
+             guild_ids=guild_ids,
+             options = [create_option(name="username", description="Enter Username (username#tag)", option_type=3, required=True),
+             create_option(name="game", description="Select game to get info on", option_type=3, required=True, 
+                choices=[create_choice(name="1",value="1"), create_choice(name="2",value="2"),
+                         create_choice(name="3",value="3"),create_choice(name="4",value="4"), create_choice(name="5",value="5")]),
+
+             create_option(name="type", description="Select type of information", option_type=3, required=True,
+                choices=[create_choice(name="overview",value="overview"), create_choice(name="round-by-round",value="round-by-round")])])
+async def games(ctx, username, game, type):
