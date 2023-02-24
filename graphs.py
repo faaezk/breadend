@@ -37,11 +37,15 @@ def get_mmr_list(puuid):
     y.pop(0)
     return range(1, len(y) + 1), y
 
-def generate_ticks(puuid):
+def generate_ticks(puuid, num_games=0):
     
     x, y = get_mmr_list(puuid)
     if not x:
         return(False, 'not enough data')
+
+    if num_games != 0:
+        y = y[-num_games:]
+        x = range(1, len(y) + 1)
 
     y_min = rounddown(min(y))
     y_max = roundup(max(y))
@@ -97,7 +101,7 @@ def generate_ticks(puuid):
 
     return  x, y, x_ticks, y_ticks, y_labels, [y_min,y_max]
 
-def graph(puuid="None", ign="", update=True, acts=False):
+def graph(puuid="None", ign="", num_games=0, update=True, acts=False):
 
     if puuid == "None" and ign == "":
         return (False, 'no ign or puuid given')
@@ -119,8 +123,8 @@ def graph(puuid="None", ign="", update=True, acts=False):
         thing = valorant.update_database(puuid=puuid)
         if thing[0] == False:
             return thing
-    
-    x, y, x_ticks, y_ticks, y_labels, y_range = generate_ticks(puuid)
+
+    x, y, x_ticks, y_ticks, y_labels, y_range = generate_ticks(puuid, num_games)
 
     fig, ax = plt.subplots()
     axes = fig.gca()
