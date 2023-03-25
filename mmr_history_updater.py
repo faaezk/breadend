@@ -27,7 +27,7 @@ def update_all(graph, printer=True,start=0):
             error_count += 1
 
             if printer:
-                print(f'{i+1}/{total}: {thing[1]} at {player.ign}')
+                print(f'{i+1:02d}/{total}: {thing[1]} at {player.ign}')
 
         else:
             new_games = int(thing[1])
@@ -40,7 +40,7 @@ def update_all(graph, printer=True,start=0):
                 graphs.graph(puuid=player.puuid, ign=player.ign, update=False)
         
             if printer:
-                print(f'{i+1}/{total}: success')
+                print(f'{i+1:02d}/{total}: Success')
 
     total = len(retry)
     for i, player in enumerate(retry):
@@ -50,7 +50,7 @@ def update_all(graph, printer=True,start=0):
             error_count += 1
 
             if printer:
-                print(f'{i+1}/{total}: {thing[1]} at {player.ign}')
+                print(f'{i+1:02d}/{total}: {thing[1]} at {player.ign}')
 
         else:
             update_count += int(thing[1])
@@ -62,7 +62,7 @@ def update_all(graph, printer=True,start=0):
                 graphs.graph(puuid=player.puuid, ign=player.ign, update=False)
         
             if printer:
-                print(f'{i+1}/{total}: success on 2nd attempt')
+                print(f'{(i+1):02d}/{total}: Success on 2nd attempt')
 
     with open('ztemp.txt','w') as f:
         f.write(str(updatedList))
@@ -85,4 +85,4 @@ def update_all(graph, printer=True,start=0):
     return printerz
 
 if __name__ == "__main__":
-    update_all(True)   
+    update_all(False)   
