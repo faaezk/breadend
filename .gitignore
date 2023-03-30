@@ -3,8 +3,8 @@ __pycache__/
 config.ini
 playerlist.csv
 playerlistb.csv
-mmr_graphs/
 ztemp.txt
 gitpullpush.bat
 jser/config.json
 jser/node_modules
+mmr_graphs/
