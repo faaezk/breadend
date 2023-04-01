@@ -1,8 +1,8 @@
 **/.DS_Store
 __pycache__/
 config.ini
+secret_stuff.py
 playerlist.csv
-playerlistb.csv
 ztemp.txt
 gitpullpush.bat
 jser/config.json

@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-import configparser
+import secret_stuff
 import graphs
 import valorant
 import mmr_history_updater
@@ -12,20 +12,12 @@ from discord_slash.utils.manage_commands import create_option, create_choice
 import random
 import playerclass
 
-def get_config():
-    c = configparser.ConfigParser()
-    c.read('config.ini')
-
-    return c['discord']['token'], c['cat']['api']
-
-token = get_config()[0]
-
 intents = discord.Intents.default()
 intents.members = True
 help_command = commands.DefaultHelpCommand(no_category = 'Commands')
 client = commands.Bot(command_prefix='$',help_command = help_command, intents=intents)
 slash = SlashCommand(client, sync_commands=True)
-guild_ids = [509314650265878530, 731539222141468673]
+guild_ids = [secret_stuff.TNG_GUILD_ID, secret_stuff.TESTING_GUILD_ID]
 
 @client.event
 async def on_ready():
@@ -78,7 +70,7 @@ async def cat(ctx):
     url = "https://api.thecatapi.com/v1/images/search?format=json"
     payload={}
     files={}
-    headers = {'Content-Type': 'application/json', 'x-api-key': get_config()[1]}
+    headers = {'Content-Type': 'application/json', 'x-api-key': secret_stuff.CAT_KEY}
 
     response = requests.request("GET", url, headers=headers, data=payload, files=files)
     embed = discord.Embed(title="cat")
@@ -544,4 +536,4 @@ async def on_message(message):
 
     await client.process_commands(message)
 
-client.run(token)
+client.run(secret_stuff.POPO_TOKEN)

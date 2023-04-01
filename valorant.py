@@ -6,17 +6,10 @@ import playerclass
 from PIL import Image
 from io import BytesIO
 import random
-import configparser
-
-def get_key():
-    c = configparser.ConfigParser()
-    c.read('config.ini')
-
-    return c['henrik']['key']
+import secret_stuff
 
 def get_data(category, puuid="None", ign="", tag="", region="", crosshair_code=""):
-    key = get_key()
-    headers = {'accept' : 'application/json', 'Authorization' : key}
+    headers = {'accept' : 'application/json', 'Authorization' : secret_stuff.VALORANT_KEY}
     errors = {1 : "Invalid API Key", 2 : "Forbidden endpoint", 3 : "Restricted endpoint", 101 : "No region found for this Player",
             102 : "No matches found, can't get puuid", 103 : "Possible name change detected, can't get puuid. Please play one match, wait 1-2 minutes and try it again",
             104 : "Invalid region", 105 : "Invalid filter", 106 : "Invalid gamemode", 107 : "Invalid map", 108 : "Invalid locale",
@@ -403,7 +396,22 @@ def random_crosshair():
 
     return (name, code)
 
-if __name__ == '__main__':
+def update_playerlist():
     playerlist = playerclass.PlayerList('playerlist.csv')
     playerlist.load()
-    print(update_database(playerlist.get_puuid_by_ign('fakinator')))
+    updates = 0
+    for player in playerlist.players:
+        response = get_data("account", puuid=player.puuid)
+        if response[0]:
+            true_ign = response[1]['data']['name'].lower()
+            true_tag = response[1]['data']['name'].lower()
+
+            if (player.ign != true_ign) or (player.tag != true_tag):
+                updates += 1
+
+            player.ign = true_ign
+            player.tag = true_tag
+
+    playerlist.save()
+
+    return updates
