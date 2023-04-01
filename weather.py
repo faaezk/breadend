@@ -1,26 +1,14 @@
-import configparser
+import secret_stuff
 import requests
 import json
-
-def get_config():
-    c = configparser.ConfigParser()
-    c.read('/home/ubuntu/discord_bot/config.ini')
-
-    return c['openweathermap']['api'], c['openweathermap']['city_id'], c['discord']['token']
-
 
 def get_weather(city_id, api_key):
     url = "https://api.openweathermap.org/data/2.5/weather?id={}&appid={}&units=metric".format(city_id, api_key)
     r = requests.get(url)
     return r.text
 
-
 def main():
-    config = get_config()
-    api_key = config[0]
-    city_id = config[1]
-    weather = get_weather(city_id, api_key)
-
+    weather = get_weather(secret_stuff.CITY_ID, secret_stuff.WEATHER_KEY)
     john = json.loads(weather)
 
     return john

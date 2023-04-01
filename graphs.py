@@ -417,6 +417,3 @@ def update_all_graphs():
         if playerlist.players[i].active != 'False':
             print(graph(puuid=playerlist.players[i].puuid, update=False))
     return
-
-if __name__ == "__main__":
-    print(graph(ign='fakinator', update=True, acts=False))

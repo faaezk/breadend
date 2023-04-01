@@ -370,7 +370,3 @@ def mangaStats(title):
     return {"reading":manga["reading"],"completed":manga["completed"],"on_hold":manga["on_hold"],
         "dropped":manga["dropped"],"plan_to_read":manga["plan_to_read"],"total":manga["total"],
         "title" : name, "url" : url}
-
-
-if __name__ == '__main__':
-    mangaStats('fruits basket first season')
