@@ -7,8 +7,20 @@ from PIL import Image
 from io import BytesIO
 import random
 import secret_stuff
+from exceptionclass import *
 
-def get_data(category, puuid="None", ign="", tag="", region="", crosshair_code=""):
+def get_data(endpoint, **kwargs):
+
+    endpoints = {"LEADERBOARD" : "https://api.henrikdev.xyz/valorant/v1/leaderboard/{region}",
+                "REGION_STATUS" : "https://api.henrikdev.xyz/valorant/v1/status/{region}",
+                "CROSSHAIR" : "https://api.henrikdev.xyz/valorant/v1/crosshair/generate?id={crosshair_code}",
+                "ACCOUNT_BY_PUUID" : "https://api.henrikdev.xyz/valorant/v1/by-puuid/account/{puuid}",
+                "MMR_BY_PUUID" : "https://api.henrikdev.xyz/valorant/v2/by-puuid/mmr/ap/{puuid}",
+                "MMR_HISTORY_BY_PUUID" : "https://api.henrikdev.xyz/valorant/v1/by-puuid/mmr-history/ap/{puuid}",
+                "ACCOUNT_BY_NAME" : "https://api.henrikdev.xyz/valorant/v1/account/{ign}/{tag}",
+                "MMR_BY_NAME" : "https://api.henrikdev.xyz/valorant/v2/mmr/ap/{ign}/{tag}",
+                "MMR_HISTORY_BY_NAME" : "https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{ign}/{tag}"}
+
     headers = {'accept' : 'application/json', 'Authorization' : secret_stuff.VALORANT_KEY}
     errors = {1 : "Invalid API Key", 2 : "Forbidden endpoint", 3 : "Restricted endpoint", 101 : "No region found for this Player",
             102 : "No matches found, can't get puuid", 103 : "Possible name change detected, can't get puuid. Please play one match, wait 1-2 minutes and try it again",
@@ -16,80 +28,46 @@ def get_data(category, puuid="None", ign="", tag="", region="", crosshair_code="
             109 : "Missing name", 110 : "Missing tag", 111 : "Player not found in leaderboard", 112 : "Invalid raw type",
             113 : "Invalid match or player id", 114 : "Invalid country code", 115 : "Invalid season", 429 : 'welp', 
             403 : 'Forbidden', 404 : 'User not found', 500 : 'No matches available'}
-
-    if region != "":
-        if category == "leaderboard":
-            url = f"https://api.henrikdev.xyz/valorant/v1/leaderboard/{region}"
-        
-        if category == "status":
-            url = f'https://api.henrikdev.xyz/valorant/v1/status/{region}'
-
-    elif category == "crosshair":
-        url = f"https://api.henrikdev.xyz/valorant/v1/crosshair/generate?id={crosshair_code}"
-        return requests.get(url, headers=headers)
-
-    else:
-        if puuid != "None":
-            if category == "account":
-                url = f'https://api.henrikdev.xyz/valorant/v1/by-puuid/account/{puuid}'
-
-            elif category == "mmr":
-                url = f'https://api.henrikdev.xyz/valorant/v2/by-puuid/mmr/ap/{puuid}'
-
-            elif category == "mmr history":
-                url = f'https://api.henrikdev.xyz/valorant/v1/by-puuid/mmr-history/ap/{puuid}'
-
-        else:
-            if ign == "":
-                return (False, 'no ign or puuid given/player not in database')
-
-            if tag == "":
-                tag = get_tag(ign)
-                if not tag:
-                    return (False, 'tag not found')
-
-            if category == "account":
-                url = f'https://api.henrikdev.xyz/valorant/v1/account/{ign}/{tag}'
-
-            elif category == "mmr":
-                url = f'https://api.henrikdev.xyz/valorant/v2/mmr/ap/{ign}/{tag}'
-            
-            elif category == "mmr history":
-                url = f"https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{ign}/{tag}"
     
+    try:
+        url = endpoints[endpoint].format(**kwargs)
+    except KeyError:
+        raise KeyException
+
     r = requests.get(url, headers=headers)
 
     if r.status_code in errors.keys():
-        return (False, errors[r.status_code])
+        DynamicException.set_message(errors[r.status_code])
+        raise DynamicException
+    
+    if endpoint == 'CROSSHAIR':
+        return r
     
     if r.status_code == 200:
         john = json.loads(r.text)
 
-        if category == 'leaderboard':
-            return (True, john)
+        if endpoint == 'LEADERBOARD':
+            return john
 
         if 'error' in john.keys() and john['error'] != None:
-            return (False, john['error']['message'])
+            DynamicException.set_message(john['error']['message'])
+            raise DynamicException
         
         if 'errors' in john.keys():
-            errs = ""
-            for error in john['errors']:
-                errs += f'{error}, '
-            
-            if errs != "":
-                return (False, errs[:-2])
+            DynamicException.set_message(' '.join(john['errors']))
+            raise DynamicException
 
-        if category == 'mmr history':
+        if 'MMR_HISTORY' in endpoint:
             if john['name'] == None or john['tag'] == None:
-                return (False, 'name/tag error?')
+                raise NoneException
         
-        elif category != 'status':
+        elif endpoint != 'REGION_STATUS':
             if john['data']['name'] == None or john['data']['tag'] == None:
-                return (False, 'name/tag error?')
+                raise NoneException
         
-        return (True, john)
+        return john
 
-    return (False, 'some error')
+    raise UnknownException
 
 def get_tag(ign):
     playerlist = playerclass.PlayerList("playerlist.csv")
@@ -133,15 +111,16 @@ def replace_all(string: str, oldValues, newValue):
 
 def update_database(puuid):
 
-    data = get_data('mmr history', puuid=puuid)
-    if not data[0]:
-        return data
+    try: 
+        data = get_data('MMR_HISTORY_BY_PUUID', puuid=puuid)
+    except Exception as E:
+        raise E
 
-    data = data[1]['data']
+    data = data['data']
 
-    if os.path.isfile(f'mmr_history/{puuid}.txt') == False:
+    if not os.path.isfile(f'mmr_history/{puuid}.txt'):
         if len(data) == 0:
-            return (False, 'not enough data')
+            raise NoneException
         else:
             initialise_file(puuid)
     
@@ -192,16 +171,17 @@ def update_database(puuid):
         with open(f'mmr_history/{puuid}.txt', "w") as f:
             f.writelines(lines)
     
-    return (True, len(new_list))
+    return len(new_list)
 
 def get_elo_list(puuid):
     
-    check = update_database(puuid)
-    if not check[0]:
-        return check
+    try: 
+        update_database(puuid)
+    except Exception as E:
+        raise E
 
     if not get_file_mmr(puuid):
-        return (False, "Player not found")
+        return MissingException
     
     lines = []
     with open(f'mmr_history/{puuid}.txt', 'r') as f:
@@ -209,14 +189,14 @@ def get_elo_list(puuid):
             lines.append(line.strip())
 
     if len(lines) == 1:
-        return (False, "No comp games recorded")
+        raise NoneException
         
     lines.pop(0)
     elolist = ""
     for elem in lines:
         elolist += f"{elem.split(',')[0]}, "
 
-    return (True, elolist[:-2])
+    return elolist[:-2]
 
 def leaderboard(region, length=20):
 
@@ -234,11 +214,10 @@ def leaderboard(region, length=20):
         leaderboard = "Player Leaderboard\n"
     
     else:
-        data = get_data('leaderboard', region=region)
-        if not data[0]:
-            return data[1]
-        else:
-            data = data[1]
+        try:
+            data = get_data('LEADERBOARD', region=region)
+        except Exception as E:
+            raise E
 
         regions = {"ap" : "Asia Pacific", "eu" : "Europe", "kr" : "Korea", "na" : "North America"}
         players = []
@@ -261,16 +240,12 @@ def leaderboard(region, length=20):
 
     return leaderboard
 
-def stats(ign="", tag="", puuid="None"):
+def stats(puuid):
 
-    if ign == "" and puuid == "None":
-        return (False, False)
-
-    john = get_data('mmr', puuid=puuid, ign=ign, tag=tag)
-    if not john[0]:
-        return john
-    else:
-        john = john[1]
+    try:
+        john = get_data('MMR_BY_PUUID', puuid=puuid)
+    except Exception as E:
+        raise E
     
     data = john['data']['by_season']
     keys = data.keys()
@@ -285,30 +260,26 @@ def stats(ign="", tag="", puuid="None"):
             rank = data[key]['final_rank_patched']
             final.append([f'Episode {key[1]} Act {key[3]}:', f'{rank}\nGames Played: {games}\nWinrate: {round((wins/games) * 100, 2)}%'])
     
-    john = get_data('account', puuid=puuid, ign=ign, tag=tag)
-    if not john[0]:
-        return john
-    else:
-        john = john[1]
+    try:
+        john = get_data('ACCOUNT_BY_PUUID', puuid=puuid)
+    except Exception as E:
+        raise E
 
     card = john['data']['card']['small']
-    return (True, [final, card])
+    return [final, card]
 
-def get_banner(ign="", tag="", puuid="None"):
+def get_banner(puuid):
 
-    if ign == "" and puuid == "None":
-        return (False, 'no ign or puuid given')
-
-    data = get_data('account', puuid=puuid, ign=ign, tag=tag)
-    if not data[0]:
-        return data
-    else:
-        data = data[1]
+    try:
+        data = get_data('ACCOUNT_BY_PUUID', puuid=puuid)
+    except Exception as E:
+        raise E
     
     url = data['data']['card']['large']
     r = requests.get(url, allow_redirects=True)
     open('stuff/banner.png', 'wb').write(r.content)
-    return (True, True)
+    
+    return True
 
 def servercheck():
     counter = 0
@@ -317,11 +288,10 @@ def servercheck():
 
     for elem in regions.keys():
         
-        data = get_data('status', region=elem)
-        if not data[0]:
-            return data[1]
-        else:
-            data = data[1]
+        try:
+            data = get_data('REGION_STATUS', region=elem)
+        except Exception as E:
+            report += f'{regions[elem]}:\n Error: {E.message}\n'
 
         maintenances = len(data['data']['maintenances'])
         incidents = len(data['data']['incidents'])
@@ -340,11 +310,10 @@ def add_player(ign, tag):
     playerlist = playerclass.PlayerList("playerlist.csv")
     playerlist.load()
 
-    data = get_data('account', ign=ign, tag=tag)
-    if not data[0]:
-        return "Account does not exist"
-    else:
-        data = data[1]
+    try:
+        data = get_data('ACCOUNT_BY_NAME', ign=ign, tag=tag)
+    except Exception as E:
+        return E.message
 
     puuid = data['data']['puuid']
     player = playerclass.Player(ign.lower(), tag.lower(), puuid)
@@ -373,7 +342,11 @@ def remove_player(ign):
     return f'{ign}#{tag} has been removed'
 
 def crosshair(code):
-    r = get_data("crosshair", crosshair_code=code)
+    try:
+        r = get_data("CROSSHAIR", crosshair_code=code)
+    except Exception as E:
+        raise E
+    
     img = Image.open(BytesIO(r.content))
     img = img.save("stuff/crosshair.png")
 
@@ -391,8 +364,11 @@ def random_crosshair():
                     "Fishnet"     : "0;P;o;1;d;1;a;0;f;0;0t;8;0l;2;0o;5;0a;0;0f;0;1l;8;1o;2;1a;0;1m;0;1f;0"}
 
     name, code = random.choice(list(crosshairs.items()))
-    if not crosshair(code):
-        return (False, False)
+
+    try:
+        crosshair(code)
+    except Exception as E:
+        return E.message
 
     return (name, code)
 
@@ -401,17 +377,30 @@ def update_playerlist():
     playerlist.load()
     updates = 0
     for player in playerlist.players:
-        response = get_data("account", puuid=player.puuid)
-        if response[0]:
-            true_ign = response[1]['data']['name'].lower()
-            true_tag = response[1]['data']['name'].lower()
 
-            if (player.ign != true_ign) or (player.tag != true_tag):
-                updates += 1
+        try:
+            response = get_data("ACCOUNT_BY_PUUID", puuid=player.puuid)
+        except Exception as E:
+            raise E
 
-            player.ign = true_ign
-            player.tag = true_tag
+        true_ign = response['data']['name'].lower()
+        true_tag = response['data']['name'].lower()
+
+        if (player.ign != true_ign) or (player.tag != true_tag):
+            updates += 1
+
+        player.ign = true_ign
+        player.tag = true_tag
 
     playerlist.save()
 
     return updates
+
+if __name__ == '__main__':
+    playerlist = playerclass.PlayerList('playerlist.csv')
+    playerlist.load()
+
+    try:
+        print(stats(playerlist.get_puuid_by_ign('fakinator')))
+    except Exception as E:
+        print(E.message)
