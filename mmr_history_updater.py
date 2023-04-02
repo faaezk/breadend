@@ -18,51 +18,48 @@ def update_all(graph, printer=True,start=0):
     for i, player in enumerate(playerList.players):
         if player.active == 'False':
             continue
-
-        thing = valorant.update_database(player.puuid)
-
-        if not thing[0]:
-
+        
+        try:
+            thing = valorant.update_database(player.puuid)
+        except Exception as E:
             retry.append(player)
             error_count += 1
-
             if printer:
-                print(f'{i+1:02d}/{total}: {thing[1]} at {player.ign}')
+                print(f'{i+1:02d}/{total}: {E.message} at {player.ign}')
 
-        else:
-            new_games = int(thing[1])
-            update_count += new_games
+        new_games = int(thing)
+        update_count += new_games
 
-            if new_games > 0:
-                updatedList.append((player.ign, new_games))
-                
-            if graph:
-                graphs.graph(puuid=player.puuid, ign=player.ign, update=False)
-        
-            if printer:
-                print(f'{i+1:02d}/{total}: Success')
+        if new_games > 0:
+            updatedList.append((player.ign, new_games))
+            
+        if graph:
+            graphs.graph(puuid=player.puuid, update=False)
+    
+        if printer:
+            print(f'{i+1:02d}/{total}: Success')
 
     total = len(retry)
     for i, player in enumerate(retry):
-        thing = valorant.update_database(player.puuid)
 
-        if not thing[0]:
+        try:
+            thing = valorant.update_database(player.puuid)
+        except Exception as E:
             error_count += 1
-
             if printer:
-                print(f'{i+1:02d}/{total}: {thing[1]} at {player.ign}')
+                print(f'{i+1:02d}/{total}: {E.message} at {player.ign}')
 
-        else:
-            update_count += int(thing[1])
+        thing = int(thing)
+        update_count += thing
 
-            if int(thing[1]) > 0:
-                updatedList.append((player.ign, thing[1]))
-                
-            if graph:
-                graphs.graph(puuid=player.puuid, ign=player.ign, update=False)
-        
-            if printer:
-                print(f'{(i+1):02d}/{total}: Success on 2nd attempt')
+        if thing > 0:
+            updatedList.append((player.ign, thing))
+            
+        if graph:
+            graphs.graph(puuid=player.puuid, update=False)
+    
+        if printer:
+            print(f'{(i+1):02d}/{total}: Success on 2nd attempt')
 
     with open('ztemp.txt','w') as f:
         f.write(str(updatedList))
