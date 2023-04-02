@@ -395,12 +395,3 @@ def update_playerlist():
     playerlist.save()
 
     return updates
-
-if __name__ == '__main__':
-    playerlist = playerclass.PlayerList('playerlist.csv')
-    playerlist.load()
-
-    try:
-        print(stats(playerlist.get_puuid_by_ign('fakinator')))
-    except Exception as E:
-        print(E.message)

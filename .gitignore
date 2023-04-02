@@ -2,6 +2,7 @@
 __pycache__/
 config.ini
 secret_stuff.py
+playground.py
 playerlist.csv
 ztemp.txt
 gitpullpush.bat
