@@ -104,8 +104,3 @@ class PlayerList():
             if puuid == player.puuid:
                 return player.ign
         return ''
-
-if __name__ == '__main__':
-    playerList = PlayerList('playerlist.csv')
-    playerList.load()
-    print('yes')
