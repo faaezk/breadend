@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:old/elo_history/grovyle.txt
 1657288369
+========
+1679824357
+>>>>>>>> main:mmr_history/86f04c78-aad6-529b-9845-a5c6e5e2ace3.txt
 776
 794
 778
@@ -49,3 +53,8 @@
 861
 882
 1150
+<<<<<<<< HEAD:old/elo_history/grovyle.txt
+========
+1250,Sunday-March-19-2023-5:10-AM
+1232,Sunday-March-26-2023-11:52-AM
+>>>>>>>> main:mmr_history/86f04c78-aad6-529b-9845-a5c6e5e2ace3.txt

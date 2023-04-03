@@ -5,74 +5,64 @@ import graphs
 
 def update_all(graph, printer=True,start=0):
     
-    playerList = playerclass.PlayerList('playerlist.csv')
-    playerList.load()
-    playerList.sort()
+    playerlist = playerclass.PlayerList('playerlist.csv')
+    playerlist.load()
+    playerlist.sort()
 
     update_count = 0
     error_count = 0
     updatedList = []
     retry = []
-    total = str(len(playerList.players) - start)
+    total = str(len(playerlist) - start)
 
-    for i in range(start, len(playerList.players)):
-        player = playerList.players[i]
-
+    for i, player in enumerate(playerlist):
         if player.active == 'False':
             continue
+        
+        try:
+            thing = valorant.update_database(player.puuid)
+        except Exception as E:
+            retry.append(player)
+            error_count += 1
+            if printer:
+                print(f'{i+1:02d}/{total}: {E.message} at {player.ign}')
 
-        thing = valorant.update_database(player.puuid)
+        new_games = int(thing)
+        update_count += new_games
 
-        if not thing[0]:
-
-            if player.priority == '1':
-                retry.append(player)
+        if new_games > 0:
+            updatedList.append((player.ign, new_games))
             
-            error_count += 1
-
-            if printer:
-                print(f'{thing[1]} at {player.ign}')
-
-        else:
-            update_count += int(thing[1])
-
-            if int(thing[1]) > 0:
-                updatedList.append((player.ign, thing[1]))
-                
-            if graph:
-                graphs.make_graph(puuid=player.puuid, ign=player.ign, update=False)
-        
-        if printer:
-            print(f'completed {i+1}/{total}')
+        if graph:
+            graphs.graph(puuid=player.puuid, update=False)
     
-    i = 0
-    total = len(retry)
-    for player in retry:
-        i += 1
-        if player.active == 'False':
-            continue
-
-        thing = valorant.update_database(player.puuid)
-
-        if not thing[0]:
-            error_count += 1
-
-            if printer:
-                print(f'{thing[1]} at {player.ign}')
-
-        else:
-            error_count -= 1
-            update_count += int(thing[1])
-
-            if int(thing[1]) > 0:
-                updatedList.append((player.ign, thing[1]))
-                
-            if graph:
-                graphs.make_graph(puuid=player.puuid, ign=player.ign, update=False)
-        
         if printer:
-            print(f'completed retry {i+1}/{total}')
+            print(f'{i+1:02d}/{total}: Success')
 
+    total = len(retry)
+    for i, player in enumerate(retry):
+
+        try:
+            thing = valorant.update_database(player.puuid)
+        except Exception as E:
+            error_count += 1
+            if printer:
+                print(f'{i+1:02d}/{total}: {E.message} at {player.ign}')
+
+        thing = int(thing)
+        update_count += thing
+
+        if thing > 0:
+            updatedList.append((player.ign, thing))
+            
+        if graph:
+            graphs.graph(puuid=player.puuid, update=False)
+    
+        if printer:
+            print(f'{(i+1):02d}/{total}: Success on 2nd attempt')
+
+    with open('ztemp.txt','w') as f:
+        f.write(str(updatedList))
 
     if printer:
         print(updatedList)
@@ -85,7 +75,7 @@ def update_all(graph, printer=True,start=0):
     melb_now = datetime.now()
     
     printerz = f'completed on: {melb_now.strftime("%d/%m/%y")} at {melb_now.strftime("%H:%M:%S")} with {updates}'
-    f = open("updater_log-2022.out", "a")
+    f = open("updater_log-2023.out", "a")
     f.write(printerz + '\n')
     f.close()
 

@@ -6,6 +6,7 @@ import math
 import pandas as pd
 import numpy as np
 from adjustText import adjust_text
+from exceptionclass import NoneException
 
 ranks = {
 0 : "Iron 1", 100 : "Iron 2", 200 : "Iron 3",
@@ -32,16 +33,20 @@ def get_mmr_list(puuid):
             y.append(int(line.split(',')[0].strip()))
 
     if len(y) == 2:
-        return False, False
+        raise NoneException
     
     y.pop(0)
     return range(1, len(y) + 1), y
 
-def generate_ticks(puuid):
+def generate_ticks(puuid, num_games=0):
     
     x, y = get_mmr_list(puuid)
     if not x:
         return(False, 'not enough data')
+
+    if num_games != 0:
+        y = y[-num_games:]
+        x = range(1, len(y) + 1)
 
     y_min = rounddown(min(y))
     y_max = roundup(max(y))
@@ -92,40 +97,32 @@ def generate_ticks(puuid):
                 x_ticks[-1] = x[-1]
             else:
                 x_ticks.append(x[-1])
+    else:
+        x_ticks = False
 
     return  x, y, x_ticks, y_ticks, y_labels, [y_min,y_max]
 
-def graph(puuid="None", ign="", update=True, acts=False):
+def graph(puuid, num_games=0, update=True, acts=False):
 
-    if puuid == "None" and ign == "":
-        return (False, 'no ign or puuid given')
-
-    if puuid == "None" and ign != "":
-        playerlist = playerclass.PlayerList('playerlist.csv')
-        playerlist.load()
-        puuid = playerlist.get_puuid_by_ign(ign)
-
-    if puuid != "None" and ign == "":
-        playerlist = playerclass.PlayerList('playerlist.csv')
-        playerlist.load()
-        ign = playerlist.get_ign_by_puuid(puuid)
-
-    if puuid == "None" or ign == "":
-        return (False, 'player not in database')
+    playerlist = playerclass.PlayerList('playerlist.csv')
+    playerlist.load()
+    ign = playerlist.get_ign_by_puuid(puuid)
 
     if update:
-        thing = valorant.update_database(puuid=puuid)
-        if thing[0] == False:
-            return thing
-    
-    x, y, x_ticks, y_ticks, y_labels, y_range = generate_ticks(puuid)
+        try:
+            valorant.update_database(puuid=puuid)
+        except Exception as E:
+            raise E
+
+    x, y, x_ticks, y_ticks, y_labels, y_range = generate_ticks(puuid, num_games)
 
     fig, ax = plt.subplots()
     axes = fig.gca()
     axes.set_ylim(y_range)
 
     axes.set_yticks(y_ticks)
-    axes.set_xticks(x_ticks)
+    if x_ticks:
+        axes.set_xticks(x_ticks)
     axes.set_yticklabels(y_labels)
 
     p = ax.plot(x, y)
@@ -136,11 +133,12 @@ def graph(puuid="None", ign="", update=True, acts=False):
     ax.set_title(ign + '\'s MMR over time')
 
     if acts:
-        act_data = valorant.get_data('mmr', puuid=puuid)
-        if not act_data[0]:
-            return act_data
-        
-        act_data = act_data[1]['data']['by_season']
+        try:
+            act_data = valorant.get_data('MMR_BY_PUUID', puuid=puuid)
+        except Exception as E:
+            raise E
+
+        act_data = act_data['data']['by_season']
         act_games = []
 
         for act in act_data.keys():
@@ -164,6 +162,10 @@ def graph(puuid="None", ign="", update=True, acts=False):
     fig.savefig(f'mmr_graphs/{puuid}.png', bbox_inches="tight")
     plt.close(fig)
 
+    return True
+
+def multigraph(players: list, update=False):
+
     return (True, True)
 
 def multigraph(players: list, update=False):
@@ -177,24 +179,24 @@ def multigraph(players: list, update=False):
     playerlist.load()
 
     for ign in players:
+        
         puuid = playerlist.get_puuid_by_ign(ign)
-        if puuid == "None":
-            fails.append((ign, "Player not in database"))
-            continue
 
-        if os.path.isfile(f'mmr_history/{puuid}.txt') == False:
+        if puuid == "None" or not os.path.isfile(f'mmr_history/{puuid}.txt'):
             fails.append((ign, "Player not in database"))
             continue
         
         if update:
-            flag = valorant.update_database(puuid)
-            if not flag[0]:
-                fails.append((ign, flag[1]))
+            try:
+                valorant.update_database(puuid)
+            except Exception as E:
+                fails.append((ign, E.message))
                 continue
-
-        x, y = get_mmr_list(puuid)
-        if not x:
-            return(False, 'not enough data')
+        
+        try:
+            x, y = get_mmr_list(puuid)
+        except Exception as E:
+            fails.append((ign, E.message))
 
         x_values.append(x)
         y_values.append(y)
@@ -209,7 +211,7 @@ def multigraph(players: list, update=False):
             most_games = len(y)
 
     if len(fails) == len(players):
-        return (False, fails)
+        raise NoneException
     
     for failure in fails:
         players.remove(failure[0])
@@ -400,16 +402,13 @@ def date_graph():
     plt.ylabel('MMR')
     plt.title('MMR over tifme')
     plt.legend(loc='upper left')
-    plt.savefig('date-graph.png', bbox_inches="tight")
+    plt.savefig('stuff/date-graph.png', bbox_inches="tight")
 
 def update_all_graphs():
     playerlist = playerclass.PlayerList('playerlist.csv')
     playerlist.load()
 
-    for i in range(len(playerlist.players)):
-        if playerlist.players[i].active != 'False':
-            print(graph(puuid=playerlist.players[i].puuid, update=False))
+    for player in enumerate(playerlist):
+        if player.active != 'False':
+            print(graph(puuid=player.puuid, update=False))
     return
-
-if __name__ == "__main__":
-    print(graph(ign='fakinator'))
