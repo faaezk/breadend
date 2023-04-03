@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 from adjustText import adjust_text
 from exceptionclass import NoneException
+import secret_stuff
 
 ranks = {
 0 : "Iron 1", 100 : "Iron 2", 200 : "Iron 3",
@@ -28,7 +29,7 @@ def rounddown(x):
 
 def get_mmr_list(puuid):
     y = []
-    with open(f'mmr_history/{puuid}.txt', 'r') as f:
+    with open(f'{secret_stuff.DATABASE_PATH}/{puuid}.txt', 'r') as f:
         for line in f:
             y.append(int(line.split(',')[0].strip()))
 
@@ -178,7 +179,7 @@ def multigraph(players: list, update=False):
         
         puuid = playerlist.get_puuid_by_ign(ign)
 
-        if puuid == "None" or not os.path.isfile(f'mmr_history/{puuid}.txt'):
+        if puuid == "None" or not os.path.isfile(f'{secret_stuff.DATABASE_PATH}/{puuid}.txt'):
             fails.append((ign, "Player not in database"))
             continue
         
