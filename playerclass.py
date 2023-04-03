@@ -26,6 +26,15 @@ class PlayerList():
     def __init__(self, filePath):
         self.filePath = filePath
         self.players = []
+
+    def __iter__(self):
+        return iter(self.players)
+    
+    def __next__(self):
+        return next(self.players)
+    
+    def __len__(self):
+        return len(self.players)
     
     def add(self, player:Player):
         self.players.append(player)

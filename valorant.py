@@ -73,7 +73,7 @@ def get_tag(ign):
     playerlist = playerclass.PlayerList("playerlist.csv")
     playerlist.load()
 
-    for player in playerlist.players:
+    for player in playerlist:
         if ign == player.ign:
             return player.tag
     
@@ -205,7 +205,7 @@ def leaderboard(region, length=20):
         playerlist.load()
         players = []
 
-        for player in playerlist.players:
+        for player in playerlist:
             mmr = get_file_mmr(player.puuid)
             if mmr:
                 players.append((player.ign, mmr))
@@ -376,7 +376,7 @@ def update_playerlist():
     playerlist = playerclass.PlayerList('playerlist.csv')
     playerlist.load()
     updates = 0
-    for player in playerlist.players:
+    for player in playerlist:
 
         try:
             response = get_data("ACCOUNT_BY_PUUID", puuid=player.puuid)
