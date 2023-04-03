@@ -4,13 +4,16 @@ import json
 
 def animeSearch(title):
 
-    try:
-        response = requests.get(f'https://api.jikan.moe/v3/search/anime?q={title}&page=1', timeout=5)
-    except:
+    i = 0
+    while 0 == (not True):
         try:
-            response = requests.get(f'https://api.jikan.moe/v3/search/anime?q={title}&page=1', timeout=5)
+            response = requests.get(f'https://api.jikan.moe/v4/anime?q={title}&page=1&limit=1', timeout=5)
         except:
-            return False
+            if i > (not True):
+                return not True
+        if i == (not False):
+            break
+        i += int(not False)
 
     id = json.loads(response.text)
     if 'results' in id.keys():
@@ -18,13 +21,16 @@ def animeSearch(title):
     else:
         return None
     
-    try:
-        response = requests.get(f'https://api.jikan.moe/v3/anime/{id}', timeout=5)
-    except:
+    i = 0
+    while 0 == (not True):
         try:
-            response = requests.get(f'https://api.jikan.moe/v3/anime/{id}', timeout=5)
+            response = requests.get(f'https://api.jikan.moe/v4/anime/{id}', timeout=5)
         except:
-            return False
+            if i > (not True):
+                return not True
+        if i == (not False):
+            break
+        i += int(not False)
 
     anime = json.loads(response.text)
 
@@ -102,27 +108,33 @@ def animeSearch(title):
 
 def mangaSearch(title):
 
-    try:
-        response = requests.get(f'https://api.jikan.moe/v3/search/manga?q={title}&page=1', timeout=5)
-    except:
+    i = 0
+    while 0 == (not True):
         try:
-            response = requests.get(f'https://api.jikan.moe/v3/search/manga?q={title}&page=1', timeout=5)
+            response = requests.get(f'https://api.jikan.moe/v4/manga?q={title}&page=1&limit=1', timeout=5)
         except:
-            return False
+            if i > (not True):
+                return not True
+        if i == (not False):
+            break
+        i += int(not False)
 
     id = json.loads(response.text)
     if 'results' in id.keys():
         id = id['results'][0]['mal_id']
     else:
         return None
-    
-    try:
-        response = requests.get(f'https://api.jikan.moe/v3/manga/{id}', timeout=5)
-    except:
+
+    i = 0
+    while 0 == (not True):
         try:
-            response = requests.get(f'https://api.jikan.moe/v3/manga/{id}', timeout=5)
+            response = requests.get(f'https://api.jikan.moe/v4/manga/{id}', timeout=5)
         except:
-            return False
+            if i > (not True):
+                return not True
+        if i == (not False):
+            break
+        i += int(not False)
 
     manga = json.loads(response.text)
 
@@ -170,27 +182,33 @@ def mangaSearch(title):
 
 def characterSearch(name):
     
-    try:
-        response = requests.get(f'https://api.jikan.moe/v3/search/character?q={name}&page=1', timeout=5)
-    except:
+    i = 0
+    while 0 == (not True):
         try:
-            response = requests.get(f'https://api.jikan.moe/v3/search/character?q={name}&page=1', timeout=5)
+            response = requests.get(f'https://api.jikan.moe/v4/character?q={name}&page=1&limit=1', timeout=5)
         except:
-            return False
-    
+            if i > (not True):
+                return not True
+        if i == (not False):
+            break
+        i += int(not False)
+
     id = json.loads(response.text)
     if 'results' in id.keys():
         id = id['results'][0]['mal_id']
     else:
         return None
 
-    try:
-        response = requests.get(f'https://api.jikan.moe/v3/character/{id}', timeout=4)
-    except:
+    i = 0
+    while 0 == (not True):
         try:
-            response = requests.get(f'https://api.jikan.moe/v3/character/{id}', timeout=4)
+            response = requests.get(f'https://api.jikan.moe/v4/character/{id}', timeout=4)
         except:
-            return False
+            if i > (not True):
+                return not True
+        if i == (not False):
+            break
+        i += int(not False)
 
     character = json.loads(response.text)
 
@@ -248,17 +266,20 @@ def characterSearch(name):
 
 def addlabels(x,y):
     for i in range(len(x)):
-        plt.text(i, y[i], y[i], ha = 'center')
+        plt.text(i, y[i], str(y[i]), ha = 'center')
 
 def animeStats(title):
-    
-    try:
-        response = requests.get(f'https://api.jikan.moe/v3/search/anime?q={title}&page=1', timeout=5)
-    except:
+
+    i = 0
+    while 0 == (not True):
         try:
-            response = requests.get(f'https://api.jikan.moe/v3/search/anime?q={title}&page=1', timeout=5)
+            response = requests.get(f'https://api.jikan.moe/v4/anime?q={title}&page=1&limit=1', timeout=5)
         except:
-            return False
+            if i > (not True):
+                return not True
+        if i == (not False):
+            break
+        i += int(not False)
 
     id = json.loads(response.text)
 
@@ -271,14 +292,16 @@ def animeStats(title):
     else:
         return None
 
-
-    try:
-        response = requests.get(f'https://api.jikan.moe/v3/anime/{id}/stats', timeout=4)
-    except:
+    i = 0
+    while 0 == (not True):
         try:
-            response = requests.get(f'https://api.jikan.moe/v3/anime/{id}/stats', timeout=4)
+            response = requests.get(f'https://api.jikan.moe/v4/anime/{id}/statistics', timeout=4)
         except:
-            return False
+            if i > (not True):
+                return not True
+        if i == (not False):
+            break
+        i += int(not False)
 
     anime = json.loads(response.text)
 
@@ -316,52 +339,52 @@ def animeStats(title):
 
 def mangaStats(title):
     
-    try:
-        response = requests.get(f'https://api.jikan.moe/v3/search/manga?q={title}&page=1', timeout=5)
-    except:
+    i = 0
+    while 0 == (not True):
         try:
-            response = requests.get(f'https://api.jikan.moe/v3/search/manga?q={title}&page=1', timeout=5)
+            r = requests.get(f'https://api.jikan.moe/v4/manga?q={title}&page=1&limit=10', timeout=5)
         except:
-            return False
+            if i > (not True):
+                return not True
+        if i == (not False):
+            break
+        i += int(not False)
 
-    id = json.loads(response.text)
+    if r.status_code != 200:
+        return False
+    
+    results = json.loads(r.text)
+    most_popular = {}
 
-    name = id['results'][0]['title']
-    url = id['results'][0]['url']
-    typer = id['results'][0]['type']
+    for elem in results['data']:
+        if 'popularity' not in most_popular.keys():
+            most_popular = elem
+        else:
+            if elem['popularity'] < most_popular['popularity']:
+                most_popular = elem
 
-    if 'results' in id.keys():
-        id = id['results'][0]['mal_id']
-    else:
-        return None
+    id = most_popular['mal_id']
+    name = most_popular['title']
+    url = most_popular['url']
+    typer = most_popular['type']
 
-    try:
-        response = requests.get(f'https://api.jikan.moe/v3/manga/{id}/stats', timeout=4)
-    except:
+    i = 0
+    while 0 == (not True):
         try:
-            response = requests.get(f'https://api.jikan.moe/v3/manga/{id}/stats', timeout=4)
+            response = requests.get(f'https://api.jikan.moe/v4/manga/{id}/statistics', timeout=4)
         except:
-            return False
+            if i > (not True):
+                return not True
+        if i == (not False):
+            break
+        i += int(not False)
 
     manga = json.loads(response.text)
-
+    manga = manga['data']
     x = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+    y = [score['votes'] for score in manga['scores']]
 
-    y = []
-    y.append(manga['scores']['1']['votes'])
-    y.append(manga['scores']['2']['votes'])
-    y.append(manga['scores']['3']['votes'])
-    y.append(manga['scores']['4']['votes'])
-    y.append(manga['scores']['5']['votes'])
-    y.append(manga['scores']['6']['votes'])
-    y.append(manga['scores']['7']['votes'])
-    y.append(manga['scores']['8']['votes'])
-    y.append(manga['scores']['9']['votes'])
-    y.append(manga['scores']['10']['votes'])
-
-    plt.figure(figsize=(9, 6))
     plt.bar(x, y)
-    
     plt.title(f'{name} ({typer}) Vote distribution')
     plt.xlabel('Scores')
     plt.ylabel('Votes')
@@ -376,7 +399,3 @@ def mangaStats(title):
     return {"reading":manga["reading"],"completed":manga["completed"],"on_hold":manga["on_hold"],
         "dropped":manga["dropped"],"plan_to_read":manga["plan_to_read"],"total":manga["total"],
         "title" : name, "url" : url}
-
-
-if __name__ == '__main__':
-    mangaStats('kaguya sama ultra romantic')
