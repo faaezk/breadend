@@ -1,139 +1,72 @@
 import discord
-from discord.ext import commands
-import configparser
-from discord_slash import SlashCommand
-import old.personClass as personClass
-import csv
+import secret_stuff
+from enum import Enum
 
-def get_config():
-    c = configparser.ConfigParser()
-    c.read('config.ini')
+guild_id = secret_stuff.TESTING_GUILD_ID
+intents = discord.Intents.all()
+intents.message_content = True
 
-    return c['discord']['ritsu']
+class aclient(discord.Client):
+  def __init__(self):
+    super().__init__(intents = intents)
+    self.synced = False # added to make sure that the command tree will be synced only once
+    self.added = False
 
-token = get_config()
+  async def on_ready(self):
+    await self.wait_until_ready()
+    if not self.synced: # check if slash commands have been synced 
+      await tree.sync(guild = discord.Object(guild_id)) 
+      self.synced = True
+    if not self.added:
+      self.added = True
+    print(f"Say hi to {self.user}!")
 
-help_command = commands.DefaultHelpCommand(no_category = 'Commands')
-client = commands.Bot(command_prefix='!',help_command = help_command)
-slash = SlashCommand(client, sync_commands=True)
-guild_ids = [731539222141468673]
+client = aclient()
+tree = discord.app_commands.CommandTree(client)
 
-@client.event
-async def on_ready():
-    print("it started working")
+@tree.command(description='Respond hello to you.', guild=discord.Object(guild_id))
+async def greet(interaction: discord.Interaction):
+  await interaction.response.send_message('Hello!')
+
+
+@tree.command(description='Respond hello to you and mention yout user.', guild=discord.Object(guild_id))
+async def greet_user(interaction: discord.Interaction):
+  user = interaction.user.id
+  await interaction.response.send_message(f'Hello, <@{user}>!')
+
+GreetingTime = Enum(value='GreetingTime', names=['MORNING', 'AFTERNOON', 'EVENING', 'NIGHT'])
+
+@tree.command(description='Respond according to the period of the day.', guild=discord.Object(guild_id))
+@discord.app_commands.describe(period='Period of the day')
+async def greet_user_time_of_the_day(interaction: discord.Interaction, period: GreetingTime):
+  user = interaction.user.id
+  if period.name == 'MORNING':
+    await interaction.response.send_message(f'Good Morning, <@{user}>!')
+    return
+  if period.name == 'AFTERNOON':
+    await interaction.response.send_message(f'Good Afternoon, <@{user}>!')
+    return
+  if period.name == 'EVENING':
+    await interaction.response.send_message(f'Good Evening, <@{user}>!')
+    return
+  if period.name == 'NIGHT':
+    await interaction.response.send_message(f'Have a good night, <@{user}>!')
+    return
 
 @client.event
 async def on_message(message):
+  # This checks if the message is not from the bot itself. If it is, it'll ignore the message.
+  if message.author == client.user:
+    return
 
-    file = open('peoplecodes.txt','r')
-    anonIDs = file.readlines()
-    file.close()
+  # From here, you can add all the rules and the behaviour of the bot.
+  # In this case, the bot checks if the content of the message is "Hello!" and send a message if it's true.
+  if message.content == 'Hello!':
+    await message.channel.send("Hello! I'm happy to see you around here.")
+    return
 
-    for i in range(0, len(anonIDs)):
-        anonIDs[i] = anonIDs[i].strip()
-
-    dontlook = []
-    with open("dontlook.csv", "r") as f:
-        reader = csv.reader(f, delimiter="\t")
-        for i, line in enumerate(reader):
-            dontlook.append(line[0].split(','))
-
-    Faaez =     personClass.Person("faaez",     410771947522359296, anonIDs[0])
-    faq =       personClass.Person("faq",       776365641576742932, anonIDs[1])
-    Dhiluka =   personClass.Person("dhiluka",   305132419474784257, anonIDs[2])
-    Rasindu =   personClass.Person("rasindu",   285341337899761673, anonIDs[3])
-    Dylan =     personClass.Person("dylan",     236820135254425600, anonIDs[4])
-    Josh =      personClass.Person("josh",      389600778651959296, anonIDs[5])
-    Vivian =    personClass.Person("vivian",    261818489159811072, anonIDs[6])
-    Ethan =     personClass.Person("ethan",     400499749263769600, anonIDs[7])
-    Albert =    personClass.Person("albert",    284881791335006209, anonIDs[8])
-    Henry =     personClass.Person("henry",     290323655437713419, anonIDs[9])
-    Joseph =    personClass.Person("joseph",    219270614362488832, anonIDs[10])
-    Darren =    personClass.Person("darren",    286762644067713035, anonIDs[11])
-    Delwyn =    personClass.Person("delwyn",    389687347605798913, anonIDs[12])
-    Hadi =      personClass.Person("hadi",      251576622698856449, anonIDs[13])
-    Will =      personClass.Person("will",      409908597397389313, anonIDs[14])
-    Chris =     personClass.Person("chris",     320792211174195210, anonIDs[15])
-
-    receiver = None
-    people = [Faaez, faq, Rasindu, Dhiluka, Dylan, Josh, Vivian, Ethan, Albert, Henry, Joseph, Darren, Delwyn, Hadi, Will, Chris]
-
-    if message.guild is None and not message.author.bot:
-        print(message.content)
-
-        name = message.content.split(' ')[0]
-        words = message.content.replace(name, '')
-
-        if name.lower() == 'reply':
-            anonReceiverID = message.content.split(' ')[1]
-            words = message.content.replace(name, '')
-            words = words.replace(anonReceiverID, '')
-
-            for person in people:
-                if int(person.anonID) == int(anonReceiverID):
-                    receiver = person
-                    break
-            
-            if receiver == None:
-                await message.author.send("invalid ID")
-
-            else:
-                flag = False
-                for i in range(0, len(dontlook)):
-                    if message.author.id == int(dontlook[i][0]):
-                        if int(dontlook[i][2]) < 4:
-                            dontlook[i][2] = int(dontlook[i][2]) + 1
-                            flag = True
-                            break
-
-                if flag:
-                    receiverUser = await client.fetch_user(receiver.discordID)
-                    await receiverUser.send("reply: \n" + words.strip())
-                    await message.author.send("message sent")
-                
-                else:
-                    await message.author.send("message limit reached")
-
-        else:
-            for person in people:
-                if person.discordID == message.author.id:
-                    sender = person
-                    break
-
-            for person in people:
-                if person.name == name:
-                    receiver = person
-                    break
-            
-            if receiver == None:
-                await message.author.send("incorrect format, please provide name")
-            
-            else:
-                flag = False
-                for i in range(0, len(dontlook)):
-                    if dontlook[i][0] == str(sender.discordID):
-                        if dontlook[i][1] == '0':
-                            dontlook[i][1] = str(receiver.anonID)
-                            dontlook[i][2] = int(dontlook[i][2]) + 1
-                            flag = True
-                        else:
-                            if dontlook[i][1] == str(receiver.anonID) and int(dontlook[i][2]) < 4:
-                                dontlook[i][2] = int(dontlook[i][2]) + 1
-                                flag = True
-                        break
-
-                if flag:
-                    receiverUser = await client.fetch_user(receiver.discordID)
-                    await receiverUser.send(words.strip() + '\nfrom: ' + str(sender.anonID)) 
-                    await message.author.send("message sent")
-                else:
-                    await message.author.send("you cant send a message to that person or message limit reached")
-
-        csvfile = open('dontlook.csv', 'w')
-        for line in dontlook:
-            csvfile.write(str(line[0]) + ',' + str(line[1]) + ',' + str(line[2]) + '\n')
-        csvfile.close()
-
-    await client.process_commands(message)
-
-client.run(token)
+  if message.content == 'Good bye!':
+    await message.channel.send("Hope to see you soon!")
+    return
+		
+client.run(secret_stuff.RITSU_TOKEN)
