@@ -404,7 +404,7 @@ def update_all_graphs():
     playerlist = playerclass.PlayerList('playerlist.csv')
     playerlist.load()
 
-    for i in range(len(playerlist.players)):
-        if playerlist.players[i].active != 'False':
-            print(graph(puuid=playerlist.players[i].puuid, update=False))
+    for player in enumerate(playerlist):
+        if player.active != 'False':
+            print(graph(puuid=player.puuid, update=False))
     return
