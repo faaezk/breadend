@@ -5,17 +5,17 @@ import graphs
 
 def update_all(graph, printer=True,start=0):
     
-    playerList = playerclass.PlayerList('playerlist.csv')
-    playerList.load()
-    playerList.sort()
+    playerlist = playerclass.PlayerList('playerlist.csv')
+    playerlist.load()
+    playerlist.sort()
 
     update_count = 0
     error_count = 0
     updatedList = []
     retry = []
-    total = str(len(playerList.players) - start)
+    total = str(len(playerlist) - start)
 
-    for i, player in enumerate(playerList.players):
+    for i, player in enumerate(playerlist):
         if player.active == 'False':
             continue
         
