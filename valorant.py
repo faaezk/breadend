@@ -81,10 +81,10 @@ def get_tag(ign):
 
 def get_file_mmr(puuid):
 
-    if os.path.isfile(f'mmr_history/{puuid}.txt') == False:
+    if os.path.isfile(f'{secret_stuff.DATABASE_PATH}/{puuid}.txt') == False:
         return False
     
-    with open(f'mmr_history/{puuid}.txt', 'r') as f:
+    with open(f'{secret_stuff.DATABASE_PATH}/{puuid}.txt', 'r') as f:
         for line in f:
             pass
 
@@ -96,10 +96,10 @@ def get_file_mmr(puuid):
 
 def initialise_file(puuid):
 
-    f = open(f'mmr_history/{puuid}.txt', "x")
+    f = open(f'{secret_stuff.DATABASE_PATH}/{puuid}.txt', "x")
     f.close()
 
-    f = open(f'mmr_history/{puuid}.txt', "w")
+    f = open(f'{secret_stuff.DATABASE_PATH}/{puuid}.txt', "w")
     f.write('\n')
     f.close()
 
@@ -118,7 +118,7 @@ def update_database(puuid):
 
     data = data['data']
 
-    if not os.path.isfile(f'mmr_history/{puuid}.txt'):
+    if not os.path.isfile(f'{secret_stuff.DATABASE_PATH}/{puuid}.txt'):
         if len(data) == 0:
             raise NoneException
         else:
@@ -128,7 +128,7 @@ def update_database(puuid):
     date_raw = data[0]['date_raw']
     lines = []
 
-    with open(f'mmr_history/{puuid}.txt', 'r') as f:
+    with open(f'{secret_stuff.DATABASE_PATH}/{puuid}.txt', 'r') as f:
         for line in f:
             lines.append(line)
     
@@ -168,7 +168,7 @@ def update_database(puuid):
         lines[0] = f"{data[0]['date_raw']}\n"
         lines += new_list[::-1]
 
-        with open(f'mmr_history/{puuid}.txt', "w") as f:
+        with open(f'{secret_stuff.DATABASE_PATH}/{puuid}.txt', "w") as f:
             f.writelines(lines)
     
     return len(new_list)
@@ -184,7 +184,7 @@ def get_elo_list(puuid):
         return MissingException
     
     lines = []
-    with open(f'mmr_history/{puuid}.txt', 'r') as f:
+    with open(f'{secret_stuff.DATABASE_PATH}/{puuid}.txt', 'r') as f:
         for line in f:
             lines.append(line.strip())
 
