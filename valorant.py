@@ -136,31 +136,23 @@ def update_database(puuid):
     new_list = []
 
     if last_file_update == 0:
-        for i in range(len(data)):
-            thedate = replace_all(data[i]['date'], [', ', ' '], '-')
-            new_list.append(f"{data[i]['elo']},{thedate}\n")
+        for game in enumerate(data):
+            thedate = replace_all(game['date'], [', ', ' '], '-')
+            new_list.append(f"{game['elo']},{thedate}\n")
 
-    elif len(str(last_file_update)) == 13:
-        if (len(str(date_raw)) == 10):
-            last_file_update = math.floor(last_file_update/1000)
-            last_num = last_file_update // 10**0 % 10
-            last_num += 1
-            last_file_update = math.floor(last_file_update/10) + last_num
-
-        for i in range(len(data)):
-            date_raw = data[i]['date_raw']
-            if last_file_update < date_raw:
-                thedate = replace_all(data[i]['date'], [', ', ' '], '-')
-                new_list.append(f"{data[i]['elo']},{thedate}\n")
-            else:
-                break
-    
     else:
-        for i in range(len(data)):
-            date_raw = data[i]['date_raw']
+        if len(str(last_file_update)) == 13:
+            if (len(str(date_raw)) == 10):
+                last_file_update = math.floor(last_file_update/1000)
+                last_num = last_file_update // 10**0 % 10
+                last_num += 1
+                last_file_update = math.floor(last_file_update/10) + last_num
+
+        for game in enumerate(data):
+            date_raw = game['date_raw']
             if last_file_update < date_raw:
-                thedate = replace_all(data[i]['date'], [', ', ' '], '-')
-                new_list.append(f"{data[i]['elo']},{thedate}\n")
+                thedate = replace_all(game['date'], [', ', ' '], '-')
+                new_list.append(f"{game['elo']},{thedate}\n")
             else:
                 break
     
@@ -230,13 +222,9 @@ def leaderboard(region, length=20):
 
         leaderboard = f'{regions[region]} Ranked Leaderboard\n'
 
-    for i in range(len(players)):
+    for i, player in enumerate(players):
         rank = i + 1
-        leaderboard += (str(rank) + '.').ljust(3) + str(players[i][0]).ljust(16) + str(players[i][1]).rjust(5) + '\n'
-
-    if region == 'local':
-        with open("stuff/leaderboard.txt", "w") as f:
-            f.write(leaderboard)
+        leaderboard += (str(rank) + '.').ljust(3) + str(player[0]).ljust(16) + str(player[1]).rjust(5) + '\n'
 
     return leaderboard
 
