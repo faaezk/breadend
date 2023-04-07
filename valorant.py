@@ -148,7 +148,7 @@ def update_database(puuid):
                 last_num += 1
                 last_file_update = math.floor(last_file_update/10) + last_num
 
-        for game in enumerate(data):
+        for i, game in enumerate(data):
             date_raw = game['date_raw']
             if last_file_update < date_raw:
                 thedate = replace_all(game['date'], [', ', ' '], '-')
