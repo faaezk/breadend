@@ -27,6 +27,7 @@ def update_all(graph, printer=True,start=0):
             error_count += 1
             if printer:
                 print(f'{i+1:02d}/{total}: {E.message} at {player.ign}')
+            continue
 
         new_games = int(thing)
         update_count += new_games
@@ -62,9 +63,6 @@ def update_all(graph, printer=True,start=0):
         if printer:
             print(f'{(i+1):02d}/{total}: Success on 2nd attempt')
 
-    with open('ztemp.txt','w') as f:
-        f.write(str(updatedList))
-
     if printer:
         print(updatedList)
 
@@ -76,9 +74,13 @@ def update_all(graph, printer=True,start=0):
     melb_now = datetime.now()
     
     printerz = f'completed on: {melb_now.strftime("%d/%m/%y")} at {melb_now.strftime("%H:%M:%S")} with {updates}'
-    f = open(secret_stuff.LOG_PATH, "a")
-    f.write(printerz + '\n')
-    f.close()
+    
+    with open('ztemp.txt','w') as f:
+        f.write(printerz + '\n')
+        f.write(str(updatedList))
+
+    with open(secret_stuff.LOG_PATH, 'a') as f:
+        f.write(printerz + '\n')
 
     return printerz
 

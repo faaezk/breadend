@@ -160,7 +160,7 @@ def graph(puuid, num_games=0, update=True, acts=False):
     else:
         ax.legend(loc='lower right')
     
-    fig.savefig(f'mmr_graphs/{puuid}.png', bbox_inches="tight")
+    fig.savefig(f'{secret_stuff.GRAPH_PATH}/{puuid}.png', bbox_inches="tight")
     plt.close(fig)
 
     return True
@@ -381,7 +381,7 @@ def update_all_graphs():
     playerlist = playerclass.PlayerList('playerlist.csv')
     playerlist.load()
 
-    for player in enumerate(playerlist):
+    for player in playerlist:
         if player.active != 'False':
             print(graph(puuid=player.puuid, update=False))
     return
