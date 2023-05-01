@@ -4,9 +4,9 @@ import playerclass
 import graphs
 import secret_stuff
 
-def update_all(graph, printer=True,start=0):
+def update_all(graph, output=False, printer=True,start=0):
     
-    playerlist = playerclass.PlayerList('playerlist.csv')
+    playerlist = playerclass.PlayerList(secret_stuff.PLAYERLIST_PATH)
     playerlist.load()
     playerlist.sort()
 
@@ -75,9 +75,10 @@ def update_all(graph, printer=True,start=0):
     
     printerz = f'completed on: {melb_now.strftime("%d/%m/%y")} at {melb_now.strftime("%H:%M:%S")} with {updates}'
     
-    with open('ztemp.txt','w') as f:
-        f.write(printerz + '\n')
-        f.write(str(updatedList))
+    if output:
+        with open('ztemp.txt','w') as f:
+            f.write(printerz + '\n')
+            f.write(str(updatedList))
 
     with open(secret_stuff.LOG_PATH, 'a') as f:
         f.write(printerz + '\n')
