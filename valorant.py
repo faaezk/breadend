@@ -57,13 +57,7 @@ def get_data(endpoint, **kwargs):
             DynamicException.set_message(' '.join(john['errors']))
             raise DynamicException
 
-        if 'MMR_HISTORY' in endpoint:
-            if john['name'] == None or john['tag'] == None:
-                raise NoneException
-        
-        elif endpoint != 'REGION_STATUS':
-            if john['data']['name'] == None or john['data']['tag'] == None:
-                raise NoneException
+
         
         return john
 
@@ -117,12 +111,11 @@ def update_database(puuid):
         raise E
 
     data = data['data']
+    if len(data) == 0:
+        raise NoneException
 
     if not os.path.isfile(f'{secret_stuff.DATABASE_PATH}/{puuid}.txt'):
-        if len(data) == 0:
-            raise NoneException
-        else:
-            initialise_file(puuid)
+        initialise_file(puuid)
     
     # Dates of last update
     date_raw = data[0]['date_raw']
