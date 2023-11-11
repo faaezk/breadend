@@ -10,6 +10,7 @@ def update_all(graph, output=False, printer=True,start=0):
     playerlist.load()
     playerlist.sort()
 
+    thing = None
     update_count = 0
     error_count = 0
     updatedList = []
@@ -86,4 +87,4 @@ def update_all(graph, output=False, printer=True,start=0):
     return printerz
 
 if __name__ == "__main__":
-    update_all(False)
+    update_all(False, output=True)
