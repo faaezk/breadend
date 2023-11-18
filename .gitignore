@@ -1,14 +1,7 @@
 **/.DS_Store
 .vscode/
 __pycache__/
-config.ini
 secret_stuff.py
 playground.py
-playerlist.csv
 ztemp.txt
-gitpullpush.bat
-jser/config.json
-jser/node_modules
-mmr_graphs/
-mmr_history/
 old/

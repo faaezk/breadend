@@ -105,7 +105,7 @@ def generate_ticks(puuid, num_games=0):
 
 def graph(puuid, num_games=0, update=True, acts=False):
 
-    playerlist = playerclass.PlayerList('playerlist.csv')
+    playerlist = playerclass.PlayerList(secret_stuff.PLAYERLIST_PATH)
     playerlist.load()
     ign = playerlist.get_ign_by_puuid(puuid)
 
@@ -172,7 +172,7 @@ def multigraph(players: list, update=False):
     most_games = 0
     x_values, y_values, fails = [], [], []
 
-    playerlist = playerclass.PlayerList('playerlist.csv')
+    playerlist = playerclass.PlayerList(secret_stuff.PLAYERLIST_PATH)
     playerlist.load()
 
     for ign in players:
@@ -249,7 +249,7 @@ def multigraph(players: list, update=False):
     plt.ylabel("MMR")
     plt.title("change in MMR over time")
     plt.legend()
-    plt.savefig(f'mmr_graphs/multigraph.png', bbox_inches="tight")
+    plt.savefig(f'{secret_stuff.GRAPHS_PATH}/multigraph.png', bbox_inches="tight")
     plt.close()
 
     return (True, fails)
@@ -378,7 +378,7 @@ def date_graph():
     plt.savefig('stuff/date-graph.png', bbox_inches="tight")
 
 def update_all_graphs():
-    playerlist = playerclass.PlayerList('playerlist.csv')
+    playerlist = playerclass.PlayerList(secret_stuff.PLAYERLIST_PATH)
     playerlist.load()
 
     for player in playerlist:

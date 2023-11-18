@@ -186,7 +186,7 @@ def get_elo_list(puuid):
 def leaderboard(region, length=20):
 
     if region == 'local':
-        playerlist = playerclass.PlayerList('playerlist.csv')
+        playerlist = playerclass.PlayerList(secret_stuff.PLAYERLIST_PATH)
         playerlist.load()
         players = []
 
@@ -354,7 +354,7 @@ def random_crosshair():
     return (name, code)
 
 def update_playerlist():
-    playerlist = playerclass.PlayerList('playerlist.csv')
+    playerlist = playerclass.PlayerList(secret_stuff.PLAYERLIST_PATH)
     playerlist.load()
     updates = 0
     for player in playerlist:
