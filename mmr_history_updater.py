@@ -3,6 +3,7 @@ from datetime import datetime
 import playerclass
 import graphs
 import secret_stuff
+import requests
 
 def update_all(graph, output=False, printer=True,start=0):
     
@@ -83,6 +84,19 @@ def update_all(graph, output=False, printer=True,start=0):
 
     with open(secret_stuff.LOG_PATH, 'a') as f:
         f.write(printerz + '\n')
+
+    embed = {
+        "title": f'{melb_now.strftime("%d/%m/%y")} at {melb_now.strftime("%H:%M:%S")}',
+        "description": updates
+    }
+
+    payload = {
+        "content": "",
+        "username": "The Updater",
+        "embeds": [embed]
+    }
+
+    requests.post(secret_stuff.LOG_WEBHOOK_URL, json=payload)
 
     return printerz
 
