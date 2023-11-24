@@ -22,12 +22,15 @@ def get_data(endpoint, **kwargs):
                 "MMR_HISTORY_BY_NAME" : "https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{ign}/{tag}"}
 
     headers = {'accept' : 'application/json', 'Authorization' : secret_stuff.VALORANT_KEY}
-    errors = {1 : "Invalid API Key", 2 : "Forbidden endpoint", 3 : "Restricted endpoint", 101 : "No region found for this Player",
-            102 : "No matches found, can't get puuid", 103 : "Possible name change detected, can't get puuid. Please play one match, wait 1-2 minutes and try it again",
+    errors = {
+            1 : "Invalid API Key", 2 : "Forbidden endpoint", 3 : "Restricted endpoint", 
+            101 : "No region found for this Player", 102 : "No matches found, can't get puuid", 
+            103 : "Possible name change detected, can't get puuid. Please play one match, wait 1-2 minutes and try it again",
             104 : "Invalid region", 105 : "Invalid filter", 106 : "Invalid gamemode", 107 : "Invalid map", 108 : "Invalid locale",
             109 : "Missing name", 110 : "Missing tag", 111 : "Player not found in leaderboard", 112 : "Invalid raw type",
-            113 : "Invalid match or player id", 114 : "Invalid country code", 115 : "Invalid season", 429 : 'welp', 
-            403 : 'Forbidden', 404 : 'User not found', 500 : 'No matches available'}
+            113 : "Invalid match or player id", 114 : "Invalid country code", 115 : "Invalid season", 
+            400 : "Not able to connect to API", 403 : 'Forbidden', 404 : 'User not found', 429 : 'welp', 500 : 'No matches available'
+        }
     
     try:
         url = endpoints[endpoint].format(**kwargs)
@@ -37,7 +40,7 @@ def get_data(endpoint, **kwargs):
     r = requests.get(url, headers=headers)
 
     if r.status_code in errors.keys():
-        DynamicException.set_message(errors[r.status_code])
+        DynamicException.set_message(self=DynamicException, message=errors[r.status_code])
         raise DynamicException
     
     if endpoint == 'CROSSHAIR':
@@ -56,8 +59,6 @@ def get_data(endpoint, **kwargs):
         if 'errors' in john.keys():
             DynamicException.set_message(' '.join(john['errors']))
             raise DynamicException
-
-
         
         return john
 

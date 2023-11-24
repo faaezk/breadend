@@ -113,3 +113,9 @@ class PlayerList():
             if puuid == player.puuid:
                 return player.ign
         return ''
+    
+    def get_tag_by_ign(self, ign):
+        for player in self.players:
+            if ign == player.ign:
+                return player.tag
+        return ''
