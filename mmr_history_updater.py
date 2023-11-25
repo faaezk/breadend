@@ -5,7 +5,7 @@ import graphs
 import secret_stuff
 import requests
 
-def update_all(graph, output=False, printer=True,start=0):
+def update_all(graph=True, output=False, printer=True,start=0):
     
     playerlist = playerclass.PlayerList(secret_stuff.PLAYERLIST_PATH)
     playerlist.load()
@@ -59,8 +59,8 @@ def update_all(graph, output=False, printer=True,start=0):
         if thing > 0:
             updatedList.append((player.ign, thing))
             
-        if graph:
-            graphs.graph(puuid=player.puuid, update=False)
+            if graph:
+                graphs.graph(puuid=player.puuid, update=False)
     
         if printer:
             print(f'{(i+1):02d}/{total}: Success on 2nd attempt')
@@ -101,4 +101,4 @@ def update_all(graph, output=False, printer=True,start=0):
     return printerz
 
 if __name__ == "__main__":
-    update_all(False, output=True)
+    update_all()
