@@ -4,6 +4,7 @@ import valorant
 import playerclass
 import secret_stuff
 import mmr_history_updater
+from datetime import datetime
 
 func = sys.argv[1]
 
@@ -62,6 +63,36 @@ def stats(ign, tag):
 
     return json.dumps(embed)
 
+def graph(ign):
+    
+    playerList = playerclass.PlayerList(secret_stuff.PLAYERLIST_PATH)
+    playerList.load()
+    puuid = playerList.get_puuid_by_ign(ign)
+
+    if puuid == "None":
+        response = {"error" : "Player not in database"}
+    else:
+        with open(f'{secret_stuff.DATABASE_PATH}/{puuid}.txt') as f:
+            for line in f:
+                pass
+            last_game = line.strip()
+        
+        content = ""
+
+        # If last game is dated, extract day, month and year
+        if len(last_game.split(',')) > 1:
+            output_format = "%d/%m/%y"
+            input_format = "%A-%B-%d-%Y-%I:%M-%p"
+            
+            date = datetime.strptime(last_game.split(',')[1], input_format)
+            content = f'Last game played on {date.strftime(output_format)}'
+        
+        response = {
+            "content" : content, 
+            "filepath" : f'{secret_stuff.GRAPH_PATH}/{puuid}.png'
+        }
+    
+    return json.dumps(response)
 
 if func == 'leaderboard':
     region = sys.argv[2]
@@ -72,6 +103,10 @@ if func == 'stats':
     ign = sys.argv[2]
     tag = sys.argv[3]
     output = stats(ign, tag)
+
+if func == 'graph':
+    ign = sys.argv[2]
+    output = graph(ign)
 
 print(str(output))
 sys.stdout.flush()
