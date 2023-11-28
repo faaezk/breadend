@@ -7,7 +7,7 @@ import requests
 
 def update_all(graph=True, output=False, printer=True,start=0):
     
-    playerlist = playerclass.PlayerList(secret_stuff.PLAYERLIST_PATH)
+    playerlist = playerclass.PlayerList(secret_stuff.get("PLAYERLIST_fP"))
     playerlist.load()
     playerlist.sort()
 
@@ -82,7 +82,7 @@ def update_all(graph=True, output=False, printer=True,start=0):
             f.write(printerz + '\n')
             f.write(str(updatedList))
 
-    with open(secret_stuff.LOG_PATH, 'a') as f:
+    with open(secret_stuff.get("LOG_fP"), 'a') as f:
         f.write(printerz + '\n')
 
     embed = {
@@ -96,7 +96,7 @@ def update_all(graph=True, output=False, printer=True,start=0):
         "embeds": [embed]
     }
 
-    requests.post(secret_stuff.LOG_WEBHOOK_URL, json=payload)
+    requests.post(secret_stuff.get("WEBHOOK_URL"), json=payload)
 
     return printerz
 

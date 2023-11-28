@@ -29,7 +29,7 @@ def rounddown(x):
 
 def get_mmr_list(puuid):
     y = []
-    with open(f'{secret_stuff.DATABASE_PATH}/{puuid}.txt', 'r') as f:
+    with open(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt', 'r') as f:
         for line in f:
             y.append(int(line.split(',')[0].strip()))
 
@@ -105,7 +105,7 @@ def generate_ticks(puuid, num_games=0):
 
 def graph(puuid, num_games=0, update=True, acts=False):
 
-    playerlist = playerclass.PlayerList(secret_stuff.PLAYERLIST_PATH)
+    playerlist = playerclass.PlayerList(secret_stuff.get("PLAYERLIST_FP"))
     playerlist.load()
     ign = playerlist.get_ign_by_puuid(puuid)
 
@@ -160,7 +160,7 @@ def graph(puuid, num_games=0, update=True, acts=False):
     else:
         ax.legend(loc='lower right')
     
-    fig.savefig(f'{secret_stuff.GRAPH_PATH}/{puuid}.png', bbox_inches="tight")
+    fig.savefig(f'{secret_stuff.get("GRAPHS_FP")}/{puuid}.png', bbox_inches="tight")
     plt.close(fig)
 
     return True
@@ -172,14 +172,14 @@ def multigraph(players: list, update=False):
     most_games = 0
     x_values, y_values, fails = [], [], []
 
-    playerlist = playerclass.PlayerList(secret_stuff.PLAYERLIST_PATH)
+    playerlist = playerclass.PlayerList(secret_stuff.get("PLAYERLIST_FP"))
     playerlist.load()
 
     for ign in players:
         
         puuid = playerlist.get_puuid_by_ign(ign)
 
-        if puuid == "None" or not os.path.isfile(f'{secret_stuff.DATABASE_PATH}/{puuid}.txt'):
+        if puuid == "None" or not os.path.isfile(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt'):
             fails.append((ign, "Player not in database"))
             continue
         
@@ -249,7 +249,7 @@ def multigraph(players: list, update=False):
     plt.ylabel("MMR")
     plt.title("change in MMR over time")
     plt.legend()
-    plt.savefig(f'{secret_stuff.GRAPHS_PATH}/multigraph.png', bbox_inches="tight")
+    plt.savefig(f'{secret_stuff.get("GRAPHS_FP")}/multigraph.png', bbox_inches="tight")
     plt.close()
 
     return (True, fails)
@@ -378,7 +378,7 @@ def date_graph():
     plt.savefig('stuff/date-graph.png', bbox_inches="tight")
 
 def update_all_graphs():
-    playerlist = playerclass.PlayerList(secret_stuff.PLAYERLIST_PATH)
+    playerlist = playerclass.PlayerList(secret_stuff.get("PLAYERLIST_FP"))
     playerlist.load()
 
     for player in playerlist:

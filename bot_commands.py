@@ -14,7 +14,7 @@ def leaderboard(region, update):
         if update == 'true':
             mmr_history_updater.update_all(False, printer=False)
 
-        with open(secret_stuff.LOG_PATH,'r') as f:
+        with open(secret_stuff.get("LOG_FP"),'r') as f:
             for lastLine in f:
                 pass
 
@@ -25,7 +25,7 @@ def leaderboard(region, update):
 
 def stats(ign, tag):
 
-    playerList = playerclass.PlayerList(secret_stuff.PLAYERLIST_PATH)
+    playerList = playerclass.PlayerList(secret_stuff.get("PLAYERLIST_FP"))
     playerList.load()
     puuid = playerList.get_puuid_by_ign(ign)
 
@@ -65,14 +65,14 @@ def stats(ign, tag):
 
 def graph(ign):
     
-    playerList = playerclass.PlayerList(secret_stuff.PLAYERLIST_PATH)
+    playerList = playerclass.PlayerList(secret_stuff.get("PLAYERLIST_FP"))
     playerList.load()
     puuid = playerList.get_puuid_by_ign(ign)
 
     if puuid == "None":
         response = {"error" : "Player not in database"}
     else:
-        with open(f'{secret_stuff.DATABASE_PATH}/{puuid}.txt') as f:
+        with open(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt') as f:
             for line in f:
                 pass
             last_game = line.strip()
@@ -89,7 +89,7 @@ def graph(ign):
         
         response = {
             "content" : content, 
-            "filepath" : f'{secret_stuff.GRAPH_PATH}/{puuid}.png'
+            "filepath" : f'{secret_stuff.get("GRAPHS_FP")}/{puuid}.png'
         }
     
     return json.dumps(response)

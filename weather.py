@@ -8,7 +8,7 @@ def get_weather(city_id, api_key):
     return r.text
 
 def main():
-    weather = get_weather(secret_stuff.CITY_ID, secret_stuff.WEATHER_KEY)
+    weather = get_weather(secret_stuff.get("CITY_ID"), secret_stuff.get("WEATHER_KEY"))
     john = json.loads(weather)
 
     return john
