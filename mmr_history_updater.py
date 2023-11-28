@@ -87,7 +87,7 @@ def update_all(graph=True, output=False, printer=True,start=0):
 
     embed = {
         "title": f'{melb_now.strftime("%d/%m/%y")} at {melb_now.strftime("%H:%M:%S")}',
-        "description": updates
+        "description": f'{updates}: {updatedList}'
     }
 
     payload = {
