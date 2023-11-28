@@ -1,13 +1,12 @@
-import math
 import os
-import requests
+import math
 import json
-import playerclass
+import random
+import requests
 from PIL import Image
 from io import BytesIO
-import random
-import secret_stuff
-from exceptionclass import *
+from modules.exceptionclass import *
+from modules import secret_stuff, playerclass
 
 def get_data(endpoint, **kwargs):
 

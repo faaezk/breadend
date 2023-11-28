@@ -1,6 +1,6 @@
-const { SlashCommandBuilder } = require('discord.js');
 const lib = require('../../python_calls');
 const { COMMANDS_FP } = require('../../config.json');
+const { SlashCommandBuilder } = require('discord.js');
 
 const data = new SlashCommandBuilder()
     .setName('leaderboard')

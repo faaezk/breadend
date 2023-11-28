@@ -1,6 +1,6 @@
-import matplotlib.pyplot as plt
-import requests
 import json
+import requests
+import matplotlib.pyplot as plt
 
 def animeSearch(title):
 

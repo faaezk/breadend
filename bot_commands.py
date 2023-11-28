@@ -1,10 +1,10 @@
 import sys
 import json
-import valorant
-import playerclass
-import secret_stuff
-import mmr_history_updater
 from datetime import datetime
+import modules.valorant as valorant
+import modules.playerclass as playerclass
+import modules.secret_stuff as secret_stuff
+import modules.mmr_history_updater as mmr_history_updater
 
 func = sys.argv[1]
 

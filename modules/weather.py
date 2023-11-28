@@ -1,6 +1,6 @@
-import secret_stuff
-import requests
 import json
+import requests
+from modules import secret_stuff
 
 def get_weather(city_id, api_key):
     url = "https://api.openweathermap.org/data/2.5/weather?id={}&appid={}&units=metric".format(city_id, api_key)

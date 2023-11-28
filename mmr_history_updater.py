@@ -1,9 +1,9 @@
-import valorant
-from datetime import datetime
-import playerclass
-import graphs
-import secret_stuff
 import requests
+from datetime import datetime
+import modules.graphs as graphs
+import modules.valorant as valorant
+import modules.playerclass as playerclass
+import modules.secret_stuff as secret_stuff
 
 def update_all(graph=True, output=False, printer=True,start=0):
     
