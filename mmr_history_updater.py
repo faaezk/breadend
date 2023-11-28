@@ -7,7 +7,7 @@ import requests
 
 def update_all(graph=True, output=False, printer=True,start=0):
     
-    playerlist = playerclass.PlayerList(secret_stuff.get("PLAYERLIST_fP"))
+    playerlist = playerclass.PlayerList(secret_stuff.get("PLAYERLIST_FP"))
     playerlist.load()
     playerlist.sort()
 
@@ -82,7 +82,7 @@ def update_all(graph=True, output=False, printer=True,start=0):
             f.write(printerz + '\n')
             f.write(str(updatedList))
 
-    with open(secret_stuff.get("LOG_fP"), 'a') as f:
+    with open(secret_stuff.get("LOG_FP"), 'a') as f:
         f.write(printerz + '\n')
 
     embed = {
