@@ -36,11 +36,19 @@ class PlayerList():
     def __len__(self):
         return len(self.players)
     
-    def add(self, player:Player):
+    def add(self, player: Player):
         self.players.append(player)
-    
-    def remove(self, player:Player):
-        self.players.remove(player)
+
+    def remove(self, ign):
+        tag = self.get_tag_by_ign(ign)
+        puuid = self.get_puuid_by_ign(ign)
+        player = Player(ign.lower(), tag, puuid)
+
+        if not self.inList(player):
+            return "Player not in list"
+        else:
+            self.players.remove(player)
+            return f'{ign}#{tag} has been removed'
 
     def save(self):
         with open(self.filePath, "w+") as f:
@@ -63,7 +71,7 @@ class PlayerList():
     def getPlayers(self):
         return self.players
 
-    def inList(self, player:Player):
+    def inList(self, player: Player):
         for x in self.players:
             if x == player:
                 return True

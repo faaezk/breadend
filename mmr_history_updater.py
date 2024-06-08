@@ -91,9 +91,8 @@ def update_all(graph=True, output=False, printer=True,start=0):
     }
 
     payload = {
-        "content": "",
         "username": "The Updater",
-        "embeds": [embed]
+        "content": printerz
     }
 
     requests.post(secret_stuff.get("WEBHOOK_URL"), json=payload)

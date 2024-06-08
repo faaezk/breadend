@@ -206,7 +206,7 @@ def multigraph(players: list, update=False):
             most_games = len(y)
 
     if len(fails) == len(players):
-        raise NoneException
+        return (False, fails)
     
     for failure in fails:
         players.remove(failure[0])
@@ -250,7 +250,10 @@ def multigraph(players: list, update=False):
     plt.savefig(f'{secret_stuff.get("GRAPHS_FP")}/multigraph.png', bbox_inches="tight")
     plt.close()
 
-    return (True, fails)
+    if len(fails) == 0:
+        return (True, "")
+    else:
+        return (True, fails)
 
 def mark_graph(texts, x, yint, ydates, i, marked, r):
     if i < 0:
