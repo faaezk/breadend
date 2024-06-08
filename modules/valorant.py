@@ -104,7 +104,6 @@ def replace_all(string: str, oldValues, newValue):
     return string
 
 def update_database(puuid):
-
     try: 
         data = get_data('MMR_HISTORY_BY_PUUID', puuid=puuid)
     except Exception as E:
@@ -116,7 +115,7 @@ def update_database(puuid):
 
     if not os.path.isfile(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt'):
         initialise_file(puuid)
-    
+
     # Dates of last update
     date_raw = data[0]['date_raw']
     lines = []

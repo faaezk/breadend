@@ -6,7 +6,7 @@ import modules.playerclass as playerclass
 import modules.secret_stuff as secret_stuff
 
 def update_all(graph=True, output=False, printer=True,start=0):
-    
+
     playerlist = playerclass.PlayerList(secret_stuff.get("PLAYERLIST_FP"))
     playerlist.load()
     playerlist.sort()
@@ -21,7 +21,7 @@ def update_all(graph=True, output=False, printer=True,start=0):
     for i, player in enumerate(playerlist):
         if player.active == 'False':
             continue
-        
+
         try:
             thing = valorant.update_database(player.puuid)
         except Exception as E:
@@ -36,10 +36,10 @@ def update_all(graph=True, output=False, printer=True,start=0):
 
         if new_games > 0:
             updatedList.append((player.ign, new_games))
-            
+
         if graph:
             graphs.graph(puuid=player.puuid, update=False)
-    
+
         if printer:
             print(f'{i+1:02d}/{total}: Success')
 
@@ -74,9 +74,8 @@ def update_all(graph=True, output=False, printer=True,start=0):
         updates = f'{update_count} updates, {error_count} errors'
 
     melb_now = datetime.now()
-    
     printerz = f'completed on: {melb_now.strftime("%d/%m/%y")} at {melb_now.strftime("%H:%M:%S")} with {updates}'
-    
+
     if output:
         with open('ztemp.txt','w') as f:
             f.write(printerz + '\n')
@@ -85,18 +84,12 @@ def update_all(graph=True, output=False, printer=True,start=0):
     with open(secret_stuff.get("LOG_FP"), 'a') as f:
         f.write(printerz + '\n')
 
-    embed = {
-        "title": f'{melb_now.strftime("%d/%m/%y")} at {melb_now.strftime("%H:%M:%S")}',
-        "description": f'{updates}: {updatedList}'
-    }
-
     payload = {
         "username": "The Updater",
         "content": printerz
     }
 
     requests.post(secret_stuff.get("WEBHOOK_URL"), json=payload)
-
     return printerz
 
 if __name__ == "__main__":
