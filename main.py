@@ -77,57 +77,6 @@ async def cat(ctx):
     embed.set_image(url=json.loads(response.text)[0]['url'])
     await ctx.send(embed=embed)
 
-@slash.slash(description="MMR history list",
-             guild_ids=guild_ids,
-             options = [create_option(name="username", description="enter username", option_type=3, required=True)])
-async def elolist(ctx, username=""):
-    
-    ign = username.split('#')[0].lower()
-    playerList = playerclass.PlayerList(secret_stuff.PLAYERLIST_PATH)
-    playerList.load()
-    puuid = playerList.get_puuid_by_ign(ign)
-    elolist = valorant.get_elo_list(puuid)
-
-    if elolist:
-        await ctx.send("```\n" + elolist[1] + "\n```")
-    else:
-        await ctx.send(elolist[1])
-
-@slash.slash(description="Ranked statistics for all acts",
-             guild_ids=guild_ids,
-             options = [create_option(name="username", description="enter username (ign#tag)", option_type=3, required=True)])
-async def stats(ctx, username=""):
-
-    the_message = await ctx.send("fetching stats...")
-    username = username.split('#')
-    ign = username[0].lower()
-    tag = ""
-    puuid = "None"
-
-    if len(username) == 2:
-        tag = username[1].lower()
-        puuid = "None"
-    else:
-        playerList = playerclass.PlayerList(secret_stuff.PLAYERLIST_PATH)
-        playerList.load()
-        puuid = playerList.get_puuid_by_ign(ign)
-
-    data = valorant.stats(ign=ign, tag=tag, puuid=puuid)
-
-    if not data[0]:
-        await the_message.edit(content=data[1])
-    
-    else:
-        stats = data[1][0]
-        card = data[1][1]
-        embed=discord.Embed(title = "Competitive Statistics", description="", color=0x00f900)
-        embed.set_author(name=ign, url = "https://youtu.be/MtN1YnoL46Q", icon_url=card)
-
-        for field in stats:
-            embed.add_field(name=field[0], value=field[1], inline=True)
-
-        await the_message.edit(contents = "", embed=embed)
-
 @slash.slash(description="graph",
              guild_ids=guild_ids,
              options = [
@@ -169,44 +118,6 @@ async def graph(ctx, usernames="", type="", update=""):
                 picture = discord.File(f)
             
             await the_message.edit(content=msg, file=picture)
-
-@slash.slash(description="Valorant Leaderboards",
-             guild_ids=guild_ids,
-             options = [
-             create_option(name="options", description="Region/options for leaderboard (leave blank for local)", option_type=3, required=False, 
-                        choices=[create_choice(name="Update local leaderboard",value="update")
-                        ,create_choice(name="Asia Pacific",value="ap"),
-                        create_choice(name="Europe",value="eu"), create_choice(name="Korea",value="kr"),
-                        create_choice(name="North America",value="na")
-                        ])])
-async def leaderboard(ctx, options=""):
-
-    if options == "ap" or options == "eu" or options == "kr" or options == "na":
-        the_message = await ctx.send("fetching leaderboard...")
-        rleaderboard = valorant.leaderboard(options)
-
-        if rleaderboard:
-            await the_message.edit(content="```\n" + rleaderboard + "\n```")
-    else:
-        if options == "":
-            the_message = await ctx.send("fetching leaderboard...")
-            with open("updater_log-2022.out",'r') as f:
-                for lastLine in f:
-                    pass
-
-            leaderboard = f"Last updated at {lastLine.split(' ')[4]}, {lastLine.split(' ')[2]}\n"
-        
-        if options == "update":
-            the_message = await ctx.send("this is gonna take a while...")
-            mmr_history_updater.update_all(False, printer=False)
-            leaderboard = ""
-            
-        valorant.leaderboard('local')
-        with open("stuff/leaderboard.txt", 'r') as f:
-            for player in f:
-                leaderboard += player
-
-        await the_message.edit(content="```\n" + leaderboard + "\n```")
 
 @slash.slash(description="Add player to database for leaderboard and stuff",
              guild_ids=guild_ids,

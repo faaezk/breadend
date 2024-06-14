@@ -7,16 +7,17 @@ const data = new SlashCommandBuilder()
     .setName('graph')
     .setDescription('MMR graph over time')
 	.addStringOption(option =>
-		option.setName('ign')
-			.setDescription('First part of the username (no #)')
+		option.setName('in_game_names')
+			.setDescription('First part of the username (no #), separated by commas')
 			.setRequired(true))
 
 const execute = async (interaction) => {
-	var ign = interaction.options.getString('ign');
+	var ign_list = interaction.options.getString('in_game_names');
 
-    await interaction.deferReply()
+    console.error('input: ', ign_list);
+    await interaction.deferReply().catch(() => console.log("wow"))
 
-    lib.python_calls([COMMANDS_FP, 'graph', ign])
+    lib.python_calls([COMMANDS_FP, 'graph', ign_list])
         .then(async (result) => {
 
             const data = JSON.parse(result);
@@ -28,8 +29,9 @@ const execute = async (interaction) => {
             }
                 
         })
-        .catch((error) => {
+        .catch(async (error) => {
             console.error('Error running Python process:', error);
+            await interaction.editReply("Something went wrong");
         });
 }
 

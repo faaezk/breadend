@@ -4,7 +4,8 @@ from datetime import datetime
 import modules.valorant as valorant
 import modules.playerclass as playerclass
 import modules.secret_stuff as secret_stuff
-import modules.mmr_history_updater as mmr_history_updater
+from modules.graphs import multigraph
+import mmr_history_updater
 
 func = sys.argv[1]
 
@@ -63,15 +64,23 @@ def stats(ign, tag):
 
     return json.dumps(embed)
 
-def graph(ign):
+def graph(ign_list):
     
     playerList = playerclass.PlayerList(secret_stuff.get("PLAYERLIST_FP"))
     playerList.load()
-    puuid = playerList.get_puuid_by_ign(ign)
+    ign_list = ign_list.split(',')
 
-    if puuid == "None":
-        response = {"error" : "Player not in database"}
-    else:
+    for i in range(0, len(ign_list)):
+        ign_list[i] = playerList.get_puuid_by_ign(ign_list[i].split('#')[0].lower().strip())
+
+    if len(ign_list) == 0:
+        response = {"error" : "No players given/something broke, try again"}
+    
+    elif len(ign_list) == 1:
+        puuid = playerList.get_puuid_by_ign(ign.split('#')[0].lower().strip())
+        if puuid == "None":
+            return json.dumps({"error" : "Players not in database"})
+
         with open(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt') as f:
             for line in f:
                 pass
@@ -91,7 +100,21 @@ def graph(ign):
             "content" : content, 
             "filepath" : f'{secret_stuff.get("GRAPHS_FP")}/{puuid}.png'
         }
-    
+
+    else:
+        res = multigraph(ign_list)
+        if res[0] == True:
+            response = {
+                "content" : f"{res[1]}", 
+                "filepath" : f'{secret_stuff.get("MULTI_GRAPH_FP")}'
+            }
+
+        else:
+            response = {"error" : "No valid players given"}
+
+    if "error" in response.keys():
+        response["error"] += ign_list
+
     return json.dumps(response)
 
 if func == 'leaderboard':

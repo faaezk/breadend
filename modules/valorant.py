@@ -63,16 +63,6 @@ def get_data(endpoint, **kwargs):
 
     raise UnknownException
 
-def get_tag(ign):
-    playerlist = playerclass.PlayerList("playerlist.csv")
-    playerlist.load()
-
-    for player in playerlist:
-        if ign == player.ign:
-            return player.tag
-    
-    return "False"
-
 def get_file_mmr(puuid):
 
     if os.path.isfile(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt') == False:
@@ -140,7 +130,7 @@ def update_database(puuid):
                 last_num += 1
                 last_file_update = math.floor(last_file_update/10) + last_num
 
-        for i, game in enumerate(data):
+        for _, game in enumerate(data):
             date_raw = game['date_raw']
             if last_file_update < date_raw:
                 thedate = replace_all(game['date'], [', ', ' '], '-')
@@ -304,22 +294,6 @@ def add_player(ign, tag):
     playerlist.save()
 
     return f'{ign}#{tag} successfully added'
-
-def remove_player(ign):
-
-    playerlist = playerclass.PlayerList("playerlist.csv")
-    playerlist.load()
-    tag = get_tag(ign)
-    puuid = playerlist.get_puuid_by_ign(ign)
-    player = playerclass.Player(ign.lower(), tag, puuid)
-
-    if puuid == "None" or not tag or not playerlist.inList(player):
-        return "Player not in list"
-        
-    playerlist.remove(player)
-    playerlist.save()
-
-    return f'{ign}#{tag} has been removed'
 
 def crosshair(code):
     try:
