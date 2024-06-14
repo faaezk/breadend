@@ -1,6 +1,6 @@
 import json
+import config
 import requests
-from modules import secret_stuff
 
 def get_weather(city_id, api_key):
     url = "https://api.openweathermap.org/data/2.5/weather?id={}&appid={}&units=metric".format(city_id, api_key)
@@ -8,7 +8,7 @@ def get_weather(city_id, api_key):
     return r.text
 
 def main():
-    weather = get_weather(secret_stuff.get("CITY_ID"), secret_stuff.get("WEATHER_KEY"))
+    weather = get_weather(config.get("CITY_ID"), config.get("WEATHER_KEY"))
     john = json.loads(weather)
 
     return john

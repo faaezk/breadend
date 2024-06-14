@@ -1,11 +1,11 @@
 import sys
 import json
-from datetime import datetime
-import modules.valorant as valorant
-import modules.playerclass as playerclass
-import modules.secret_stuff as secret_stuff
-from modules.graphs import multigraph
+import config
 import mmr_history_updater
+from datetime import datetime
+import backend.valorant as valorant
+from backend.graphs import multigraph
+import backend.playerclass as playerclass
 
 func = sys.argv[1]
 
@@ -15,7 +15,7 @@ def leaderboard(region, update):
         if update == 'true':
             mmr_history_updater.update_all(False, printer=False)
 
-        with open(secret_stuff.get("LOG_FP"),'r') as f:
+        with open(config.get("LOG_FP"),'r') as f:
             for lastLine in f:
                 pass
 
@@ -26,7 +26,7 @@ def leaderboard(region, update):
 
 def stats(ign, tag):
 
-    playerList = playerclass.PlayerList(secret_stuff.get("PLAYERLIST_FP"))
+    playerList = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
     playerList.load()
     puuid = playerList.get_puuid_by_ign(ign)
 
@@ -66,7 +66,7 @@ def stats(ign, tag):
 
 def graph(ign_list):
     
-    playerList = playerclass.PlayerList(secret_stuff.get("PLAYERLIST_FP"))
+    playerList = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
     playerList.load()
     ign_list = ign_list.split(',')
 
@@ -81,7 +81,7 @@ def graph(ign_list):
         if puuid == "None":
             return json.dumps({"error" : "Players not in database"})
 
-        with open(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt') as f:
+        with open(f'{config.get("HISTORY_FP")}/{puuid}.txt') as f:
             for line in f:
                 pass
             last_game = line.strip()
@@ -98,7 +98,7 @@ def graph(ign_list):
         
         response = {
             "content" : content, 
-            "filepath" : f'{secret_stuff.get("GRAPHS_FP")}/{puuid}.png'
+            "filepath" : f'{config.get("GRAPHS_FP")}/{puuid}.png'
         }
 
     else:
@@ -106,7 +106,7 @@ def graph(ign_list):
         if res[0] == True:
             response = {
                 "content" : f"{res[1]}", 
-                "filepath" : f'{secret_stuff.get("MULTI_GRAPH_FP")}'
+                "filepath" : f'{config.get("MULTI_GRAPH_FP")}'
             }
 
         else:

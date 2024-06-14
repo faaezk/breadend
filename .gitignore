@@ -1,13 +1,7 @@
 **/.DS_Store
 .vscode/
-.venv/
 __pycache__/
-secret_stuff.py
-playground.py
-ztemp.txt
-old/
-
-config.json
+config.py
 
 # Logs
 logs

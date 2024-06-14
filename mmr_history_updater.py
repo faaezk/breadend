@@ -1,13 +1,13 @@
 import requests
 from datetime import datetime
-import modules.graphs as graphs
-import modules.valorant as valorant
-import modules.playerclass as playerclass
-import modules.secret_stuff as secret_stuff
+import backend.graphs as graphs
+import backend.config as config
+import backend.valorant as valorant
+import backend.playerclass as playerclass
 
 def update_all(graph=True, output=False, printer=True,start=0):
 
-    playerlist = playerclass.PlayerList(secret_stuff.get("PLAYERLIST_FP"))
+    playerlist = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
     playerlist.load()
     playerlist.sort()
 
@@ -81,7 +81,7 @@ def update_all(graph=True, output=False, printer=True,start=0):
             f.write(printerz + '\n')
             f.write(str(updatedList))
 
-    with open(secret_stuff.get("LOG_FP"), 'a') as f:
+    with open(config.get("LOG_FP"), 'a') as f:
         f.write(printerz + '\n')
 
     payload = {
@@ -89,7 +89,7 @@ def update_all(graph=True, output=False, printer=True,start=0):
         "content": printerz
     }
 
-    requests.post(secret_stuff.get("WEBHOOK_URL"), json=payload)
+    requests.post(config.get("WEBHOOK_URL"), json=payload)
     return printerz
 
 if __name__ == "__main__":

@@ -1,23 +1,23 @@
-import discord
-from discord.ext import commands
-import secret_stuff
-import graphs
-import valorant
-import mmr_history_updater
-import requests
 import json
+import random
+import graphs
+import config
+import discord
+import valorant
+import requests
 import malsearch
+import playerclass
+
+from discord.ext import commands
 from discord_slash import SlashCommand
 from discord_slash.utils.manage_commands import create_option, create_choice
-import random
-import playerclass
 
 intents = discord.Intents.default()
 intents.members = True
 help_command = commands.DefaultHelpCommand(no_category = 'Commands')
 client = commands.Bot(command_prefix='$',help_command = help_command, intents=intents)
 slash = SlashCommand(client, sync_commands=True)
-guild_ids = [secret_stuff.TNG_GUILD_ID, secret_stuff.TESTING_GUILD_ID]
+guild_ids = [config.TNG_GUILD_ID, config.TESTING_GUILD_ID]
 
 @client.event
 async def on_ready():
@@ -70,7 +70,7 @@ async def cat(ctx):
     url = "https://api.thecatapi.com/v1/images/search?format=json"
     payload={}
     files={}
-    headers = {'Content-Type': 'application/json', 'x-api-key': secret_stuff.CAT_KEY}
+    headers = {'Content-Type': 'application/json', 'x-api-key': config.CAT_KEY}
 
     response = requests.request("GET", url, headers=headers, data=payload, files=files)
     embed = discord.Embed(title="cat")
@@ -152,7 +152,7 @@ async def updatePriority(ctx, username="", priority=""):
     if ctx.author.id == 410771947522359296:
         username = username.split('#')
         ign = username[0].lower()
-        playerList = playerclass.PlayerList(secret_stuff.PLAYERLIST_PATH)
+        playerList = playerclass.PlayerList(config.PLAYERLIST_PATH)
         playerList.load()
 
         found = playerList.change_priority(ign, int(priority))
@@ -184,7 +184,7 @@ async def banner(ctx, username=""):
     if len(username) == 2:
         tag = username[1].lower()
     else:
-        playerList = playerclass.PlayerList(secret_stuff.PLAYERLIST_PATH)
+        playerList = playerclass.PlayerList(config.PLAYERLIST_PATH)
         playerList.load()
         puuid = playerList.get_puuid_by_ign(ign)
 
@@ -207,7 +207,7 @@ async def namechange(ctx, old_ign="", old_tag="", new_ign="", new_tag=""):
     if ctx.author.id == 410771947522359296:
         the_message = await ctx.send("please wait...")
 
-        playerList = playerclass.PlayerList(secret_stuff.PLAYERLIST_PATH)
+        playerList = playerclass.PlayerList(config.PLAYERLIST_PATH)
         playerList.load()
         puuid = playerList.get_puuid_by_ign(old_ign)
 
@@ -229,7 +229,7 @@ async def namechange(ctx, old_ign="", old_tag="", new_ign="", new_tag=""):
 @client.command()
 async def getcsv(ctx):
 
-    playerList = playerclass.PlayerList(secret_stuff.PLAYERLIST_PATH)
+    playerList = playerclass.PlayerList(config.PLAYERLIST_PATH)
     playerList.load()
     msg = ""
 
@@ -447,4 +447,4 @@ async def on_message(message):
 
     await client.process_commands(message)
 
-client.run(secret_stuff.POPO_TOKEN)
+client.run(config.POPO_TOKEN)

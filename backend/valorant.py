@@ -1,12 +1,13 @@
 import os
 import math
 import json
+import config
 import random
 import requests
 from PIL import Image
 from io import BytesIO
-from modules.exceptionclass import *
-from modules import secret_stuff, playerclass
+from backend import playerclass
+from backend.exceptionclass import *
 
 def get_data(endpoint, **kwargs):
 
@@ -20,7 +21,7 @@ def get_data(endpoint, **kwargs):
                 "MMR_BY_NAME" : "https://api.henrikdev.xyz/valorant/v2/mmr/ap/{ign}/{tag}",
                 "MMR_HISTORY_BY_NAME" : "https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{ign}/{tag}"}
 
-    headers = {'accept' : 'application/json', 'Authorization' : secret_stuff.get("VALORANT_KEY")}
+    headers = {'accept' : 'application/json', 'Authorization' : config.get("VALORANT_KEY")}
     errors = {
             1 : "Invalid API Key", 2 : "Forbidden endpoint", 3 : "Restricted endpoint", 
             101 : "No region found for this Player", 102 : "No matches found, can't get puuid", 
@@ -65,10 +66,10 @@ def get_data(endpoint, **kwargs):
 
 def get_file_mmr(puuid):
 
-    if os.path.isfile(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt') == False:
+    if os.path.isfile(f'{config.get("HISTORY_FP")}/{puuid}.txt') == False:
         return False
     
-    with open(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt', 'r') as f:
+    with open(f'{config.get("HISTORY_FP")}/{puuid}.txt', 'r') as f:
         for line in f:
             pass
 
@@ -80,10 +81,10 @@ def get_file_mmr(puuid):
 
 def initialise_file(puuid):
 
-    f = open(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt', "x")
+    f = open(f'{config.get("HISTORY_FP")}/{puuid}.txt', "x")
     f.close()
 
-    f = open(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt', "w")
+    f = open(f'{config.get("HISTORY_FP")}/{puuid}.txt', "w")
     f.write('\n')
     f.close()
 
@@ -103,14 +104,14 @@ def update_database(puuid):
     if len(data) == 0:
         raise NoneException
 
-    if not os.path.isfile(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt'):
+    if not os.path.isfile(f'{config.get("HISTORY_FP")}/{puuid}.txt'):
         initialise_file(puuid)
 
     # Dates of last update
     date_raw = data[0]['date_raw']
     lines = []
 
-    with open(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt', 'r') as f:
+    with open(f'{config.get("HISTORY_FP")}/{puuid}.txt', 'r') as f:
         for line in f:
             lines.append(line)
     
@@ -142,7 +143,7 @@ def update_database(puuid):
         lines[0] = f"{data[0]['date_raw']}\n"
         lines += new_list[::-1]
 
-        with open(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt', "w") as f:
+        with open(f'{config.get("HISTORY_FP")}/{puuid}.txt', "w") as f:
             f.writelines(lines)
     
     return len(new_list)
@@ -158,7 +159,7 @@ def get_elo_list(puuid):
         return MissingException
     
     lines = []
-    with open(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt', 'r') as f:
+    with open(f'{config.get("HISTORY_FP")}/{puuid}.txt', 'r') as f:
         for line in f:
             lines.append(line.strip())
 
@@ -175,7 +176,7 @@ def get_elo_list(puuid):
 def leaderboard(region, length=20):
 
     if region == 'local':
-        playerlist = playerclass.PlayerList(secret_stuff.get("PLAYERLIST_FP"))
+        playerlist = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
         playerlist.load()
         players = []
 
@@ -327,7 +328,7 @@ def random_crosshair():
     return (name, code)
 
 def update_playerlist():
-    playerlist = playerclass.PlayerList(secret_stuff.get("PLAYERLIST_FP"))
+    playerlist = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
     playerlist.load()
     updates = 0
     for player in playerlist:
