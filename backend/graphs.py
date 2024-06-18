@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from adjustText import adjust_text
-from backend import valorant, playerclass
-from backend.exceptionclass import NoneException
+import valorant, playerclass
+from exceptionclass import NoneException
 
 ranks = {
     0 : "Iron 1", 100 : "Iron 2", 200 : "Iron 3",

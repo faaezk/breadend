@@ -1,7 +1,9 @@
 **/.DS_Store
 .vscode/
 __pycache__/
-config.py
+backend/env
+backend/config.py
+config.json
 
 # Logs
 logs

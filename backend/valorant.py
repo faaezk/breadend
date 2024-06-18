@@ -6,8 +6,8 @@ import random
 import requests
 from PIL import Image
 from io import BytesIO
-from backend import playerclass
-from backend.exceptionclass import *
+import playerclass
+from exceptionclass import *
 
 def get_data(endpoint, **kwargs):
 
@@ -175,6 +175,7 @@ def get_elo_list(puuid):
 
 def leaderboard(region, length=20):
 
+    result = {}
     if region == 'local':
         playerlist = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
         playerlist.load()
@@ -203,13 +204,14 @@ def leaderboard(region, length=20):
             else:
                 players.append((data[i]['gameName'], data[i]['rankedRating']))
 
-        leaderboard = f'{regions[region]} Ranked Leaderboard\n'
+        result['title'] = f'{regions[region]} Ranked Leaderboard'
 
+    result['leaderboard'] = ""
     for i, player in enumerate(players):
         rank = i + 1
-        leaderboard += (str(rank) + '.').ljust(3) + str(player[0]).ljust(16) + str(player[1]).rjust(5) + '\n'
+        result['leaderboard'] += (str(rank) + '.').ljust(3) + str(player[0]).ljust(16) + str(player[1]).rjust(5) + '\n'
 
-    return leaderboard
+    return result
 
 def stats(puuid):
 
