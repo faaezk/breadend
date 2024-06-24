@@ -1,5 +1,4 @@
-const lib = require('../../python_calls');
-const { COMMANDS_FP } = require('../../config.json');
+const { DB_API_URL } = require('../../../config.json');
 const { SlashCommandBuilder } = require('discord.js');
 
 
@@ -12,26 +11,32 @@ const data = new SlashCommandBuilder()
 			.setRequired(true))
 
 const execute = async (interaction) => {
-	var ign_list = interaction.options.getString('in_game_names');
+    var ign_list = interaction.options.getString('in_game_names');
+    
+    await interaction.deferReply()
 
-    console.error('input: ', ign_list);
-    await interaction.deferReply().catch(() => console.log("wow"))
-
-    lib.python_calls([COMMANDS_FP, 'graph', ign_list])
-        .then(async (result) => {
-
-            const data = JSON.parse(result);
-
-            if ("error" in data) {
-                await interaction.editReply(data.error);
-            } else {
-                await interaction.editReply({ content: data.content, files: [data.filepath] });
+    fetch(`${DB_API_URL}/valorant/graph/${ign_list}`)
+        .then(response => {
+            if (!response.ok) {
+                console.log(response.json());
+                throw new Error('Network response was not ok ' + response.statusText);
             }
-                
+            
+            return response.json();
         })
-        .catch(async (error) => {
-            console.error('Error running Python process:', error);
-            await interaction.editReply("Something went wrong");
+
+        .then(async data => {
+            console.log(data); // Handle the data from the response
+            
+            if ("error" in data) {
+                await interaction.editReply(data['error']);
+            } else {
+                await interaction.editReply({ content: data['content'], files: [data['filepath']] });
+            }
+        })
+
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
         });
 }
 

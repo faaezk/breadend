@@ -225,9 +225,7 @@ def stats(puuid):
     final = []
 
     for key in keys:
-        if 'error' in data[key].keys():
-            final.append([f'Episode {key[1]} Act {key[3]}', "No data Available\n"])
-        else:
+        if 'error' not in data[key].keys():
             wins = data[key]['wins']
             games = data[key]['number_of_games']
             rank = data[key]['final_rank_patched']

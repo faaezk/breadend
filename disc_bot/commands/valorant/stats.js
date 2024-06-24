@@ -1,7 +1,5 @@
-const lib = require('../../python_calls');
-const { EmbedBuilder } = require('discord.js');
-const { COMMANDS_FP } = require('../../config.json');
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { DB_API_URL } = require('../../../config.json');
 
 const data = new SlashCommandBuilder()
     .setName('stats')
@@ -26,28 +24,50 @@ const execute = async (interaction) => {
         tag = "emptytag"
     }
 
-    lib.python_calls([COMMANDS_FP, 'stats', ign, tag])
-        .then(async (result) => {
-            const data = JSON.parse(result);
+    fetch(`${DB_API_URL}/valorant/stats/${ign}/${tag}`)
+    .then(response => {
+        if (!response.ok) {
+            console.log(response.json());
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        
+        return response.json();
+    })
 
-            if ("error" in data) {
-                await interaction.editReply(data.error);
-            } else {
-
-                // Set fields to be in rows
-                const updatedFields = data.fields.map(item => ({ ...item, inline: true }));
-                const embed = new EmbedBuilder()
-                    .setColor(0x0099FF)
-                    .setTitle(data.title)
-                    .setAuthor({ name: data.author, iconURL: data.thumbnail, url: data.url})
-                    .addFields(updatedFields);
-                await interaction.editReply({ embeds: [embed] });
-            }
-                
-        })
-        .catch((error) => {
-            console.error('Error running Python process:', error);
-        });
+    .then(async data => {
+        if ("error" in data) {
+            await interaction.editReply(data.error);
+        } else {
+            console.log(data['title'])
+            // Set fields to be in rows
+            //const updatedFields = data['fields'].map(item => ({ ...item, inline: true }));
+            const embed = new EmbedBuilder()
+            .setColor(0x0099FF)
+            .setTitle('Some title')
+            .setURL('https://discord.js.org/')
+            .setAuthor({ name: 'Some name', iconURL: 'https://i.imgur.com/AfFp7pu.png', url: 'https://discord.js.org' })
+            .setDescription('Some description here')
+            .setThumbnail('https://i.imgur.com/AfFp7pu.png')
+            .addFields(
+                { name: 'Regular field title', value: 'Some value here' },
+                { name: '\u200B', value: '\u200B' },
+                { name: 'Inline field title', value: 'Some value here', inline: true },
+                { name: 'Inline field title', value: 'Some value here', inline: true },
+            )
+            .addFields({ name: 'Inline field title', value: 'Some value here', inline: true })
+            .setImage('https://i.imgur.com/AfFp7pu.png')
+            .setTimestamp()
+            .setFooter({ text: 'Some footer text here', iconURL: 'https://i.imgur.com/AfFp7pu.png' });
+                // .setColor(0x0099FF)
+                // .setTitle(data['title'])
+                // .setAuthor({ name: data['author'], iconURL: data['thumbnail'], url: data['url']})
+                // .addFields(updatedFields);
+            await interaction.editReply({ content: "woah", embeds: [embed] });
+        }
+    })
+    .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+    });
 }
 
 module.exports = {

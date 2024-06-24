@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { DB_API_URL } = require('../config.json');
+const { DB_API_URL } = require('../../../config.json');
 
 const data = new SlashCommandBuilder()
     .setName('leaderboard')
@@ -27,6 +27,11 @@ const data = new SlashCommandBuilder()
 const execute = async (interaction) => {
 	var region = interaction.options.getString('region');
 	var update = interaction.options.getString('update');
+
+	if (!update) {
+        update = "false"
+    }
+
     await interaction.deferReply()
 
 	fetch(`${DB_API_URL}/valorant/leaderboard/${region}/${update}`)
