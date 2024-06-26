@@ -1,17 +1,16 @@
 import os
 import math
 import json
-import config
 import random
 import requests
 from PIL import Image
 from io import BytesIO
+
+import config
 import playerclass
 from exceptionclass import *
 
-def get_data(endpoint, **kwargs):
-
-    endpoints = {"LEADERBOARD" : "https://api.henrikdev.xyz/valorant/v1/leaderboard/{region}",
+endpoints = {"LEADERBOARD" : "https://api.henrikdev.xyz/valorant/v1/leaderboard/{region}",
                 "REGION_STATUS" : "https://api.henrikdev.xyz/valorant/v1/status/{region}",
                 "CROSSHAIR" : "https://api.henrikdev.xyz/valorant/v1/crosshair/generate?id={crosshair_code}",
                 "ACCOUNT_BY_PUUID" : "https://api.henrikdev.xyz/valorant/v1/by-puuid/account/{puuid}",
@@ -21,8 +20,8 @@ def get_data(endpoint, **kwargs):
                 "MMR_BY_NAME" : "https://api.henrikdev.xyz/valorant/v2/mmr/ap/{ign}/{tag}",
                 "MMR_HISTORY_BY_NAME" : "https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{ign}/{tag}"}
 
-    headers = {'accept' : 'application/json', 'Authorization' : config.get("VALORANT_KEY")}
-    errors = {
+headers = {'accept' : 'application/json', 'Authorization' : config.get("VALORANT_KEY")}
+errors = {
             1 : "Invalid API Key", 2 : "Forbidden endpoint", 3 : "Restricted endpoint", 
             101 : "No region found for this Player", 102 : "No matches found, can't get puuid", 
             103 : "Possible name change detected, can't get puuid. Please play one match, wait 1-2 minutes and try it again",
@@ -31,13 +30,33 @@ def get_data(endpoint, **kwargs):
             113 : "Invalid match or player id", 114 : "Invalid country code", 115 : "Invalid season", 
             400 : "Not able to connect to API", 403 : 'Forbidden', 404 : 'User not found', 429 : 'welp', 500 : 'No matches available'
         }
+
+def get_data(endpoint, **kwargs):
+    global endpoints
+    global headers
+    global errors
     
+    if endpoint == "MMR_HISTORY_BY_PUUID" and "puuid_list" in kwargs.keys():
+        session = requests.Session()
+        data_list = []
+        puuid_list = kwargs['puuid_list']
+        for puuid in puuid_list:
+            url = f"https://api.henrikdev.xyz/valorant/v1/by-puuid/mmr-history/ap/{puuid}".format(puuid)
+            data_list.append((puuid, parse_req(session.get(url, headers=headers), endpoint)))
+        
+        return data_list
+
     try:
         url = endpoints[endpoint].format(**kwargs)
     except KeyError:
         raise KeyException
 
-    r = requests.get(url, headers=headers)
+    return parse_req(requests.get(url, headers=headers), endpoint)
+
+def parse_req(r, endpoint):
+    global endpoints
+    global headers
+    global errors
 
     if r.status_code in errors.keys():
         DynamicException.set_message(self=DynamicException, message=errors[r.status_code])
@@ -62,7 +81,7 @@ def get_data(endpoint, **kwargs):
         
         return john
 
-    raise UnknownException
+    raise UnknownException    
 
 def get_file_mmr(puuid):
 
@@ -94,11 +113,13 @@ def replace_all(string: str, oldValues, newValue):
     
     return string
 
-def update_database(puuid):
-    try: 
-        data = get_data('MMR_HISTORY_BY_PUUID', puuid=puuid)
-    except Exception as E:
-        raise E
+def update_database(puuid, data=None):
+
+    if data == None:
+        try: 
+            data = get_data('MMR_HISTORY_BY_PUUID', puuid=puuid)
+        except Exception as E:
+            raise E
 
     data = data['data']
     if len(data) == 0:
