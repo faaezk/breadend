@@ -114,7 +114,7 @@ class PlayerList():
         for player in self.players:
             if ign == player.ign:
                 return player.puuid
-        return 'None'
+        return False
     
     def get_ign_by_puuid(self, puuid):
         for player in self.players:

@@ -1,11 +1,14 @@
 import os
 import math
 import config
+import matplotlib
+matplotlib.use('Agg')
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from adjustText import adjust_text
+
 import valorant, playerclass
+from adjustText import adjust_text
 from exceptionclass import NoneException
 
 ranks = {
@@ -164,7 +167,7 @@ def graph(puuid, num_games=0, update=True, acts=False):
 
     return True
 
-def multigraph(players: list, update=False):
+def multigraph(puuid_list: list, update=False):
 
     ymin = 10000
     ymax = 0
@@ -173,26 +176,30 @@ def multigraph(players: list, update=False):
 
     playerlist = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
     playerlist.load()
-
-    for ign in players:
-        
-        puuid = playerlist.get_puuid_by_ign(ign)
-
-        if puuid == "None" or not os.path.isfile(f'{config.get("HISTORY_FP")}/{puuid}.txt'):
+    player_list = []
+    
+    for puuid in puuid_list:
+        ign = playerlist.get_ign_by_puuid(puuid)
+        if not puuid or not os.path.isfile(f'{config.get("HISTORY_FP")}/{puuid}.txt'):
             fails.append((ign, "Player not in database"))
-            continue
-        
+        else:
+            player_list.append((puuid, ign))
+
+    if len(player_list) == 0:
+        return (False, fails)
+
+    for player in player_list:
         if update:
             try:
-                valorant.update_database(puuid)
+                valorant.update_database(player[0])
             except Exception as E:
-                fails.append((ign, E.message))
+                fails.append((player[1], E.message))
                 continue
         
         try:
-            x, y = get_mmr_list(puuid)
+            x, y = get_mmr_list(player[0])
         except Exception as E:
-            fails.append((ign, E.message))
+            fails.append((player[1], E.message))
 
         x_values.append(x)
         y_values.append(y)
@@ -205,12 +212,6 @@ def multigraph(players: list, update=False):
 
         if (len(y) > most_games):
             most_games = len(y)
-
-    if len(fails) == len(players):
-        return (False, fails)
-    
-    for failure in fails:
-        players.remove(failure[0])
 
     axes = plt.gca()
     axes.set_ylim([ymin,ymax])
@@ -239,8 +240,8 @@ def multigraph(players: list, update=False):
 
     axes.set_yticklabels(y_labels)
 
-    for i in range(len(players)):
-        p = plt.plot(x_values[i], y_values[i], label=players[i])
+    for i in range(len(player_list)):
+        p = plt.plot(x_values[i], y_values[i], label=player_list[i][1])
         colour = p[0].get_color()
         plt.axhline(y=y_values[i][-1], color=colour, linestyle='--')
 

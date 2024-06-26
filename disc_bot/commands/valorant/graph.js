@@ -12,7 +12,6 @@ const data = new SlashCommandBuilder()
 
 const execute = async (interaction) => {
     var ign_list = interaction.options.getString('in_game_names');
-    
     await interaction.deferReply()
 
     fetch(`${DB_API_URL}/valorant/graph/${ign_list}`)
