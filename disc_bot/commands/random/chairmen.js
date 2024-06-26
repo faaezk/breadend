@@ -23,8 +23,6 @@ const execute = async (interaction) => {
         if ("error" in data) {
             await interaction.editReply(data.error);
         } else {
-            console.log(data['title'])
-
             const embed = new EmbedBuilder()
                 .setColor(0x0099FF)
                 .setTitle(data['title'])

@@ -24,9 +24,7 @@ const execute = async (interaction) => {
             return response.json();
         })
 
-        .then(async data => {
-            console.log(data); // Handle the data from the response
-            
+        .then(async data => {            
             if ("error" in data) {
                 await interaction.editReply(data['error']);
             } else {

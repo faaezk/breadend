@@ -45,7 +45,6 @@ const execute = async (interaction) => {
 		})
 
 		.then(async data => {
-			console.log(data); // Handle the data from the response
 			await interaction.editReply('```' + data['title'] + '\n' + data['leaderboard'] + '```');
 		})
 		.catch(error => {

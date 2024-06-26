@@ -17,13 +17,12 @@ const data = new SlashCommandBuilder()
 const execute = async (interaction) => {
 	var ign = interaction.options.getString('ign');
 	var tag = interaction.options.getString('tag');
-
-    await interaction.deferReply()
-
     if (!tag) {
         tag = "emptytag"
     }
 
+    await interaction.deferReply()
+    
     fetch(`${DB_API_URL}/valorant/stats/${ign}/${tag}`)
     .then(response => {
         if (!response.ok) {
@@ -38,30 +37,12 @@ const execute = async (interaction) => {
         if ("error" in data) {
             await interaction.editReply(data.error);
         } else {
-            console.log(data['title'])
-            // Set fields to be in rows
-            //const updatedFields = data['fields'].map(item => ({ ...item, inline: true }));
+            const updatedFields = data['fields'].map(item => ({ ...item, inline: true }));
             const embed = new EmbedBuilder()
-            .setColor(0x0099FF)
-            .setTitle('Some title')
-            .setURL('https://discord.js.org/')
-            .setAuthor({ name: 'Some name', iconURL: 'https://i.imgur.com/AfFp7pu.png', url: 'https://discord.js.org' })
-            .setDescription('Some description here')
-            .setThumbnail('https://i.imgur.com/AfFp7pu.png')
-            .addFields(
-                { name: 'Regular field title', value: 'Some value here' },
-                { name: '\u200B', value: '\u200B' },
-                { name: 'Inline field title', value: 'Some value here', inline: true },
-                { name: 'Inline field title', value: 'Some value here', inline: true },
-            )
-            .addFields({ name: 'Inline field title', value: 'Some value here', inline: true })
-            .setImage('https://i.imgur.com/AfFp7pu.png')
-            .setTimestamp()
-            .setFooter({ text: 'Some footer text here', iconURL: 'https://i.imgur.com/AfFp7pu.png' });
-                // .setColor(0x0099FF)
-                // .setTitle(data['title'])
-                // .setAuthor({ name: data['author'], iconURL: data['thumbnail'], url: data['url']})
-                // .addFields(updatedFields);
+                .setColor(0x0099FF)
+                .setTitle(data['title'])
+                .setAuthor({ name: data['author'], iconURL: data['thumbnail'], url: data['url']})
+                .addFields(updatedFields);
             await interaction.editReply({ content: "woah", embeds: [embed] });
         }
     })
