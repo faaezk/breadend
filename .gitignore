@@ -4,6 +4,7 @@ __pycache__/
 backend/env
 backend/config.py
 config.json
+res/banner.png
 
 # Logs
 logs

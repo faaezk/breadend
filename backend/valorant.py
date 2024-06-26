@@ -239,17 +239,15 @@ def stats(puuid):
     card = john['data']['card']['small']
     return [final, card]
 
-def get_banner(puuid):
-
+def get_banner(ign, tag):
     try:
-        data = get_data('ACCOUNT_BY_PUUID', puuid=puuid)
+        data = get_data('ACCOUNT_BY_NAME', ign=ign, tag=tag)
     except Exception as E:
-        raise E
+        return False
     
     url = data['data']['card']['large']
     r = requests.get(url, allow_redirects=True)
-    open('stuff/banner.png', 'wb').write(r.content)
-    
+    open(config.get("BANNER_FP"), 'wb').write(r.content)
     return True
 
 def servercheck():

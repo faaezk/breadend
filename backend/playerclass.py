@@ -126,4 +126,4 @@ class PlayerList():
         for player in self.players:
             if ign == player.ign:
                 return player.tag
-        return ''
+        return False

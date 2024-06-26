@@ -29,7 +29,7 @@ def stats(ign, tag):
     playerList.load()
     puuid = playerList.get_puuid_by_ign(ign)
 
-    if puuid == "None" and tag != 'emptytag':
+    if not puuid and tag != 'emptytag':
         player_data = valorant.get_data("ACCOUNT_BY_NAME", ign=ign, tag=tag)
         puuid = player_data['data']['puuid']
     
@@ -111,6 +111,22 @@ def graph(ign_list):
             response = json.dumps({"error" : "No valid players given"})
 
     return response
+
+@app.route('/data/valorant/banner/<username>', methods=['GET'])
+def banner(username):
+
+    username = username.lower().split('#')
+    if len(username) == 1:
+        playerList = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
+        playerList.load()
+        username.append(playerList.get_tag_by_ign(username[0]))
+        if not username[1]:
+            return json.dumps({"error" : "Player not in database, provide ign and tag"})
+
+    if valorant.get_banner(ign=username[0], tag=username[1]):
+        return json.dumps({"content" : f"Banner for {username[0]}#{username[1]}", "filepath" : config.get("BANNER_FP")})
+    else:
+        return json.dumps({"error" : "An error occurred while contacting the server."})
 
 if __name__ == "__main__":
     app.run(debug=True)
