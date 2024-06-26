@@ -1,4 +1,5 @@
 import json
+import requests
 from flask import Flask
 from datetime import datetime
 
@@ -127,6 +128,21 @@ def banner(username):
         return json.dumps({"content" : f"Banner for {username[0]}#{username[1]}", "filepath" : config.get("BANNER_FP")})
     else:
         return json.dumps({"error" : "An error occurred while contacting the server."})
+
+@app.route('/data/connected', methods=['GET'])
+def chairmen():
+    r = requests.get("https://rickies.co/api/chairmen.json", headers={'accept': 'application/json'})
+    chairmen = json.loads(r.text)
+
+    keynote = chairmen['keynote_chairman']
+    annual = chairmen['annual_chairman']
+
+    return json.dumps({
+        "title" : "The Rickies Chairmen",
+        "url" : "https://www.relay.fm/connected",
+        "fields" : [{"name" : "Keynote Chairman:", "value" : f"{keynote['name']} {keynote['last_name']}"}, 
+                    {"name" : "Annual Chairman:", "value" : f"{annual['name']} {annual['last_name']}"}]
+    })
 
 if __name__ == "__main__":
     app.run(debug=True)
