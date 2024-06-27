@@ -81,10 +81,7 @@ class PlayerList():
     def get_puuid_list(self, active):
         puuid_list = []
         for player in self.players:
-            if active:
-                if player.active:
-                    puuid_list.append(player.puuid)
-            else:
+            if not active or player.active:
                 puuid_list.append(player.puuid)
 
         return puuid_list
