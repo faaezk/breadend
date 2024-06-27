@@ -1,6 +1,5 @@
-const lib = require('../../python_calls');
-const { COMMANDS_FP } = require('../../config.json');
 const { SlashCommandBuilder } = require('discord.js');
+const { DB_API_URL } = require('../../../config.json');
 
 const data = new SlashCommandBuilder()
     .setName('leaderboard')
@@ -29,15 +28,28 @@ const execute = async (interaction) => {
 	var region = interaction.options.getString('region');
 	var update = interaction.options.getString('update');
 
+	if (!update) {
+        update = "false"
+    }
+
     await interaction.deferReply()
 
-    lib.python_calls([COMMANDS_FP, 'leaderboard', region, update])
-        .then(async (result) => {
-            await interaction.editReply('```' + result + '```');
-        })
-        .catch((error) => {
-            console.error('Error running Python process:', error);
-        });
+	fetch(`${DB_API_URL}/valorant/leaderboard/${region}/${update}`)
+		.then(response => {
+			if (!response.ok) {
+				console.log(response.json());
+				throw new Error('Network response was not ok ' + response.statusText);
+			}
+			
+			return response.json();
+		})
+
+		.then(async data => {
+			await interaction.editReply('```' + data['title'] + '\n' + data['leaderboard'] + '```');
+		})
+		.catch(error => {
+			console.error('There was a problem with the fetch operation:', error);
+		});
 }
 
 module.exports = {

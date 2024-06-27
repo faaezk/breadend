@@ -1,13 +1,10 @@
 **/.DS_Store
 .vscode/
-.venv/
 __pycache__/
-secret_stuff.py
-playground.py
-ztemp.txt
-old/
-
+backend/env
+backend/config.py
 config.json
+res/banner.png
 
 # Logs
 logs

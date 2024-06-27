@@ -5,12 +5,12 @@ import random
 import requests
 from PIL import Image
 from io import BytesIO
-from modules.exceptionclass import *
-from modules import secret_stuff, playerclass
 
-def get_data(endpoint, **kwargs):
+import config
+import playerclass
+from exceptionclass import *
 
-    endpoints = {"LEADERBOARD" : "https://api.henrikdev.xyz/valorant/v1/leaderboard/{region}",
+endpoints = {"LEADERBOARD" : "https://api.henrikdev.xyz/valorant/v1/leaderboard/{region}",
                 "REGION_STATUS" : "https://api.henrikdev.xyz/valorant/v1/status/{region}",
                 "CROSSHAIR" : "https://api.henrikdev.xyz/valorant/v1/crosshair/generate?id={crosshair_code}",
                 "ACCOUNT_BY_PUUID" : "https://api.henrikdev.xyz/valorant/v1/by-puuid/account/{puuid}",
@@ -20,8 +20,8 @@ def get_data(endpoint, **kwargs):
                 "MMR_BY_NAME" : "https://api.henrikdev.xyz/valorant/v2/mmr/ap/{ign}/{tag}",
                 "MMR_HISTORY_BY_NAME" : "https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{ign}/{tag}"}
 
-    headers = {'accept' : 'application/json', 'Authorization' : secret_stuff.get("VALORANT_KEY")}
-    errors = {
+headers = {'accept' : 'application/json', 'Authorization' : config.get("VALORANT_KEY")}
+errors = {
             1 : "Invalid API Key", 2 : "Forbidden endpoint", 3 : "Restricted endpoint", 
             101 : "No region found for this Player", 102 : "No matches found, can't get puuid", 
             103 : "Possible name change detected, can't get puuid. Please play one match, wait 1-2 minutes and try it again",
@@ -30,13 +30,33 @@ def get_data(endpoint, **kwargs):
             113 : "Invalid match or player id", 114 : "Invalid country code", 115 : "Invalid season", 
             400 : "Not able to connect to API", 403 : 'Forbidden', 404 : 'User not found', 429 : 'welp', 500 : 'No matches available'
         }
+
+def get_data(endpoint, **kwargs):
+    global endpoints
+    global headers
+    global errors
     
+    if endpoint == "MMR_HISTORY_BY_PUUID" and "puuid_list" in kwargs.keys():
+        session = requests.Session()
+        data_list = []
+        puuid_list = kwargs['puuid_list']
+        for puuid in puuid_list:
+            url = f"https://api.henrikdev.xyz/valorant/v1/by-puuid/mmr-history/ap/{puuid}".format(puuid)
+            data_list.append((puuid, parse_req(session.get(url, headers=headers), endpoint)))
+        
+        return data_list
+
     try:
         url = endpoints[endpoint].format(**kwargs)
     except KeyError:
         raise KeyException
 
-    r = requests.get(url, headers=headers)
+    return parse_req(requests.get(url, headers=headers), endpoint)
+
+def parse_req(r, endpoint):
+    global endpoints
+    global headers
+    global errors
 
     if r.status_code in errors.keys():
         DynamicException.set_message(self=DynamicException, message=errors[r.status_code])
@@ -61,14 +81,14 @@ def get_data(endpoint, **kwargs):
         
         return john
 
-    raise UnknownException
+    raise UnknownException    
 
 def get_file_mmr(puuid):
 
-    if os.path.isfile(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt') == False:
+    if os.path.isfile(f'{config.get("HISTORY_FP")}/{puuid}.txt') == False:
         return False
     
-    with open(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt', 'r') as f:
+    with open(f'{config.get("HISTORY_FP")}/{puuid}.txt', 'r') as f:
         for line in f:
             pass
 
@@ -80,10 +100,10 @@ def get_file_mmr(puuid):
 
 def initialise_file(puuid):
 
-    f = open(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt', "x")
+    f = open(f'{config.get("HISTORY_FP")}/{puuid}.txt', "x")
     f.close()
 
-    f = open(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt', "w")
+    f = open(f'{config.get("HISTORY_FP")}/{puuid}.txt', "w")
     f.write('\n')
     f.close()
 
@@ -93,24 +113,26 @@ def replace_all(string: str, oldValues, newValue):
     
     return string
 
-def update_database(puuid):
-    try: 
-        data = get_data('MMR_HISTORY_BY_PUUID', puuid=puuid)
-    except Exception as E:
-        raise E
+def update_database(puuid, data=None):
+
+    if data == None:
+        try: 
+            data = get_data('MMR_HISTORY_BY_PUUID', puuid=puuid)
+        except Exception as E:
+            raise E
 
     data = data['data']
     if len(data) == 0:
         raise NoneException
 
-    if not os.path.isfile(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt'):
+    if not os.path.isfile(f'{config.get("HISTORY_FP")}/{puuid}.txt'):
         initialise_file(puuid)
 
     # Dates of last update
     date_raw = data[0]['date_raw']
     lines = []
 
-    with open(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt', 'r') as f:
+    with open(f'{config.get("HISTORY_FP")}/{puuid}.txt', 'r') as f:
         for line in f:
             lines.append(line)
     
@@ -142,7 +164,7 @@ def update_database(puuid):
         lines[0] = f"{data[0]['date_raw']}\n"
         lines += new_list[::-1]
 
-        with open(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt', "w") as f:
+        with open(f'{config.get("HISTORY_FP")}/{puuid}.txt', "w") as f:
             f.writelines(lines)
     
     return len(new_list)
@@ -158,7 +180,7 @@ def get_elo_list(puuid):
         return MissingException
     
     lines = []
-    with open(f'{secret_stuff.get("HISTORY_FP")}/{puuid}.txt', 'r') as f:
+    with open(f'{config.get("HISTORY_FP")}/{puuid}.txt', 'r') as f:
         for line in f:
             lines.append(line.strip())
 
@@ -174,8 +196,9 @@ def get_elo_list(puuid):
 
 def leaderboard(region, length=20):
 
+    result = {}
     if region == 'local':
-        playerlist = playerclass.PlayerList(secret_stuff.get("PLAYERLIST_FP"))
+        playerlist = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
         playerlist.load()
         players = []
 
@@ -202,13 +225,14 @@ def leaderboard(region, length=20):
             else:
                 players.append((data[i]['gameName'], data[i]['rankedRating']))
 
-        leaderboard = f'{regions[region]} Ranked Leaderboard\n'
+        result['title'] = f'{regions[region]} Ranked Leaderboard'
 
+    result['leaderboard'] = ""
     for i, player in enumerate(players):
         rank = i + 1
-        leaderboard += (str(rank) + '.').ljust(3) + str(player[0]).ljust(16) + str(player[1]).rjust(5) + '\n'
+        result['leaderboard'] += (str(rank) + '.').ljust(3) + str(player[0]).ljust(16) + str(player[1]).rjust(5) + '\n'
 
-    return leaderboard
+    return result
 
 def stats(puuid):
 
@@ -222,9 +246,7 @@ def stats(puuid):
     final = []
 
     for key in keys:
-        if 'error' in data[key].keys():
-            final.append([f'Episode {key[1]} Act {key[3]}', "No data Available\n"])
-        else:
+        if 'error' not in data[key].keys():
             wins = data[key]['wins']
             games = data[key]['number_of_games']
             rank = data[key]['final_rank_patched']
@@ -238,17 +260,15 @@ def stats(puuid):
     card = john['data']['card']['small']
     return [final, card]
 
-def get_banner(puuid):
-
+def get_banner(ign, tag):
     try:
-        data = get_data('ACCOUNT_BY_PUUID', puuid=puuid)
+        data = get_data('ACCOUNT_BY_NAME', ign=ign, tag=tag)
     except Exception as E:
-        raise E
+        return False
     
     url = data['data']['card']['large']
     r = requests.get(url, allow_redirects=True)
-    open('stuff/banner.png', 'wb').write(r.content)
-    
+    open(config.get("BANNER_FP"), 'wb').write(r.content)
     return True
 
 def servercheck():
@@ -327,7 +347,7 @@ def random_crosshair():
     return (name, code)
 
 def update_playerlist():
-    playerlist = playerclass.PlayerList(secret_stuff.get("PLAYERLIST_FP"))
+    playerlist = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
     playerlist.load()
     updates = 0
     for player in playerlist:

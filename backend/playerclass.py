@@ -70,6 +70,21 @@ class PlayerList():
     
     def getPlayers(self):
         return self.players
+    
+    def get_player(self, puuid):
+        for player in self.players:
+            if player.puuid == puuid:
+                return player
+        
+        return False
+
+    def get_puuid_list(self, active):
+        puuid_list = []
+        for player in self.players:
+            if not active or player.active:
+                puuid_list.append(player.puuid)
+
+        return puuid_list
 
     def inList(self, player: Player):
         for x in self.players:
@@ -114,7 +129,7 @@ class PlayerList():
         for player in self.players:
             if ign == player.ign:
                 return player.puuid
-        return 'None'
+        return False
     
     def get_ign_by_puuid(self, puuid):
         for player in self.players:
@@ -126,4 +141,4 @@ class PlayerList():
         for player in self.players:
             if ign == player.ign:
                 return player.tag
-        return ''
+        return False
