@@ -5,6 +5,7 @@ from datetime import datetime
 
 import config
 import valorant
+import malsearch
 import playerclass
 from graphs import multigraph
 
@@ -143,6 +144,19 @@ def chairmen():
         "fields" : [{"name" : "Keynote Chairman:", "value" : f"{keynote['name']} {keynote['last_name']}"}, 
                     {"name" : "Annual Chairman:", "value" : f"{annual['name']} {annual['last_name']}"}]
     })
+
+@app.route('/data/mal/graph/<category>/<type>/<title>', methods=['GET'])
+def mal_graph(category, type, title):
+
+    content = malsearch.score_graph(title, category, type)
+
+    if content == False:
+        return json.dumps({"error" : "Server connection error, try again."})
+    
+    elif content == None:
+        return json.dumps({"error" : f"{category} not found."})
+
+    return json.dumps({"content" : content, "filepath" : config.get("MAL_GRAPH_FP")})
 
 if __name__ == "__main__":
     app.run(debug=True)
