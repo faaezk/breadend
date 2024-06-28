@@ -5,6 +5,7 @@ backend/env
 backend/config.py
 config.json
 res/banner.png
+res/stats.png
 
 # Logs
 logs
