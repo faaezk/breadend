@@ -10,10 +10,10 @@ def trim(text, limit):
         text += "...\nMore at MyAnimeList (link in title)"
     return text
 
-def api_request(query, category, type="", stats=False):
+def api_request(query, category, type="null", stats=False):
 
     session = requests.Session()
-    if type == "":
+    if type == "null":
         r = session.get(f'https://api.jikan.moe/v4/{category}?q={query}&page=1&limit=1')
     else:
         r = session.get(f'https://api.jikan.moe/v4/{category}?q={query}&type={type}&page=1&limit=1')
@@ -225,24 +225,24 @@ def generate_graph(x, y, title):
     for i in range(len(x)):
         plt.text(i, y[i], str(y[i]), ha = 'center')
 
-    plt.savefig(config.get("MAL_STATS_FP"), bbox_inches='tight')
+    plt.savefig(config.get("MAL_GRAPH_FP"), bbox_inches='tight')
     plt.clf()
 
-def score_graph(title, category, type=""):
+def score_graph(title, category, type="null"):
 
     res = api_request(title, category, type, stats=True)
     if not res:
         return None
     
-    data = {"completed" : res["completed"], "on_hold" : res["on_hold"],
-        "dropped" : res["dropped"], "total" : res["total"], "title" : res['title'], "url" : res['url']}
+    data = {"completed" : f'{res["completed"]:,}', "on_hold" : f'{res["on_hold"]:,}',
+        "dropped" : f'{res["dropped"]:,}', "total" : f'{res["total"]:,}', "title" : res['title'], "url" : res['url']}
     
     if category == "manga":
-        data["reading"] = res["reading"]
-        data["plan_to_read"] = res["plan_to_read"]
+        data["reading"] = f'{res["reading"]:,}'
+        data["plan_to_read"] = f'{res["plan_to_read"]:,}'
     else:
-        data["watching"] = res["watching"]
-        data["plan_to_watch"] = res["plan_to_watch"]
+        data["watching"] = f'{res["watching"]:,}'
+        data["plan_to_watch"] = f'{res["plan_to_watch"]:,}'
 
     x = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
     y = [score['votes'] for score in res['scores']]

@@ -1,4 +1,5 @@
 const { DB_API_URL } = require('../../../config.json');
+const { MAL_GRAPH_FP } = require('../../../config.json');
 const { SlashCommandBuilder } = require('discord.js');
 
 
@@ -36,6 +37,7 @@ const execute = async (interaction) => {
     var category = interaction.options.getString('category');
     var title = interaction.options.getString('title');
     var type = interaction.options.getString('type');
+    var msg = "";
 
     await interaction.deferReply()
 
@@ -49,11 +51,25 @@ const execute = async (interaction) => {
             return response.json();
         })
 
-        .then(async data => {            
+        .then(async data => {          
             if ("error" in data) {
                 await interaction.editReply(data['error']);
             } else {
-                await interaction.editReply({ content: "test", files: [data['filepath']] });
+                if (category == 'anime') {
+                    msg = `- Completed: ${data['completed']}\n` +
+                    `- Watching: ${data['watching']}\n` +
+                    `- On Hold: ${data['on_hold']}\n` +
+                    `- Dropped: ${data['dropped']}\n` +
+                    `- Total: ${data['total']}`;
+                } else {
+                    msg = `- Completed: ${data['completed']}\n` +
+                    `- Reading: ${data['reading']}\n` +
+                    `- On Hold: ${data['on_hold']}\n` +
+                    `- Dropped: ${data['dropped']}\n` +
+                    `- Total: ${data['total']}`;
+                }
+
+                await interaction.editReply({ content: msg, files: [MAL_GRAPH_FP] });
             }
         })
 
@@ -65,4 +81,4 @@ const execute = async (interaction) => {
 module.exports = {
 	data: data,
 	execute
-}
+};

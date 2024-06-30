@@ -13,8 +13,8 @@ def update_all(graph=True, output=False, printer=True):
 
     update_count = 0
     error_count = 0
-    updated_list = []
-    err_list = []
+    updates_list = []
+    errors_list = []
     total = str(len(playerlist))
 
     puuid_list = playerlist.get_puuid_list(active=True)
@@ -31,7 +31,7 @@ def update_all(graph=True, output=False, printer=True):
             new_games = int(update)
             update_count += new_games
             if new_games > 0:
-                updated_list.append((elem[1]['name'], new_games))
+                updates_list.append((elem[1]['name'], new_games))
 
             if graph:
                 graphs.graph(puuid=elem[0], update=False)
@@ -40,11 +40,11 @@ def update_all(graph=True, output=False, printer=True):
                 print(f'{i+1:02d}/{total}: Success')
         else:
             ign = playerlist.get_ign_by_puuid(elem[0])
-            err_list.append(ign)
+            errors_list.append(ign)
             print(f'{i+1:02d}/{total}: error at {ign}')
 
     if printer:
-        print(updated_list)
+        print(updates_list)
 
     if error_count == 0:
         updates = f'{update_count} updates'
@@ -57,14 +57,24 @@ def update_all(graph=True, output=False, printer=True):
     if output:
         with open('ztemp.txt','w') as f:
             f.write(log_msg + '\n')
-            f.write(str(updated_list))
+            f.write(str(updates_list))
+    
+    update_msg = ""
+    for (player, updates) in updates_list:
+        update_msg += f"{player} - {updates}, "
+    update_msg = "No Updates" if update_msg == "" else f"Updates: {update_msg[:-2]}"
+
+    errors_msg = ""
+    for player in errors_list:
+        errors_msg += f"{player}, "
+    errors_msg = "No Errors" if errors_msg == "" else f"Errors: {errors_msg[:-2]}"
 
     with open(config.get("LOG_FP"), 'a') as f:
         f.write(log_msg + '\n')
 
     payload = {
         "username": "The Updater",
-        "content": f'{log_msg} \nUpdates: {updated_list} \nErrors at: {err_list}'
+        "content": f'{log_msg} \n{update_msg} \n{errors_msg}'
     }
 
     requests.post(config.get("WEBHOOK_URL"), json=payload)

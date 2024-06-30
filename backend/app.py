@@ -7,6 +7,7 @@ import config
 import valorant
 import malsearch
 import playerclass
+import database_updater
 from graphs import multigraph
 
 app = Flask(__name__)
@@ -17,10 +18,8 @@ def index():
 
 @app.route('/data/valorant/leaderboard/<region>/<isUpdate>', methods=['GET'])
 def leaderboard(region, isUpdate):
-
     if isUpdate == 'true':
-        # update with mmr_history_updater.update_all(False, printer=False)
-        pass
+        database_updater.update_all(False, False, False)
 
     return valorant.leaderboard(region)
 
@@ -90,11 +89,11 @@ def graph(ign_list):
 
         # If last game is dated, extract day, month and year
         if len(last_game.split(',')) > 1:
-            output_format = "%d/%m/%y"
+            output_format = "%H:%M on %d/%m/%y"
             input_format = "%A-%B-%d-%Y-%I:%M-%p"
             
             date = datetime.strptime(last_game.split(',')[1], input_format)
-            content = f'Last game recorded on {date.strftime(output_format)}'
+            content = f'Last game recorded at {date.strftime(output_format)}'
         
         response = json.dumps({
             "content" : content, 
@@ -137,7 +136,6 @@ def chairmen():
 
     keynote = chairmen['keynote_chairman']
     annual = chairmen['annual_chairman']
-
     return json.dumps({
         "title" : "The Rickies Chairmen",
         "url" : "https://www.relay.fm/connected",
@@ -147,16 +145,13 @@ def chairmen():
 
 @app.route('/data/mal/graph/<category>/<type>/<title>', methods=['GET'])
 def mal_graph(category, type, title):
-
     content = malsearch.score_graph(title, category, type)
-
     if content == False:
         return json.dumps({"error" : "Server connection error, try again."})
-    
     elif content == None:
         return json.dumps({"error" : f"{category} not found."})
-
-    return json.dumps({"content" : content, "filepath" : config.get("MAL_GRAPH_FP")})
+    
+    return json.dumps(content)
 
 if __name__ == "__main__":
     app.run(debug=True)
