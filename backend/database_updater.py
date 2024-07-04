@@ -12,8 +12,10 @@ def update_all(graph=True, output=False, printer=True):
     playerlist.sort()
 
     update_count = 0
-    error_count = 0
+    dataless_count = 0
+    errors_count = 0
     updates_list = []
+    dataless_list = []
     errors_list = []
     total = str(len(playerlist))
 
@@ -38,18 +40,26 @@ def update_all(graph=True, output=False, printer=True):
 
             if printer:
                 print(f'{i+1:02d}/{total}: Success')
+        
+        elif elem[1]['status'] == 200:
+            ign = playerlist.get_ign_by_puuid(elem[0])
+            dataless_list.append(ign)
+            print(f'{i+1:02d}/{total}: No games found for {ign}')
+            dataless_count += 1
         else:
             ign = playerlist.get_ign_by_puuid(elem[0])
             errors_list.append(ign)
-            print(f'{i+1:02d}/{total}: error at {ign}')
+            print(f'{i+1:02d}/{total}: Error at {ign}')
+            errors_count += 1
 
     if printer:
         print(updates_list)
 
-    if error_count == 0:
-        updates = f'{update_count} updates'
-    else:
-        updates = f'{update_count} updates, {error_count} errors'
+    updates = f'{update_count} updates'
+    if dataless_count > 0:
+        updates += f', {dataless_count} dataless players'
+    if errors_count > 0:
+        updates += f', {errors_count} errors'
 
     melb_now = datetime.now()
     log_msg = f'completed on: {melb_now.strftime("%d/%m/%y")} at {melb_now.strftime("%H:%M:%S")} with {updates}'
@@ -61,20 +71,25 @@ def update_all(graph=True, output=False, printer=True):
     
     update_msg = ""
     for (player, updates) in updates_list:
-        update_msg += f"{player} - {updates}, "
-    update_msg = "No Updates" if update_msg == "" else f"Updates: {update_msg[:-2]}"
+        update_msg += f"{player}: {updates}, "
+    update_msg = "No Updates" if update_msg == "" else f"**Updates:** {update_msg[:-2]}"
+
+    dataless_msg = ""
+    for player in dataless_list:
+        dataless_msg += f"{player}, "
+    dataless_msg = "No Issues" if dataless_msg == "" else f"**Data-less players:** {dataless_msg[:-2]}"
 
     errors_msg = ""
     for player in errors_list:
         errors_msg += f"{player}, "
-    errors_msg = "No Errors" if errors_msg == "" else f"Errors: {errors_msg[:-2]}"
+    errors_msg = "No Errors" if errors_msg == "" else f"**Errors:** {errors_msg[:-2]}"
 
     with open(config.get("LOG_FP"), 'a') as f:
         f.write(log_msg + '\n')
 
     payload = {
         "username": "The Updater",
-        "content": f'{log_msg} \n{update_msg} \n{errors_msg}'
+        "content": f'{log_msg} \n{update_msg} \n{dataless_msg} \n{errors_msg}'
     }
 
     requests.post(config.get("WEBHOOK_URL"), json=payload)
