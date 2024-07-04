@@ -1,13 +1,12 @@
 class Player():
-    def __init__(self, ign, tag, puuid, priority = 2, active = True):
+    def __init__(self, ign, tag, puuid, priority = 2):
         self.ign = ign
         self.tag = tag
         self.puuid = puuid
         self.priority = priority
-        self.active = active
     
     def getCsv(self) -> str:
-        return f"{self.ign},{self.tag},{self.puuid},{self.priority},{self.active}\n"
+        return f"{self.ign},{self.tag},{self.puuid},{self.priority}\n"
 
     def __str__(self) -> str:
         return f"{self.ign}#{self.tag},{self.puuid}"
@@ -61,9 +60,8 @@ class PlayerList():
                 ign = playerData[0]
                 tag = playerData[1]
                 puuid = playerData[2]
-                priority = playerData[3]
-                active = playerData[4][:-1]
-                self.players.append(Player(ign, tag, puuid, priority, active))
+                priority = playerData[3].strip()
+                self.players.append(Player(ign, tag, puuid, priority))
     
     def sort(self):
         self.players.sort(key=lambda x: x.priority)
@@ -78,11 +76,10 @@ class PlayerList():
         
         return False
 
-    def get_puuid_list(self, active):
+    def get_puuid_list(self):
         puuid_list = []
         for player in self.players:
-            if not active or player.active:
-                puuid_list.append(player.puuid)
+            puuid_list.append(player.puuid)
 
         return puuid_list
 

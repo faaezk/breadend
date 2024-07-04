@@ -19,7 +19,7 @@ def update_all(graph=True, output=False, printer=True):
     errors_list = []
     total = str(len(playerlist))
 
-    puuid_list = playerlist.get_puuid_list(active=True)
+    puuid_list = playerlist.get_puuid_list()
     try:
         data_list = valorant.get_data("MMR_HISTORY_BY_PUUID", puuid_list=puuid_list)
     except Exception:

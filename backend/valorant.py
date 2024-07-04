@@ -36,12 +36,11 @@ def get_data(endpoint, **kwargs):
     global headers
     global errors
     
-    if endpoint == "MMR_HISTORY_BY_PUUID" and "puuid_list" in kwargs.keys():
+    if "puuid_list" in kwargs.keys():
         session = requests.Session()
         data_list = []
-        puuid_list = kwargs['puuid_list']
-        for puuid in puuid_list:
-            url = f"https://api.henrikdev.xyz/valorant/v1/by-puuid/mmr-history/ap/{puuid}".format(puuid)
+        for puuid in kwargs['puuid_list']:
+            url = endpoints[endpoint].format(**{'puuid' : puuid})
             data_list.append((puuid, parse_req(session.get(url, headers=headers), endpoint)))
         
         return data_list
