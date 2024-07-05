@@ -1,9 +1,10 @@
 import requests
 from datetime import datetime
-import graphs as graphs
-import config as config
-import valorant as valorant
-import playerclass as playerclass
+
+import graphs
+import config
+import valorant
+import playerclass
 
 def update_all(graph=True, output=False, printer=True):
 
@@ -59,8 +60,8 @@ def update_all(graph=True, output=False, printer=True):
     if errors_count > 0:
         updates += f', {errors_count} errors'
 
-    melb_now = datetime.now()
-    log_msg = f'completed on: {melb_now.strftime("%d/%m/%y")} at {melb_now.strftime("%H:%M:%S")} with {updates}'
+    curr_time = datetime.now()
+    log_msg = f'completed on {curr_time.strftime("%d/%m/%y")} at {curr_time.strftime("%H:%M:%S")} with {updates}'
 
     if output:
         with open('ztemp.txt','w') as f:
@@ -80,8 +81,7 @@ def update_all(graph=True, output=False, printer=True):
     with open(config.get("LOG_FP"), 'a') as f:
         f.write(log_msg + '\n')
 
-    payload = {"username": "The Updater", "content": f'{log_msg} \n- {update_msg} \n- {errors_msg}'}
-
+    payload = {"username": "The Updater", "content": f'{log_msg}\n- {update_msg}\n- {errors_msg}'}
     requests.post(config.get("WEBHOOK_URL"), json=payload)
     return log_msg
 
