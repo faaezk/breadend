@@ -15,7 +15,6 @@ def update_all(graph=True, output=False, printer=True):
     dataless_count = 0
     errors_count = 0
     updates_list = []
-    dataless_list = []
     errors_list = []
     total = str(len(playerlist))
 
@@ -43,7 +42,6 @@ def update_all(graph=True, output=False, printer=True):
         
         elif elem[1]['status'] == 200:
             ign = playerlist.get_ign_by_puuid(elem[0])
-            dataless_list.append(ign)
             print(f'{i+1:02d}/{total}: No games found for {ign}')
             dataless_count += 1
         else:
@@ -74,11 +72,6 @@ def update_all(graph=True, output=False, printer=True):
         update_msg += f"{player}: {updates}, "
     update_msg = "**No Updates**" if update_msg == "" else f"**Updates:** {update_msg[:-2]}"
 
-    dataless_msg = ""
-    for player in dataless_list:
-        dataless_msg += f"{player}, "
-    dataless_msg = "**No Issues**" if dataless_msg == "" else f"**Data-less players:** {dataless_msg[:-2]}"
-
     errors_msg = ""
     for player in errors_list:
         errors_msg += f"{player}, "
@@ -87,10 +80,7 @@ def update_all(graph=True, output=False, printer=True):
     with open(config.get("LOG_FP"), 'a') as f:
         f.write(log_msg + '\n')
 
-    payload = {
-        "username": "The Updater",
-        "content": f'{log_msg} \n{update_msg} \n{dataless_msg} \n{errors_msg}'
-    }
+    payload = {"username": "The Updater", "content": f'{log_msg} \n- {update_msg} \n- {errors_msg}'}
 
     requests.post(config.get("WEBHOOK_URL"), json=payload)
     return log_msg
