@@ -200,18 +200,18 @@ def score_graph(title, category, type="null"):
     if not res:
         return None
     
-    data = {"completed" : f'{res["completed"]:,}', "on_hold" : f'{res["on_hold"]:,}',
-        "dropped" : f'{res["dropped"]:,}', "total" : f'{res["total"]:,}', "title" : res['title'], "url" : res['url']}
+    data = {"completed" : f"{res['completed']:,}", "on_hold" : f"{res['on_hold']:,}",
+        "dropped" : f"{res['dropped']:,}", "total" : f"{res['total']:,}", "title" : res['title'], "url" : res['url']}
     
     if category == "manga":
-        data["reading"] = f'{res["reading"]:,}'
-        data["plan_to_read"] = f'{res["plan_to_read"]:,}'
+        data["reading"] = f"{res['reading']:,}"
+        data["plan_to_read"] = f"{res['plan_to_read']:,}"
     else:
-        data["watching"] = f'{res["watching"]:,}'
-        data["plan_to_watch"] = f'{res["plan_to_watch"]:,}'
+        data["watching"] = f"{res['watching']:,}"
+        data["plan_to_watch"] = f"{res['plan_to_watch']:,}"
 
     x = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
     y = [score['votes'] for score in res['scores']]
 
-    generate_graph(x, y, f'{res['title']} ({res['type']}) Vote distribution')
+    generate_graph(x, y, f"{res['title']} ({res['type']}) Vote distribution")
     return data

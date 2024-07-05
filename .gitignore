@@ -2,6 +2,7 @@
 .vscode/
 __pycache__/
 backend/env
+backend/venv
 backend/config.py
 config.json
 

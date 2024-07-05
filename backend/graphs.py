@@ -1,14 +1,15 @@
 import os
 import math
-import config
 import matplotlib
 matplotlib.use('Agg')
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-
-import valorant, playerclass
 from adjustText import adjust_text
+
+import config
+import valorant
+import playerclass
 from exceptionclass import NoneException
 
 ranks = {
