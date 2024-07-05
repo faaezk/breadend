@@ -72,17 +72,17 @@ def update_all(graph=True, output=False, printer=True):
     update_msg = ""
     for (player, updates) in updates_list:
         update_msg += f"{player}: {updates}, "
-    update_msg = "No Updates" if update_msg == "" else f"**Updates:** {update_msg[:-2]}"
+    update_msg = "**No Updates**" if update_msg == "" else f"**Updates:** {update_msg[:-2]}"
 
     dataless_msg = ""
     for player in dataless_list:
         dataless_msg += f"{player}, "
-    dataless_msg = "No Issues" if dataless_msg == "" else f"**Data-less players:** {dataless_msg[:-2]}"
+    dataless_msg = "**No Issues**" if dataless_msg == "" else f"**Data-less players:** {dataless_msg[:-2]}"
 
     errors_msg = ""
     for player in errors_list:
         errors_msg += f"{player}, "
-    errors_msg = "No Errors" if errors_msg == "" else f"**Errors:** {errors_msg[:-2]}"
+    errors_msg = "**No Errors**" if errors_msg == "" else f"**Errors:** {errors_msg[:-2]}"
 
     with open(config.get("LOG_FP"), 'a') as f:
         f.write(log_msg + '\n')
