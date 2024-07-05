@@ -17,7 +17,7 @@ const data = new SlashCommandBuilder()
 
     .addStringOption(option =>
         option.setName('update')
-            .setDescription('Latest data vs up to day old (for local)')
+            .setDescription('For local: Latest data vs since 12pm')
             .setRequired(false)
 			.addChoices(
 				{ name: 'True', value: 'true' },
@@ -32,7 +32,11 @@ const execute = async (interaction) => {
         update = "false"
     }
 
-    await interaction.deferReply()
+	if (update == 'true') {
+		await interaction.reply('Please wait...')
+	} else {
+		await interaction.deferReply()
+	}
 
 	fetch(`${DB_API_URL}/valorant/leaderboard/${region}/${update}`)
 		.then(response => {
@@ -45,7 +49,7 @@ const execute = async (interaction) => {
 		})
 
 		.then(async data => {
-			await interaction.editReply('```' + data['title'] + '\n' + data['leaderboard'] + '```');
+			await interaction.editReply('```' + data['leaderboard'] + '```');
 		})
 		.catch(error => {
 			console.error('There was a problem with the fetch operation:', error);

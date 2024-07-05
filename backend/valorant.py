@@ -5,6 +5,7 @@ import random
 import requests
 from PIL import Image
 from io import BytesIO
+from datetime import datetime, timedelta
 
 import config
 import playerclass
@@ -82,7 +83,7 @@ def parse_req(r, endpoint):
 
     raise UnknownException    
 
-def get_file_mmr(puuid):
+def get_file_mmr(puuid, date=False):
 
     if os.path.isfile(f'{config.get("HISTORY_FP")}/{puuid}.txt') == False:
         return False
@@ -95,6 +96,9 @@ def get_file_mmr(puuid):
         return False
 
     #return the latest MMR value in file
+    if date:
+        return line.split(',')
+
     return int(line.split(',')[0])
 
 def initialise_file(puuid):
@@ -193,21 +197,27 @@ def get_elo_list(puuid):
 
     return elolist[:-2]
 
-def leaderboard(region, length=20):
+def leaderboard(region, length=20, last_played=90):
 
     result = {}
     if region == 'local':
+        date_format = "%A-%B-%d-%Y-%I:%M-%p"
         playerlist = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
         playerlist.load()
         players = []
+        cut_off = datetime.now() - timedelta(days=last_played)
 
         for player in playerlist:
-            mmr = get_file_mmr(player.puuid)
-            if mmr:
-                players.append((player.ign, mmr))
-            
+            data = get_file_mmr(player.puuid, date=True)
+            if data and len(data) == 2:
+                date_str = data[1].strip()
+                if date_str != "":
+                    date = datetime.strptime(date_str, date_format)
+                    if date > cut_off:
+                        players.append((player.ign, int(data[0])))
+                    
         players.sort(key=lambda x:x[1], reverse=True)
-        leaderboard = "Player Leaderboard\n"
+        result['leaderboard'] = "Player Leaderboard (Last 3 months)\n"
     
     else:
         try:
@@ -224,9 +234,8 @@ def leaderboard(region, length=20):
             else:
                 players.append((data[i]['gameName'], data[i]['rankedRating']))
 
-        result['title'] = f'{regions[region]} Ranked Leaderboard'
+        result['leaderboard'] = f'{regions[region]} Ranked Leaderboard\n'
 
-    result['leaderboard'] = ""
     for i, player in enumerate(players):
         rank = i + 1
         result['leaderboard'] += (str(rank) + '.').ljust(3) + str(player[0]).ljust(16) + str(player[1]).rjust(5) + '\n'

@@ -18,7 +18,7 @@ def index():
 
 @app.route('/data/valorant/leaderboard/<region>/<isUpdate>', methods=['GET'])
 def leaderboard(region, isUpdate):
-    if isUpdate == 'true':
+    if isUpdate == 'true' and region == 'local':
         database_updater.update_all(False, False, False)
 
     return valorant.leaderboard(region)
