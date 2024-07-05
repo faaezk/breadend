@@ -63,37 +63,22 @@ def anime_search(title, type):
     data['ep_count'] = '?' if not anime['episodes'] else str(anime['episodes'])
     data['synopsis'] = trim(anime['synopsis'], 980)
 
-    data['opening_themes'] = ""
+    data['opening_themes'] = []
     if 'openings' in anime['theme'].keys():
-        for theme in anime['theme']['openings']:
-            if len(data['opening_themes']) > 989:
-                data['opening_themes'] = data['opening_themes'][:-(len(last) + 1)]
-                data['opening_themes'] += "more at MyAnimeList (link in title)"
-                break
-            data['opening_themes'] += theme + '\n'
-            last = theme
+        for op in anime['theme']['openings']:
+            data['opening_themes'].append(op)
 
-    data['ending_themes'] = ""
+    data['ending_themes'] = []
     if 'endings' in anime['theme'].keys():
-        for theme in anime['theme']['endings']:
-            if len(data['ending_themes']) > 989:
-                data['ending_themes'] = data['ending_themes'][:-(len(last) + 1)]
-                data['ending_themes'] += "more at MyAnimeList (link in title)"
-                break
-            data['ending_themes'] += theme + '\n'
-            last = theme
+        for ed in anime['theme']['endings']:
+            data['ending_themes'].append(ed)
 
-    data['sequel'] = ""
+    data['sequel'] = []
     for related in anime['relations']:
         if related['relation'] == 'Sequel':
-            sequel_list = related['entry']
-            if len(sequel_list) == 1:
-                data['sequel'] = sequel_list[0]['name'] + '\n'
-            else:
-                for i in range(sequel_list):
-                    data['sequel'] += str(i + 1) + '. ' + sequel_list[i]['name'] + '\n'
+            for sequel in related['entry']:
+                data['sequel'].append(sequel['name'])
 
-            data['sequel'] = data['sequel'][:-1]
             break
 
     data['genres'] = ""
@@ -171,36 +156,17 @@ def character_search(name):
 
     data['description'] = trim(character['about'], 980)
 
-    data['anime'] = ""
+    data['anime'] = []
     for show in character['anime']:
-        if len(data['anime']) > 989:
-            data['anime'] = data['anime'][:-(len(last))]
-            data['anime'] += "more at MyAnimeList (link in title)"
-            break
-        
-        last = show['anime']['title'] + '\n'
-        data['anime'] += last
+        data['anime'].append(show['anime']['title'])
 
-    data['manga'] = ""
+    data['manga'] = []
     for book in character['manga']:
-        if len(data['manga']) > 989:
-            data['manga'] = data['manga'][:-(len(last))]
-            data['manga'] += "more at MyAnimeList (link in title)"
-            break
+        data['manga'].append(book['anime']['title'])
 
-        last = book['manga']['title'] + '\n'
-        data['manga'] += last
-
-    data['voice_actors'] = ""
+    data['voice_actors'] = []
     for va in character['voices']:
-
-        if len(data['voice_actors']) > 989:
-            data['voice_actors'] = data['voice_actors'][:-(len(last))]
-            data['voice_actors'] += "More at MyAnimeList (link in title)"
-            break
-        
-        last = va['language'] + ': ' + va['person']['name'] + '\n'
-        data['voice_actors'] += last
+        data['voice_actors'].append((va['person']['name'], va['language']))
 
     data['image_url'] = ""
     if 'jpg' in character['images'].keys():

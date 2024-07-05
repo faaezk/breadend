@@ -143,6 +143,36 @@ def chairmen():
                     {"name" : "Annual Chairman:", "value" : f"{annual['name']} {annual['last_name']}"}]
     })
 
+@app.route('/data/mal/info/anime/<title>/<type>', methods=['GET'])
+def anime_stats(title, type):
+    anime = malsearch.anime_search(title, type)
+    if anime == False:
+        return json.dumps({"error" : "Server connection error, try again."})
+    elif anime == None:
+        return json.dumps({"error" : "Anime not found."})
+    
+    return anime
+
+@app.route('/data/mal/info/manga/<title>', methods=['GET'])
+def manga_stats(title):
+    manga = malsearch.manga_search(title)
+    if manga == False:
+        return json.dumps({"error" : "Server connection error, try again."})
+    elif manga == None:
+        return json.dumps({"error" : "Manga not found."})
+
+    return manga
+
+@app.route('/data/mal/info/character/<name>', methods=['GET'])
+def character_stats(name):
+    character = malsearch.character_search(name)
+    if character == False:
+        return json.dumps({"error" : "Server connection error, try again."})
+    elif character == None:
+        return json.dumps({"error" : "Character not found."})
+
+    return character
+
 @app.route('/data/mal/graph/<category>/<type>/<title>', methods=['GET'])
 def mal_graph(category, type, title):
     content = malsearch.score_graph(title, category, type)
