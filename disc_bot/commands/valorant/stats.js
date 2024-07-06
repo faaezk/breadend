@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { DB_API_URL } = require('../../../config.json');
+const { DB_API_URL } = require('../../config.json');
 
 const data = new SlashCommandBuilder()
     .setName('stats')

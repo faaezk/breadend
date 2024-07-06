@@ -11,15 +11,15 @@ import config
 import playerclass
 from exceptionclass import *
 
-endpoints = {"LEADERBOARD" : "https://api.henrikdev.xyz/valorant/v1/leaderboard/{region}",
-                "REGION_STATUS" : "https://api.henrikdev.xyz/valorant/v1/status/{region}",
-                "CROSSHAIR" : "https://api.henrikdev.xyz/valorant/v1/crosshair/generate?id={crosshair_code}",
-                "ACCOUNT_BY_PUUID" : "https://api.henrikdev.xyz/valorant/v1/by-puuid/account/{puuid}",
-                "MMR_BY_PUUID" : "https://api.henrikdev.xyz/valorant/v2/by-puuid/mmr/ap/{puuid}",
-                "MMR_HISTORY_BY_PUUID" : "https://api.henrikdev.xyz/valorant/v1/by-puuid/mmr-history/ap/{puuid}",
-                "ACCOUNT_BY_NAME" : "https://api.henrikdev.xyz/valorant/v1/account/{ign}/{tag}",
-                "MMR_BY_NAME" : "https://api.henrikdev.xyz/valorant/v2/mmr/ap/{ign}/{tag}",
-                "MMR_HISTORY_BY_NAME" : "https://api.henrikdev.xyz/valorant/v1/mmr-history/ap/{ign}/{tag}"}
+endpoints = {"LEADERBOARD" : "v1/leaderboard/{region}",
+                "REGION_STATUS" : "v1/status/{region}",
+                "CROSSHAIR" : "v1/crosshair/generate?id={crosshair_code}",
+                "ACCOUNT_BY_PUUID" : "v1/by-puuid/account/{puuid}",
+                "MMR_BY_PUUID" : "v2/by-puuid/mmr/ap/{puuid}",
+                "MMR_HISTORY_BY_PUUID" : "v1/by-puuid/mmr-history/ap/{puuid}",
+                "ACCOUNT_BY_NAME" : "v1/account/{ign}/{tag}",
+                "MMR_BY_NAME" : "v2/mmr/ap/{ign}/{tag}",
+                "MMR_HISTORY_BY_NAME" : "v1/mmr-history/ap/{ign}/{tag}"}
 
 headers = {'accept' : 'application/json', 'Authorization' : config.get("VALORANT_KEY")}
 errors = {
@@ -42,8 +42,7 @@ def get_data(endpoint, **kwargs):
         data_list = []
         for puuid in kwargs['puuid_list']:
             try:
-                url = endpoints[endpoint].format(**{'puuid' : puuid})
-                print(url)
+                url = config.get("API_BASE_URL") + endpoints[endpoint].format(**{'puuid' : puuid})
                 data_list.append((puuid, parse_req(session.get(url, headers=headers), endpoint)))
             except Exception as e:
                 data_list.append((puuid, {'error' : str(e)}))
@@ -51,7 +50,7 @@ def get_data(endpoint, **kwargs):
         return data_list
 
     try:
-        url = endpoints[endpoint].format(**kwargs)
+        url = config.get("API_BASE_URL") + endpoints[endpoint].format(**kwargs)
     except KeyError:
         raise KeyException
 

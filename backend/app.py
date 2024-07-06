@@ -183,5 +183,8 @@ def mal_graph(category, type, title):
     
     return json.dumps(content)
 
-if __name__ == "__main__":
-    app.run(debug=True)
+# if __name__ == "__main__":
+#    app.run(debug=True)
+
+def create_app():
+   return app

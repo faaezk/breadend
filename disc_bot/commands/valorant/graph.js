@@ -1,4 +1,4 @@
-const { DB_API_URL } = require('../../../config.json');
+const { DB_API_URL } = require('../../config.json');
 const { SlashCommandBuilder } = require('discord.js');
 
 
