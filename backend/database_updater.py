@@ -20,34 +20,30 @@ def update_all(graph=True, output=False, printer=True):
     total = str(len(playerlist))
 
     puuid_list = playerlist.get_puuid_list()
-    try:
-        data_list = valorant.get_data("MMR_HISTORY_BY_PUUID", puuid_list=puuid_list)
-    except Exception:
-        pass
+    data_list = valorant.get_data("MMR_HISTORY_BY_PUUID", puuid_list=puuid_list)
 
-    for i, elem in enumerate(data_list):
-        playerlist.get_player(elem[0])
+    for i, (puuid, data) in enumerate(data_list):
 
-        if 'name' in elem[1].keys() and elem[1]['name'] != None:
-            update = valorant.update_database(puuid=elem[0], data=elem[1])
+        if 'name' in data.keys() and data['name'] != None:
+            update = valorant.update_database(puuid=puuid, data=data)
             new_games = int(update)
             update_count += new_games
             if new_games > 0:
-                updates_list.append((elem[1]['name'], new_games))
+                updates_list.append((data['name'], new_games))
 
             if graph:
-                graphs.graph(puuid=elem[0], update=False)
+                graphs.graph(puuid=puuid, update=False)
 
             if printer:
                 print(f'{i+1:02d}/{total}: Success')
         
-        elif elem[1]['status'] == 200:
-            ign = playerlist.get_ign_by_puuid(elem[0])
+        elif 'status' in data.keys() and data['status'] == 200:
+            ign = playerlist.get_ign_by_puuid(puuid)
             print(f'{i+1:02d}/{total}: No games found for {ign}')
             dataless_count += 1
         else:
-            ign = playerlist.get_ign_by_puuid(elem[0])
-            errors_list.append(ign)
+            ign = playerlist.get_ign_by_puuid(puuid)
+            errors_list.append((ign, data['error']))
             print(f'{i+1:02d}/{total}: Error at {ign}')
             errors_count += 1
 
@@ -74,8 +70,8 @@ def update_all(graph=True, output=False, printer=True):
     update_msg = "**No Updates**" if update_msg == "" else f"**Updates:** {update_msg[:-2]}"
 
     errors_msg = ""
-    for player in errors_list:
-        errors_msg += f"{player}, "
+    for player, error in errors_list:
+        errors_msg += f"{player}: {error}, "
     errors_msg = "**No Errors**" if errors_msg == "" else f"**Errors:** {errors_msg[:-2]}"
 
     with open(config.get("LOG_FP"), 'a') as f:

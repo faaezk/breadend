@@ -41,8 +41,12 @@ def get_data(endpoint, **kwargs):
         session = requests.Session()
         data_list = []
         for puuid in kwargs['puuid_list']:
-            url = endpoints[endpoint].format(**{'puuid' : puuid})
-            data_list.append((puuid, parse_req(session.get(url, headers=headers), endpoint)))
+            try:
+                url = endpoints[endpoint].format(**{'puuid' : puuid})
+                print(url)
+                data_list.append((puuid, parse_req(session.get(url, headers=headers), endpoint)))
+            except Exception as e:
+                data_list.append((puuid, {'error' : str(e)}))
         
         return data_list
 
@@ -59,8 +63,7 @@ def parse_req(r, endpoint):
     global errors
 
     if r.status_code in errors.keys():
-        DynamicException.set_message(self=DynamicException, message=errors[r.status_code])
-        raise DynamicException
+        raise DynamicException(errors[r.status_code], r.status_code)
     
     if endpoint == 'CROSSHAIR':
         return r
@@ -81,7 +84,7 @@ def parse_req(r, endpoint):
         
         return john
 
-    raise UnknownException    
+    raise UnknownException
 
 def get_file_mmr(puuid, date=False):
 
