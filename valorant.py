@@ -11,7 +11,7 @@ import config
 import playerclass
 from exceptionclass import *
 
-endpoints = {"LEADERBOARD" : "v1/leaderboard/{region}",
+endpoints = {"LEADERBOARD" : "v2/leaderboard/{region}",
                 "REGION_STATUS" : "v1/status/{region}",
                 "CROSSHAIR" : "v1/crosshair/generate?id={crosshair_code}",
                 "ACCOUNT_BY_PUUID" : "v1/by-puuid/account/{puuid}",
