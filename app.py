@@ -189,8 +189,8 @@ def chairmen():
                     {"name" : "Annual Chairman:", "value" : f"{annual['name']} {annual['last_name']}"}]
     })
 
-# if __name__ == "__main__":
-#    app.run(debug=True)
+if __name__ == "__main__":
+   app.run(debug=True)
 
-def create_app():
-   return app
+# def create_app():
+#    return app
