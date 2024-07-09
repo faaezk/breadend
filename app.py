@@ -1,7 +1,7 @@
 import json
 import requests
-from flask import Flask
 from datetime import datetime
+from flask import Flask, abort
 
 import config
 import valorant
@@ -16,55 +16,74 @@ app = Flask(__name__)
 def index():
     return "Hello"
 
-@app.route('/data/valorant/leaderboard/<region>/<isUpdate>', methods=['GET'])
-def leaderboard(region, isUpdate):
-    if isUpdate == 'true' and region == 'local':
+@app.route('/valorant/leaderboard/<region>', defaults={'toUpdate': 'false'}, methods=['GET'])
+@app.route('/valorant/leaderboard/<region>/<toUpdate>', methods=['GET'])
+def leaderboard(region, toUpdate):
+    if toUpdate == 'true' and region == 'local':
         database_updater.update_all(False, False, False)
 
-    return valorant.leaderboard(region)
+    res = valorant.leaderboard(region)
+    if "error" in res.keys():
+        abort(400, res['error'])
+    else:
+        return res
 
-@app.route('/data/valorant/stats/<ign>/<tag>', methods=['GET'])
+@app.route('/valorant/stats/<ign>', defaults={'tag': False}, methods=['GET'])
+@app.route('/valorant/stats/<ign>/<tag>', methods=['GET'])
 def stats(ign, tag):
 
-    playerList = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
-    playerList.load()
-    puuid = playerList.get_puuid_by_ign(ign)
-
-    if not puuid and tag != 'emptytag':
-        player_data = valorant.get_data("ACCOUNT_BY_NAME", ign=ign, tag=tag)
+    if not tag:
+        playerList = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
+        playerList.load()
+        tag = playerList.get_tag_by_ign(ign)
+        puuid = playerList.get_puuid_by_ign(ign)
+        
+        if not ign or not tag:
+            abort(400, "Player not in database, provide ign and tag")
+        
+    else:
+        try:
+            player_data = valorant.get_data("ACCOUNT_BY_NAME", ign=ign, tag=tag)
+        except Exception as E:
+            abort(400, E.message)
         puuid = player_data['data']['puuid']
     
     try:
         data = valorant.stats(puuid)
     except Exception as E:
-        return json.dumps({"error" : E.message})
-
-    tag = playerList.get_tag_by_ign(ign)
+        abort(400, E.message)
     
     if not data[0]:
-        return json.dumps({"error" : "Player not found"})
+        abort(400, "Player not found")
     
     else:
         stats = data[0]
-        fields = []
-
-        for act in stats:
-            fields.append({
-                "name": act[0],
-                "value": act[1]}
-            )
-
+        acts = [{"name": act[0], "value": act[1]} for act in stats]
         embed = json.dumps({
-            "title": "Competitive Statistics",
-            "url": "https://youtu.be/kJa2kwoZ2a4?si=K_NtlL62gv2RwhDP",
             "author": f"{ign}#{tag}",
             "thumbnail": data[1],
-            "fields": fields
+            "acts": acts
         })
 
     return embed
 
-@app.route('/data/valorant/graph/<ign_list>', methods=['GET'])
+@app.route('/valorant/banner/<ign>', defaults={'tag': False}, methods=['GET'])
+@app.route('/valorant/banner/<ign>/<tag>', methods=['GET'])
+def banner(ign, tag):
+
+    if not tag:
+        playerList = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
+        playerList.load()
+        tag = playerList.get_tag_by_ign(ign)
+        if not tag:
+            abort(400, "Player not in database, provide ign and tag")
+
+    if valorant.get_banner(ign, tag):
+        return json.dumps({"content" : f"Banner for {ign}#{tag}", "filepath" : config.get("BANNER_FP")})
+    else:
+        abort(400, "An error occurred while contacting the server.")
+
+@app.route('/valorant/graph/<ign_list>', methods=['GET'])
 def graph(ign_list):
     playerList = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
     playerList.load()
@@ -77,9 +96,10 @@ def graph(ign_list):
             puuid_list.append(puuid)
 
     if len(puuid_list) == 0:
-        response = {"error" : "No valid players given"}
+        abort(400, "No valid players given")
     
     elif len(puuid_list) == 1:
+        puuid = puuid_list[0]
         with open(f'{config.get("HISTORY_FP")}/{puuid}.txt') as f:
             for line in f:
                 pass
@@ -109,27 +129,53 @@ def graph(ign_list):
             })
 
         else:
-            response = json.dumps({"error" : "No valid players given"})
+            abort(400, "No valid players given")
 
     return response
 
-@app.route('/data/valorant/banner/<username>', methods=['GET'])
-def banner(username):
+@app.route('/mal/info/anime/<title>', defaults={'type': 'tv'}, methods=['GET'])
+@app.route('/mal/info/anime/<type>/<title>', methods=['GET'])
+def anime_stats(type, title):
+    anime = malsearch.anime_search(type, title)
+    if anime == False:
+        abort(400, "Server connection error, try again.")
+    elif anime == None:
+        abort(400, "Anime not found.")
+    
+    return anime
 
-    username = username.lower().split('#')
-    if len(username) == 1:
-        playerList = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
-        playerList.load()
-        username.append(playerList.get_tag_by_ign(username[0]))
-        if not username[1]:
-            return json.dumps({"error" : "Player not in database, provide ign and tag"})
+@app.route('/mal/info/manga/<title>', methods=['GET'])
+def manga_stats(title):
+    manga = malsearch.manga_search(title)
+    if manga == False:
+        abort(400, "Server connection error, try again.")
+    elif manga == None:
+        abort(400, "Manga not found.")
 
-    if valorant.get_banner(ign=username[0], tag=username[1]):
-        return json.dumps({"content" : f"Banner for {username[0]}#{username[1]}", "filepath" : config.get("BANNER_FP")})
-    else:
-        return json.dumps({"error" : "An error occurred while contacting the server."})
+    return manga
 
-@app.route('/data/connected', methods=['GET'])
+@app.route('/mal/info/character/<name>', methods=['GET'])
+def character_stats(name):
+    character = malsearch.character_search(name)
+    if character == False:
+        abort(400, "Server connection error, try again.")
+    elif character == None:
+        abort(400, "Character not found.")
+
+    return character
+
+@app.route('/mal/graph/<category>/<title>', defaults={'type': 'tv'}, methods=['GET'])
+@app.route('/mal/graph/<category>/<type>/<title>', methods=['GET'])
+def mal_graph(category, type, title):
+    content = malsearch.score_graph(title, category, type)
+    if content == False:
+        abort(400, "Server connection error, try again.")
+    elif content == None:
+        abort(400, f"{category} not found.")
+    
+    return json.dumps(content)
+
+@app.route('/other/connected', methods=['GET'])
 def chairmen():
     r = requests.get("https://rickies.co/api/chairmen.json", headers={'accept': 'application/json'})
     chairmen = json.loads(r.text)
@@ -142,46 +188,6 @@ def chairmen():
         "fields" : [{"name" : "Keynote Chairman:", "value" : f"{keynote['name']} {keynote['last_name']}"}, 
                     {"name" : "Annual Chairman:", "value" : f"{annual['name']} {annual['last_name']}"}]
     })
-
-@app.route('/data/mal/info/anime/<title>/<type>', methods=['GET'])
-def anime_stats(title, type):
-    anime = malsearch.anime_search(title, type)
-    if anime == False:
-        return json.dumps({"error" : "Server connection error, try again."})
-    elif anime == None:
-        return json.dumps({"error" : "Anime not found."})
-    
-    return anime
-
-@app.route('/data/mal/info/manga/<title>', methods=['GET'])
-def manga_stats(title):
-    manga = malsearch.manga_search(title)
-    if manga == False:
-        return json.dumps({"error" : "Server connection error, try again."})
-    elif manga == None:
-        return json.dumps({"error" : "Manga not found."})
-
-    return manga
-
-@app.route('/data/mal/info/character/<name>', methods=['GET'])
-def character_stats(name):
-    character = malsearch.character_search(name)
-    if character == False:
-        return json.dumps({"error" : "Server connection error, try again."})
-    elif character == None:
-        return json.dumps({"error" : "Character not found."})
-
-    return character
-
-@app.route('/data/mal/graph/<category>/<type>/<title>', methods=['GET'])
-def mal_graph(category, type, title):
-    content = malsearch.score_graph(title, category, type)
-    if content == False:
-        return json.dumps({"error" : "Server connection error, try again."})
-    elif content == None:
-        return json.dumps({"error" : f"{category} not found."})
-    
-    return json.dumps(content)
 
 # if __name__ == "__main__":
 #    app.run(debug=True)

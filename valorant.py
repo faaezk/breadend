@@ -54,7 +54,10 @@ def get_data(endpoint, **kwargs):
     except KeyError:
         raise KeyException
 
-    return parse_req(requests.get(url, headers=headers), endpoint)
+    try:
+        return parse_req(requests.get(url, headers=headers), endpoint)
+    except Exception as E:
+        raise E
 
 def parse_req(r, endpoint):
     global endpoints
@@ -219,25 +222,27 @@ def leaderboard(region, length=20, last_played=90):
                         players.append((player.ign, int(data[0])))
                     
         players.sort(key=lambda x:x[1], reverse=True)
-        result['leaderboard'] = "Player Leaderboard (Last 3 months)\n"
+        result['title'] = "Player Leaderboard (Last 3 months)\n"
     
     else:
         try:
             data = get_data('LEADERBOARD', region=region)
         except Exception as E:
-            raise E
+            return {"error" : E.message}
 
         regions = {"ap" : "Asia Pacific", "eu" : "Europe", "kr" : "Korea", "na" : "North America"}
         players = []
         
         for i in range(length):
-            if data[i]['IsAnonymized'] == True:
-                players.append(("Anonymous", data[i]['rankedRating']))
+            player = data['players'][i]
+            if player['IsAnonymized'] == True:
+                players.append(("Anonymous", player['rankedRating']))
             else:
-                players.append((data[i]['gameName'], data[i]['rankedRating']))
+                players.append((player['gameName'], player['rankedRating']))
 
-        result['leaderboard'] = f'{regions[region]} Ranked Leaderboard\n'
+        result['title'] = f'{regions[region]} Ranked Leaderboard\n'
 
+    result['leaderboard'] = ""
     for i, player in enumerate(players):
         rank = i + 1
         result['leaderboard'] += (str(rank) + '.').ljust(3) + str(player[0]).ljust(16) + str(player[1]).rjust(5) + '\n'

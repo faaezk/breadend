@@ -50,7 +50,7 @@ def api_request(query, category, type="null", stats=False):
 
     return res['data']
 
-def anime_search(title, type):
+def anime_search(type, title):
 
     anime = api_request(title, "anime", type)
     if not anime:
@@ -162,7 +162,7 @@ def character_search(name):
 
     data['manga'] = []
     for book in character['manga']:
-        data['manga'].append(book['anime']['title'])
+        data['manga'].append(book['manga']['title'])
 
     data['voice_actors'] = []
     for va in character['voices']:
