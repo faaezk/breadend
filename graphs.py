@@ -10,7 +10,7 @@ from adjustText import adjust_text
 import config
 import valorant
 import playerclass
-from exceptionclass import NoneException
+from exceptionclass import NoneException, MissingException
 
 ranks = {
     0 : "Iron 1", 100 : "Iron 2", 200 : "Iron 3",
@@ -43,10 +43,13 @@ def get_mmr_list(puuid):
     return range(1, len(y) + 1), y
 
 def generate_ticks(puuid, num_games=0):
-    
-    x, y = get_mmr_list(puuid)
+    try:
+        x, y = get_mmr_list(puuid)
+    except Exception as E:
+        raise E
+
     if not x:
-        return(False, 'not enough data')
+        raise NoneException
 
     if num_games != 0:
         y = y[-num_games:]
@@ -71,7 +74,6 @@ def generate_ticks(puuid, num_games=0):
             i += 100
 
     y_labels = []
-
     for value in y_ticks:
         if value in ranks.keys():
             y_labels.append(ranks[value])
@@ -106,19 +108,24 @@ def generate_ticks(puuid, num_games=0):
 
     return  x, y, x_ticks, y_ticks, y_labels, [y_min,y_max]
 
-def graph(puuid, num_games=0, update=True, acts=False):
-
+def graph(puuid, num_games=0, update=False, acts=False):
     playerlist = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
     playerlist.load()
     ign = playerlist.get_ign_by_puuid(puuid)
 
+    if not ign:
+        raise MissingException
+
     if update:
         try:
-            valorant.update_database(puuid=puuid)
+            valorant.update_database(puuid)
         except Exception as E:
             raise E
 
-    x, y, x_ticks, y_ticks, y_labels, y_range = generate_ticks(puuid, num_games)
+    try:
+        x, y, x_ticks, y_ticks, y_labels, y_range = generate_ticks(puuid, num_games)
+    except Exception as E:
+        raise E
 
     fig, ax = plt.subplots()
     axes = fig.gca()
@@ -146,12 +153,19 @@ def graph(puuid, num_games=0, update=True, acts=False):
         act_games = []
 
         for act in act_data.keys():
+            title = act.replace("e", " Ep ")
+            title = title.replace("a", ", Act ")
             if 'error' not in act_data[act].keys():
-                act_games.append((act, act_data[act]['number_of_games']))
+                act_games.append((title, act_data[act]['number_of_games']))
 
         temp = len(x)
         i = 0
-        colours = ['b', 'r', 'g', 'k', 'c', 'm', 'y', 'darkgreen', 'peru']
+        colours = ['lightcoral', 'chocolate',  'goldenrod',  'olive',  'turquoise',  
+                   'indigo',  'red',  'peru',  'gold',  'greenyellow',  'teal',  
+                   'violet',  'salmon',  'orange',  'khaki',  'lawngreen',  
+                   'aqua',  'purple',  'orangered',  'yellow',  'palegreen',  
+                   'skyblue',  'fuchsia',  'limegreen',  'blue',  'hotpink',  'lime']
+
         while temp > 0:
             plt.axvline(temp, linestyle="dotted", color=colours[i], label=act_games[i][0])
             temp -= act_games[i][1]
@@ -234,10 +248,8 @@ def multigraph(puuid_list: list, update=False):
     y_labels = []
 
     for value in y_ticks:
-        if value % 100 != 0:
-            y_labels.append(str(value))
-        else:
-            y_labels.append(ranks[value])
+        label = str(value) if value % 100 != 0 else ranks[value]
+        y_labels.append(label)
 
     axes.set_yticklabels(y_labels)
 
@@ -279,7 +291,6 @@ def date_graph():
             "October" : 10, "November" : 11, "December" : 12}
 
     data = []
-
     num_points = len(data)
     rows_list, years = [], []
 
@@ -309,10 +320,8 @@ def date_graph():
 
     while i <= int(math.ceil(ymax / 25.0)) * 25:
         y_ticks.append(i)
-        if i % 100 == 0:
-            y_labels.append(ranks[i])
-        else:
-            y_labels.append(str(i))
+        label = ranks[i] if i % 100 == 0 else str(i)
+        y_labels.append(label)
 
         if ranger == 1:
             i += 20
@@ -380,12 +389,3 @@ def date_graph():
     plt.title('MMR over tifme')
     plt.legend(loc='upper left')
     plt.savefig('stuff/date-graph.png', bbox_inches="tight")
-
-def update_all_graphs():
-    playerlist = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
-    playerlist.load()
-
-    for player in playerlist:
-        if player.active != 'False':
-            print(graph(puuid=player.puuid, update=False))
-    return

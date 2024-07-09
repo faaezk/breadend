@@ -23,16 +23,12 @@ def update_all(graph=True, output=False, printer=True):
     data_list = valorant.get_data("MMR_HISTORY_BY_PUUID", puuid_list=puuid_list)
 
     for i, (puuid, data) in enumerate(data_list):
-
         if 'name' in data.keys() and data['name'] != None:
             update = valorant.update_database(puuid=puuid, data=data)
             new_games = int(update)
             update_count += new_games
             if new_games > 0:
                 updates_list.append((data['name'], new_games))
-
-            if graph:
-                graphs.graph(puuid=puuid, update=False)
 
             if printer:
                 print(f'{i+1:02d}/{total}: Success')
@@ -46,6 +42,10 @@ def update_all(graph=True, output=False, printer=True):
             errors_list.append((ign, data['error']))
             print(f'{i+1:02d}/{total}: Error at {ign}')
             errors_count += 1
+
+    if graph:
+        for player in playerlist:
+            graph(puuid=player.puuid, update=False)
 
     if printer:
         print(updates_list)

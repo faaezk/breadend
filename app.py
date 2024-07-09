@@ -4,6 +4,7 @@ from datetime import datetime
 from flask import Flask, abort, jsonify
 
 import config
+import graphs
 import valorant
 import malsearch
 import playerclass
@@ -34,11 +35,11 @@ def leaderboard(region, toUpdate):
     else:
         return res
 
-@app.route('/valorant/stats/<ign>', defaults={'tag': False}, methods=['GET'])
+@app.route('/valorant/stats/<ign>', defaults={'tag': ''}, methods=['GET'])
 @app.route('/valorant/stats/<ign>/<tag>', methods=['GET'])
 def stats(ign, tag):
 
-    if not tag:
+    if tag == '':
         playerList = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
         playerList.load()
         tag = playerList.get_tag_by_ign(ign)
@@ -73,11 +74,11 @@ def stats(ign, tag):
 
     return embed
 
-@app.route('/valorant/banner/<ign>', defaults={'tag': False}, methods=['GET'])
+@app.route('/valorant/banner/<ign>', defaults={'tag': ''}, methods=['GET'])
 @app.route('/valorant/banner/<ign>/<tag>', methods=['GET'])
 def banner(ign, tag):
 
-    if not tag:
+    if tag == '':
         playerList = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
         playerList.load()
         tag = playerList.get_tag_by_ign(ign)
@@ -89,8 +90,9 @@ def banner(ign, tag):
     else:
         abort(400, "An error occurred while contacting the server.")
 
-@app.route('/valorant/graph/<ign_list>', methods=['GET'])
-def graph(ign_list):
+@app.route('/valorant/graph/<ign_list>', defaults={'acts': 'false'}, methods=['GET'])
+@app.route('/valorant/graph/<ign_list>/<acts>', methods=['GET'])
+def graph(ign_list, acts):
     playerList = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
     playerList.load()
     ign_list = ign_list.split(',')
@@ -111,9 +113,11 @@ def graph(ign_list):
                 pass
             last_game = line.strip()
         
-        content = ""
-
+        if acts == 'true':
+            graphs.graph(puuid, acts=True)
+        
         # If last game is dated, extract day, month and year
+        content = ""
         if len(last_game.split(',')) > 1:
             output_format = "%H:%M on %d/%m/%y"
             input_format = "%A-%B-%d-%Y-%I:%M-%p"

@@ -19,10 +19,10 @@ Response:
 #### Account Statistics: `/valorant/stats/<ign>/<tag>`
 Parameter Options:
 
-| Parameter | Type   | Required | Description                                                                                     |
-| --------- | ------ | -------- | ----------------------------------------------------------------------------------------------- |
-| ign       | String | Yes      | Riot in-game name (first section of username in `ign#tag` format)                               |
-| tag       | String | No       | Riot tag, (second section of username in `ign#tag` format). Not required if account in database |
+| Parameter | Type   | Required | Description                                                                                                       |
+| --------- | ------ | -------- | ----------------------------------------------------------------------------------------------------------------- |
+| ign       | String | Yes      | Riot in-game name (first section of username in `ign#tag` format)                                                 |
+| tag       | String | No       | Riot tag, (second section of username in `ign#tag` format). Not required if account in database \| Default: false |
 
 Response:
 
@@ -30,14 +30,14 @@ Response:
 | --------- | --------- | ------------------------------------------------------- |
 | author    | String    | Username of player in `ign#tag` format                  |
 | thumbnail | String    | URL to in-game banner (small format)                    |
-| acts      | [Dict] | Act-rank for each act. Keys of each item: [name, value] |
+| acts      | [Dict]    | Act-rank for each act. Keys of each item: [name, value] |
 #### Account Banner: `/valorant/banner/<ign>/<tag>`
 Parameter Options:
 
 | Parameter | Type   | Required | Description                                                                                                       |
 | --------- | ------ | -------- | ----------------------------------------------------------------------------------------------------------------- |
 | ign       | String | Yes      | Riot in-game name (first section of username in `ign#tag` format)                                                 |
-| tag       | String | No       | Riot tag, (second section of username in `ign#tag` format). Not required if account in database \| Default: False |
+| tag       | String | No       | Riot tag, (second section of username in `ign#tag` format). Not required if account in database \| Default: false |
 
 Response:
 
@@ -46,12 +46,13 @@ Response:
 | author    | String    | Username of player in `ign#tag` format                  |
 | thumbnail | String    | URL to in-game banner (small format)                    |
 | acts      | Dict List | Act-rank for each act. Keys of each item: [name, value] |
-#### MMR Graph: `/valorant/graph/<ign_list>`
+#### MMR Graph: `/valorant/graph/<ign_list>/<acts>`
 Parameter Options:
 
-| Parameter | Type   | Required | Description                                                                                   |
-| --------- | ------ | -------- | --------------------------------------------------------------------------------------------- |
-| ign_list  | String | Yes      | Comma separated Riot in-game names (first section of username in `ign#tag` format)            |
+| Parameter | Type   | Required | Description                                                                        | Options                         |
+| --------- | ------ | -------- | ---------------------------------------------------------------------------------- | ------------------------------- |
+| ign_list  | String | Yes      | Comma separated Riot in-game names (first section of username in `ign#tag` format) |                                 |
+| acts      | String | No       | Whether to mark acts on graph                                                      | [true, false] \| Default: false |
 
 Response:
 
@@ -117,9 +118,9 @@ Response:
 #### Character information: `/mal/info/character/<name>`
 Parameter Options:
 
-| Parameter | Type   | Required | Description    |
-| --------- | ------ | -------- | -------------- |
-| name     | String | Yes      | name of character |
+| Parameter | Type   | Required | Description       |
+| --------- | ------ | -------- | ----------------- |
+| name      | String | Yes      | name of character |
 
 Response:
 
@@ -162,9 +163,9 @@ Response:
 #### Rickies Chairmen: `/other/connected`
 Response:
 
-| Name        | Type   | Description                           |
-| ----------- | ------ | ------------------------------------- |
-| title       | String | A title                |
-| url | String | Link to show |
-| chairmen | [Dict] | List of current chairmen. Keys for each item: [name (position title), value (name of position holder)] |
-| image_url    | String   | URL to artwork |
+| Name        | Type   | Description                                                                                            |
+| ----------- | ------ | ------------------------------------------------------------------------------------------------------ |
+| title       | String | A title                                                                                                |
+| url         | String | Link to show                                                                                           |
+| chairmen    | [Dict] | List of current chairmen. Keys for each item: [name (position title), value (name of position holder)] |
+| image_url   | String | URL to artwork                                                                                         |
