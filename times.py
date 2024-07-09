@@ -49,9 +49,9 @@ def graph(title, df, labels, colours=""):
     if "/" in title:
         title = title.replace("/", "-")
     
-    plt.savefig(f"{config.get("TIME_PLOTS_FP")}/{title}.png", bbox_inches='tight')
+    plt.savefig(f"{config.get('TIME_PLOTS_FP')}/{title}.png", bbox_inches='tight')
 
-def main(graphs, days):
+def update_file_entries():
     proj_data = get_data("projects")
     projects = [Project(elem['id'], elem['name'], elem['color']) for elem in proj_data]
 
@@ -89,23 +89,34 @@ def main(graphs, days):
     df = df.sort_values(by=['start']).reset_index(drop=True)
     df.to_csv(config.get("TIME_ENTRIES_FP"), index=False)
 
+def main(days):
+
+    proj_data = get_data("projects")
+    projects = [Project(elem['id'], elem['name'], elem['color']) for elem in proj_data]
+
+    # Get file entries
+    files_df = pd.read_csv(config.get("TIME_ENTRIES_FP"))
+    files_df['tag'] = files_df['tag'].fillna('None')
+    files_df['description'] = files_df['description'].fillna('None')
+    files_df['start'] = pd.to_datetime(files_df['start'], format="ISO8601", utc=True)
+    files_df['start'] = files_df['start'].dt.tz_convert('Australia/Melbourne')
+    files_df['stop'] = pd.to_datetime(files_df['stop'], format="ISO8601", utc=True)
+    files_df['stop'] = files_df['stop'].dt.tz_convert('Australia/Melbourne')
+
     now = pd.Timestamp.now(tz='Australia/Melbourne')
     cut_off = now - timedelta(days=days)
     df = df[df['start'] >= cut_off]
 
-    if graphs:
-        proj_group = df.groupby(['project', 'colour'])['duration'].sum().reset_index()
-        graph("Projects", proj_group, proj_group['project'], colours=proj_group['colour'])
 
-        for project in projects:
-            if project.name in ['Reading', 'Leisure']:
-                tag_group = df[df['project'] == project.name]
-                tag_group['tag_desc'] = df['tag'] + ' - ' + df['description']
-                tag_group = tag_group.groupby(['tag_desc'])['duration'].sum().reset_index()
-                graph(project.name, tag_group, tag_group['tag_desc'])
-            else:
-                tag_group = df[df['project'] == project.name].groupby(['tag'])['duration'].sum().reset_index()
-                graph(project.name, tag_group, tag_group['tag'])
+    proj_group = df.groupby(['project', 'colour'])['duration'].sum().reset_index()
+    graph("Projects", proj_group, proj_group['project'], colours=proj_group['colour'])
 
-if __name__ == "__main__":
-    main(graphs=True, days=7)
+    for project in projects:
+        if project.name in ['Reading', 'Leisure']:
+            tag_group = df[df['project'] == project.name]
+            tag_group['tag_desc'] = df['tag'] + ' - ' + df['description']
+            tag_group = tag_group.groupby(['tag_desc'])['duration'].sum().reset_index()
+            graph(project.name, tag_group, tag_group['tag_desc'])
+        else:
+            tag_group = df[df['project'] == project.name].groupby(['tag'])['duration'].sum().reset_index()
+            graph(project.name, tag_group, tag_group['tag'])

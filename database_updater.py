@@ -5,6 +5,7 @@ import graphs
 import config
 import valorant
 import playerclass
+from times import update_file_entries
 
 def update_all(graph=True, output=False, printer=True):
 
@@ -45,7 +46,7 @@ def update_all(graph=True, output=False, printer=True):
 
     if graph:
         for player in playerlist:
-            graph(puuid=player.puuid, update=False)
+            graphs.graph(puuid=player.puuid, update=False)
 
     if printer:
         print(updates_list)
@@ -83,3 +84,4 @@ def update_all(graph=True, output=False, printer=True):
 
 if __name__ == "__main__":
     update_all()
+    update_file_entries()
