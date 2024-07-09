@@ -58,7 +58,7 @@ Response:
 | Name     | Type   | Description                    |
 | -------- | ------ | ------------------------------ |
 | content  | String | Last update date/error message |
-| filepath | String | Filepath to image of graph     |
+| filepath | String | File path to image of graph    |
 ### MyAnimeList:
 
 #### Anime information: `/mal/info/anime/<type>/<title>`
@@ -147,6 +147,7 @@ Response:
 | Name          | Type   | Description                                                                |
 | ------------- | ------ | -------------------------------------------------------------------------- |
 | url           | String | Link to entry on MyAnimeList                                               |
+| filepath      | String | File path to image of graph                                                |
 | title         | String | Title of anime/manga                                                       |
 | completed     | String | Number of people who have completed it                                     |
 | on_hold       | String | Number of people who have put it on hold                                   |
@@ -166,3 +167,4 @@ Response:
 | title       | String | A title                |
 | url | String | Link to show |
 | chairmen | [Dict] | List of current chairmen. Keys for each item: [name (position title), value (name of position holder)] |
+| image_url    | String   | URL to artwork |

@@ -1,7 +1,7 @@
 import json
 import requests
 from datetime import datetime
-from flask import Flask, abort
+from flask import Flask, abort, jsonify
 
 import config
 import valorant
@@ -11,6 +11,12 @@ import database_updater
 from graphs import multigraph
 
 app = Flask(__name__)
+
+@app.errorhandler(400)
+def bad_request_error(error):
+    response = jsonify({"error": "Bad Request", "message": error.description})
+    response.status_code = 400
+    return response
 
 @app.route('/')
 def index():
@@ -173,6 +179,7 @@ def mal_graph(category, type, title):
     elif content == None:
         abort(400, f"{category} not found.")
     
+    content['filepath'] = config.get("MAL_GRAPH_FP")
     return json.dumps(content)
 
 @app.route('/other/connected', methods=['GET'])
@@ -185,7 +192,8 @@ def chairmen():
     return json.dumps({
         "title" : "The Rickies Chairmen",
         "url" : "https://www.relay.fm/connected",
-        "fields" : [{"name" : "Keynote Chairman:", "value" : f"{keynote['name']} {keynote['last_name']}"}, 
+        "image_url" : "https://relayfm.s3.amazonaws.com/uploads/broadcast/image_3x/5/connected_artwork_0ecdaa3e-7019-4a34-86f7-f82d6a997144.png",
+        "chairmen" : [{"name" : "Keynote Chairman:", "value" : f"{keynote['name']} {keynote['last_name']}"}, 
                     {"name" : "Annual Chairman:", "value" : f"{annual['name']} {annual['last_name']}"}]
     })
 
