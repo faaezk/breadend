@@ -191,7 +191,7 @@ def generate_graph(x, y, title):
     for i in range(len(x)):
         plt.text(i, y[i], str(y[i]), ha = 'center')
 
-    plt.savefig(config.get("MAL_GRAPH_FP"), bbox_inches='tight')
+    plt.savefig(config.get("MAL_GRAPH"), bbox_inches='tight')
     plt.clf()
 
 def score_graph(title, category, type="null"):

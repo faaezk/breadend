@@ -32,7 +32,7 @@ def rounddown(x):
 
 def get_mmr_list(puuid):
     y = []
-    with open(f'{config.get("HISTORY_FP")}/{puuid}.txt', 'r') as f:
+    with open(f"{config.get('MMR_HISTORY')}/{puuid}.txt", 'r') as f:
         for line in f:
             y.append(int(line.split(',')[0].strip()))
 
@@ -177,7 +177,7 @@ def graph(puuid, num_games=0, update=False, acts=False):
     else:
         ax.legend(loc='lower right')
     
-    fig.savefig(f'{config.get("GRAPHS_FP")}/{puuid}.png', bbox_inches="tight")
+    fig.savefig(f"{config.get('MMR_GRAPH')}/{puuid}.png", bbox_inches="tight")
     plt.close(fig)
 
     return True
@@ -195,7 +195,7 @@ def multigraph(puuid_list: list, update=False):
     
     for puuid in puuid_list:
         ign = playerlist.get_ign_by_puuid(puuid)
-        if not puuid or not os.path.isfile(f'{config.get("HISTORY_FP")}/{puuid}.txt'):
+        if not puuid or not os.path.isfile(f"{config.get('HISTORY_FP')}/{puuid}.txt"):
             fails.append((ign, "Player not in database"))
         else:
             player_list.append((puuid, ign))
@@ -262,7 +262,7 @@ def multigraph(puuid_list: list, update=False):
     plt.ylabel("MMR")
     plt.title("change in MMR over time")
     plt.legend()
-    plt.savefig(f'{config.get("GRAPHS_FP")}/multigraph.png', bbox_inches="tight")
+    plt.savefig(f"{config.get('RES')}/multigraph.png", bbox_inches="tight")
     plt.close()
 
     if len(fails) == 0:

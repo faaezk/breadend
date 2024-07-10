@@ -1,7 +1,8 @@
+import os
 import json
 import requests
 from datetime import datetime
-from flask import Flask, abort, jsonify
+from flask import Flask, abort, jsonify, send_file, url_for
 
 import config
 import graphs
@@ -9,7 +10,6 @@ import valorant
 import malsearch
 import playerclass
 import database_updater
-from graphs import multigraph
 
 app = Flask(__name__)
 
@@ -23,6 +23,15 @@ def bad_request_error(error):
 def index():
     return "Hello"
 
+@app.route('/image/<type>/<filename>', methods=['GET'])
+def get_image(type, filename):
+    
+    image_path = f'{config.get(type)}/{filename}'
+    if not os.path.isfile(image_path):
+        abort(400, "File not found")
+
+    return send_file(image_path, mimetype='image/png')
+
 @app.route('/valorant/leaderboard/<region>', defaults={'toUpdate': 'false'}, methods=['GET'])
 @app.route('/valorant/leaderboard/<region>/<toUpdate>', methods=['GET'])
 def leaderboard(region, toUpdate):
@@ -33,12 +42,11 @@ def leaderboard(region, toUpdate):
     if "error" in res.keys():
         abort(400, res['error'])
     else:
-        return res
+        return jsonify(res)
 
 @app.route('/valorant/stats/<ign>', defaults={'tag': ''}, methods=['GET'])
 @app.route('/valorant/stats/<ign>/<tag>', methods=['GET'])
 def stats(ign, tag):
-
     if tag == '':
         playerList = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
         playerList.load()
@@ -47,7 +55,6 @@ def stats(ign, tag):
         
         if not ign or not tag:
             abort(400, "Player not in database, provide ign and tag")
-        
     else:
         try:
             player_data = valorant.get_data("ACCOUNT_BY_NAME", ign=ign, tag=tag)
@@ -62,22 +69,18 @@ def stats(ign, tag):
     
     if not data[0]:
         abort(400, "Player not found")
-    
     else:
         stats = data[0]
         acts = [{"name": act[0], "value": act[1]} for act in stats]
-        embed = json.dumps({
+        return jsonify({
             "author": f"{ign}#{tag}",
             "thumbnail": data[1],
             "acts": acts
         })
 
-    return embed
-
 @app.route('/valorant/banner/<ign>', defaults={'tag': ''}, methods=['GET'])
 @app.route('/valorant/banner/<ign>/<tag>', methods=['GET'])
 def banner(ign, tag):
-
     if tag == '':
         playerList = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
         playerList.load()
@@ -86,7 +89,8 @@ def banner(ign, tag):
             abort(400, "Player not in database, provide ign and tag")
 
     if valorant.get_banner(ign, tag):
-        return json.dumps({"content" : f"Banner for {ign}#{tag}", "filepath" : config.get("BANNER_FP")})
+        return jsonify({"content" : f'Banner for {ign}#{tag}', 
+                        "file" : url_for('get_image', type='RES', filename='banner.png', _external=True)})
     else:
         abort(400, "An error occurred while contacting the server.")
 
@@ -108,7 +112,7 @@ def graph(ign_list, acts):
     
     elif len(puuid_list) == 1:
         puuid = puuid_list[0]
-        with open(f'{config.get("HISTORY_FP")}/{puuid}.txt') as f:
+        with open(f"{config.get('MMR_HISTORY')}/{puuid}.txt") as f:
             for line in f:
                 pass
             last_game = line.strip()
@@ -125,17 +129,17 @@ def graph(ign_list, acts):
             date = datetime.strptime(last_game.split(',')[1], input_format)
             content = f'Last game recorded at {date.strftime(output_format)}'
         
-        response = json.dumps({
+        response = jsonify({
             "content" : content, 
-            "filepath" : f'{config.get("GRAPHS_FP")}/{puuid}.png'
+            "file" : url_for('get_image', type='MMR_GRAPH', filename=f'{puuid}.png', _external=True)
         })
 
     else:
-        res = multigraph(puuid_list)
+        res = graphs.multigraph(puuid_list)
         if res[0] == True:
-            response = json.dumps({
+            response = jsonify({
                 "content" : f"{res[1]}", 
-                "filepath" : f'{config.get("MULTI_GRAPH_FP")}'
+                "file" : url_for('get_image', type='RES', filename='multigraph.png', _external=True)
             })
 
         else:
@@ -152,7 +156,7 @@ def anime_stats(type, title):
     elif anime == None:
         abort(400, "Anime not found.")
     
-    return anime
+    return jsonify(anime)
 
 @app.route('/mal/info/manga/<title>', methods=['GET'])
 def manga_stats(title):
@@ -162,7 +166,7 @@ def manga_stats(title):
     elif manga == None:
         abort(400, "Manga not found.")
 
-    return manga
+    return jsonify(manga)
 
 @app.route('/mal/info/character/<name>', methods=['GET'])
 def character_stats(name):
@@ -172,7 +176,7 @@ def character_stats(name):
     elif character == None:
         abort(400, "Character not found.")
 
-    return character
+    return jsonify(character)
 
 @app.route('/mal/graph/<category>/<title>', defaults={'type': 'tv'}, methods=['GET'])
 @app.route('/mal/graph/<category>/<type>/<title>', methods=['GET'])
@@ -183,8 +187,8 @@ def mal_graph(category, type, title):
     elif content == None:
         abort(400, f"{category} not found.")
     
-    content['filepath'] = config.get("MAL_GRAPH_FP")
-    return json.dumps(content)
+    content['file'] = url_for('get_image', type='RES', filename='mal_graph.png', _external=True)
+    return jsonify(content)
 
 @app.route('/other/connected', methods=['GET'])
 def chairmen():
@@ -193,7 +197,7 @@ def chairmen():
 
     keynote = chairmen['keynote_chairman']
     annual = chairmen['annual_chairman']
-    return json.dumps({
+    return jsonify({
         "title" : "The Rickies Chairmen",
         "url" : "https://www.relay.fm/connected",
         "image_url" : "https://relayfm.s3.amazonaws.com/uploads/broadcast/image_3x/5/connected_artwork_0ecdaa3e-7019-4a34-86f7-f82d6a997144.png",

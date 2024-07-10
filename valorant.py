@@ -90,10 +90,10 @@ def parse_req(r, endpoint):
 
 def get_file_mmr(puuid, date=False):
 
-    if os.path.isfile(f'{config.get("HISTORY_FP")}/{puuid}.txt') == False:
+    if os.path.isfile(f"{config.get('MMR_HISTORY')}/{puuid}.txt") == False:
         return False
     
-    with open(f'{config.get("HISTORY_FP")}/{puuid}.txt', 'r') as f:
+    with open(f"{config.get('MMR_HISTORY')}/{puuid}.txt", 'r') as f:
         for line in f:
             pass
 
@@ -108,10 +108,10 @@ def get_file_mmr(puuid, date=False):
 
 def initialise_file(puuid):
 
-    f = open(f'{config.get("HISTORY_FP")}/{puuid}.txt', "x")
+    f = open(f"{config.get('MMR_HISTORY')}/{puuid}.txt", "x")
     f.close()
 
-    f = open(f'{config.get("HISTORY_FP")}/{puuid}.txt', "w")
+    f = open(f"{config.get('MMR_HISTORY')}/{puuid}.txt", "w")
     f.write('\n')
     f.close()
 
@@ -133,14 +133,14 @@ def update_database(puuid, data=None):
     if len(data) == 0:
         raise NoneException
 
-    if not os.path.isfile(f'{config.get("HISTORY_FP")}/{puuid}.txt'):
+    if not os.path.isfile(f"{config.get('MMR_HISTORY')}/{puuid}.txt"):
         initialise_file(puuid)
 
     # Dates of last update
     date_raw = data[0]['date_raw']
     lines = []
 
-    with open(f'{config.get("HISTORY_FP")}/{puuid}.txt', 'r') as f:
+    with open(f"{config.get('MMR_HISTORY')}/{puuid}.txt", 'r') as f:
         for line in f:
             lines.append(line)
     
@@ -172,7 +172,7 @@ def update_database(puuid, data=None):
         lines[0] = f"{data[0]['date_raw']}\n"
         lines += new_list[::-1]
 
-        with open(f'{config.get("HISTORY_FP")}/{puuid}.txt', "w") as f:
+        with open(f"{config.get('MMR_HISTORY')}/{puuid}.txt", "w") as f:
             f.writelines(lines)
     
     return len(new_list)
@@ -188,7 +188,7 @@ def get_elo_list(puuid):
         return MissingException
     
     lines = []
-    with open(f'{config.get("HISTORY_FP")}/{puuid}.txt', 'r') as f:
+    with open(f"{config.get('MMR_HISTORY')}/{puuid}.txt", 'r') as f:
         for line in f:
             lines.append(line.strip())
 
@@ -283,7 +283,7 @@ def get_banner(ign, tag):
     
     url = data['data']['card']['large']
     r = requests.get(url, allow_redirects=True)
-    open(config.get("BANNER_FP"), 'wb').write(r.content)
+    open(f"{config.get('RES')}/banner.png", 'wb').write(r.content)
     return True
 
 def servercheck():
