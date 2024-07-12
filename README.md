@@ -41,11 +41,10 @@ Parameter Options:
 
 Response:
 
-| Name      | Type      | Description                                             |
-| --------- | --------- | ------------------------------------------------------- |
-| author    | String    | Username of player in `ign#tag` format                  |
-| thumbnail | String    | URL to in-game banner (small format)                    |
-| acts      | Dict List | Act-rank for each act. Keys of each item: [name, value] |
+| Name    | Type   | Description                                |
+| ------- | ------ | ------------------------------------------ |
+| content | String | Title including player in `ign#tag` format |
+| file    | String | API link to image of graph                 |
 #### MMR Graph: `/valorant/graph/<ign_list>/<acts>`
 Parameter Options:
 
@@ -59,7 +58,7 @@ Response:
 | Name     | Type   | Description                    |
 | -------- | ------ | ------------------------------ |
 | content  | String | Last update date/error message |
-| filepath | String | File path to image of graph    |
+| file     | String | API link to image of graph     |
 ### MyAnimeList:
 
 #### Anime information: `/mal/info/anime/<type>/<title>`
@@ -148,7 +147,7 @@ Response:
 | Name          | Type   | Description                                                                |
 | ------------- | ------ | -------------------------------------------------------------------------- |
 | url           | String | Link to entry on MyAnimeList                                               |
-| filepath      | String | File path to image of graph                                                |
+| file          | String | API link to image of graph                                                 |
 | title         | String | Title of anime/manga                                                       |
 | completed     | String | Number of people who have completed it                                     |
 | on_hold       | String | Number of people who have put it on hold                                   |
