@@ -76,8 +76,8 @@ def update_all(graph=True, output=False, printer=True):
 
     errors_msg = ""
     for error in errors_lists.keys():
-        errors_msg += f'\t- {error}: {errors_lists[error]}\n'
-    errors_msg = "**No Errors**" if errors_msg == "" else f"**Errors:**\n{errors_msg[:-2]}"
+        errors_msg += f'- {error}: {errors_lists[error]}\n'
+    errors_msg = "**No Errors**" if errors_msg == "" else f"**Errors:**\n\t{errors_msg}"
 
     with open(config.get("LOG_FP"), 'a') as f:
         f.write(log_msg + '\n')
