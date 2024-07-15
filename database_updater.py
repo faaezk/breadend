@@ -17,7 +17,7 @@ def update_all(graph=True, output=False, printer=True):
     dataless_count = 0
     errors_count = 0
     updates_list = []
-    errors_list = []
+    errors_lists = {}
     total = str(len(playerlist))
 
     puuid_list = playerlist.get_puuid_list()
@@ -40,7 +40,11 @@ def update_all(graph=True, output=False, printer=True):
             dataless_count += 1
         else:
             ign = playerlist.get_ign_by_puuid(puuid)
-            errors_list.append((ign, data['error']))
+            if data['error'] in errors_lists.keys():
+                errors_lists[data['error']] += f', {ign}'
+            else:
+                errors_lists[data['error']] = ign
+            
             print(f'{i+1:02d}/{total}: Error at {ign}')
             errors_count += 1
 
@@ -71,9 +75,9 @@ def update_all(graph=True, output=False, printer=True):
     update_msg = "**No Updates**" if update_msg == "" else f"**Updates:** {update_msg[:-2]}"
 
     errors_msg = ""
-    for player, error in errors_list:
-        errors_msg += f"{player}: {error}, "
-    errors_msg = "**No Errors**" if errors_msg == "" else f"**Errors:** {errors_msg[:-2]}"
+    for error in errors_lists.keys():
+        errors_msg += f'\t- {error}: {errors_lists[error]}\n'
+    errors_msg = "**No Errors**" if errors_msg == "" else f"**Errors:**\n{errors_msg[:-2]}"
 
     with open(config.get("LOG_FP"), 'a') as f:
         f.write(log_msg + '\n')
@@ -83,5 +87,5 @@ def update_all(graph=True, output=False, printer=True):
     return log_msg
 
 if __name__ == "__main__":
-    update_all()
     update_file_entries()
+    update_all()

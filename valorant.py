@@ -64,15 +64,24 @@ def parse_req(r, endpoint):
     global headers
     global errors
 
-    if r.status_code in errors.keys():
-        raise DynamicException(errors[r.status_code], r.status_code)
+    if r.status_code == 504:
+        raise DynamicException('Gateway Time-out', r.status_code)
+    
+    try:
+        john = json.loads(r.text)
+    except:
+        if r.status_code in errors.keys():
+            raise DynamicException(errors[r.status_code], r.status_code)
+        else:
+            raise UnknownException
+    
+    if ('errors' in john.keys()) and (len(john['errors']) > 0) and ('message' in john['errors'][0].keys()):
+        raise DynamicException(john['errors'][0]['message'], r.status_code)
     
     if endpoint == 'CROSSHAIR':
         return r
     
     if r.status_code == 200:
-        john = json.loads(r.text)
-
         if endpoint == 'LEADERBOARD':
             return john
 
