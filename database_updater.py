@@ -1,3 +1,4 @@
+import json
 import requests
 from datetime import datetime
 
@@ -41,9 +42,9 @@ def update_all(graph=True, output=False, printer=True):
         else:
             ign = playerlist.get_ign_by_puuid(puuid)
             if data['error'] in errors_lists.keys():
-                errors_lists[data['error']] += f', {ign}'
+                errors_lists[data['error']].append(ign)
             else:
-                errors_lists[data['error']] = ign
+                errors_lists[data['error']] = [ign]
             
             print(f'{i+1:02d}/{total}: Error at {ign}')
             errors_count += 1
@@ -58,6 +59,26 @@ def update_all(graph=True, output=False, printer=True):
     updates = f'{update_count} updates'
     if dataless_count > 0:
         updates += f', {dataless_count} dataless players'
+
+    try:
+        # Get errors from file
+        with open(config.get("MMR_ERRORS_LIST"), 'r') as f:
+            prev_errors = json.load(f)
+
+        # Overwrite new errors into file
+        with open(config.get("MMR_ERRORS_LIST"), 'w') as f:
+            json.dump(errors_lists, f)
+
+        # Remove repeated errors for log message
+        for error in prev_errors:
+            if error in errors_lists.keys():
+                for player in prev_errors[error]:
+                    errors_lists[error].remove(player)
+                if len(errors_lists[error]) == 0:
+                    del errors_lists[error]
+    except:
+        pass
+
     if errors_count > 0:
         updates += f', {errors_count} errors'
 
@@ -70,14 +91,17 @@ def update_all(graph=True, output=False, printer=True):
             f.write(str(updates_list))
     
     update_msg = ""
-    for (player, updates) in updates_list:
-        update_msg += f"{player}: {updates}, "
+    for (ign, updates) in updates_list:
+        update_msg += f"{ign}: {updates}, "
     update_msg = "**No Updates**" if update_msg == "" else f"**Updates:** {update_msg[:-2]}"
 
     errors_msg = ""
     for error in errors_lists.keys():
-        errors_msg += f'- {error}: {errors_lists[error]}\n'
-    errors_msg = "**No Errors**" if errors_msg == "" else f"**Errors:**\n\t{errors_msg}"
+        msg = ""
+        for ign in errors_lists[error]:
+            msg += f'{ign}, '
+        errors_msg += f'- {error}: {msg[:-2]}\n'
+    errors_msg = "**No New Errors**" if errors_msg == "" else f"**Errors:**\n\t{errors_msg}"
 
     with open(config.get("LOG_FP"), 'a') as f:
         f.write(log_msg + '\n')
