@@ -21,7 +21,7 @@ endpoints = {   "LEADERBOARD" : "v3/leaderboard/{region}",
                 "MMR_HISTORY_BY_NAME" : "v1/mmr-history/ap/{ign}/{tag}",
                 "MMR_HISTORY_BY_PUUID" : "v1/by-puuid/mmr-history/ap/{puuid}"}
 
-headers = {'accept' : 'application/json', 'Authorization' : config.get("HENRIK_URL")}
+headers = {'accept' : 'application/json', 'Authorization' : config.get("HENRIK_KEY")}
 errors = {
             1 : "Invalid API Key", 2 : "Forbidden endpoint", 3 : "Restricted endpoint", 
             101 : "No region found for this Player", 102 : "No matches found, can't get puuid", 
