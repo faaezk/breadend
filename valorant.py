@@ -11,17 +11,17 @@ import config
 import playerclass
 from exceptionclass import *
 
-endpoints = {"LEADERBOARD" : "v2/leaderboard/{region}",
+endpoints = {   "LEADERBOARD" : "v3/leaderboard/{region}",
                 "REGION_STATUS" : "v1/status/{region}",
                 "CROSSHAIR" : "v1/crosshair/generate?id={crosshair_code}",
-                "ACCOUNT_BY_PUUID" : "v1/by-puuid/account/{puuid}",
-                "MMR_BY_PUUID" : "v2/by-puuid/mmr/ap/{puuid}",
-                "MMR_HISTORY_BY_PUUID" : "v1/by-puuid/mmr-history/ap/{puuid}",
-                "ACCOUNT_BY_NAME" : "v1/account/{ign}/{tag}",
-                "MMR_BY_NAME" : "v2/mmr/ap/{ign}/{tag}",
-                "MMR_HISTORY_BY_NAME" : "v1/mmr-history/ap/{ign}/{tag}"}
+                "ACCOUNT_BY_NAME" : "v2/account/{ign}/{tag}",
+                "ACCOUNT_BY_PUUID" : "v2/by-puuid/account/{puuid}",
+                "MMR_BY_NAME" : "v3/mmr/ap/pc/{ign}/{tag}",
+                "MMR_BY_PUUID" : "v3/by-puuid/mmr/ap/pc/{puuid}",
+                "MMR_HISTORY_BY_NAME" : "v1/mmr-history/ap/{ign}/{tag}",
+                "MMR_HISTORY_BY_PUUID" : "v1/by-puuid/mmr-history/ap/{puuid}"}
 
-headers = {'accept' : 'application/json', 'Authorization' : config.get("VALORANT_KEY")}
+headers = {'accept' : 'application/json', 'Authorization' : config.get("HENRIK_URL")}
 errors = {
             1 : "Invalid API Key", 2 : "Forbidden endpoint", 3 : "Restricted endpoint", 
             101 : "No region found for this Player", 102 : "No matches found, can't get puuid", 
@@ -42,7 +42,7 @@ def get_data(endpoint, **kwargs):
         data_list = []
         for puuid in kwargs['puuid_list']:
             try:
-                url = config.get("API_BASE_URL") + endpoints[endpoint].format(**{'puuid' : puuid})
+                url = config.get("HENRIK_URL") + endpoints[endpoint].format(**{'puuid' : puuid})
                 data_list.append((puuid, parse_req(session.get(url, headers=headers), endpoint)))
             except Exception as e:
                 data_list.append((puuid, {'error' : str(e)}))
@@ -50,7 +50,7 @@ def get_data(endpoint, **kwargs):
         return data_list
 
     try:
-        url = config.get("API_BASE_URL") + endpoints[endpoint].format(**kwargs)
+        url = config.get("HENRIK_URL") + endpoints[endpoint].format(**kwargs)
     except KeyError:
         raise KeyException
 
@@ -58,6 +58,19 @@ def get_data(endpoint, **kwargs):
         return parse_req(requests.get(url, headers=headers), endpoint)
     except Exception as E:
         raise E
+
+def get_card_data(playercard_uuid):
+
+    url = config.get() + f'playercards/{playercard_uuid}'
+    try:
+        r = requests.get(url)
+        john = json.loads(r.text)
+        return john
+    except:
+        if r.status_code in errors.keys():
+            raise DynamicException(errors[r.status_code], r.status_code)
+        else:
+            raise UnknownException
 
 def parse_req(r, endpoint):
     global endpoints
@@ -244,10 +257,10 @@ def leaderboard(region, length=20, last_played=90):
         
         for i in range(length):
             player = data['players'][i]
-            if player['IsAnonymized'] == True:
-                players.append(("Anonymous", player['rankedRating']))
+            if player['is_anonymized'] == True:
+                players.append(("(Anonymous)", player['rr']))
             else:
-                players.append((player['gameName'], player['rankedRating']))
+                players.append((player['name'], player['rr']))
 
         result['title'] = f'{regions[region]} Ranked Leaderboard\n'
 
@@ -265,32 +278,40 @@ def stats(puuid):
     except Exception as E:
         raise E
     
-    data = john['data']['by_season']
-    keys = data.keys()
+    data = john['data']['seasonal']
     final = []
 
-    for key in keys:
-        if 'error' not in data[key].keys():
-            wins = data[key]['wins']
-            games = data[key]['number_of_games']
-            rank = data[key]['final_rank_patched']
-            final.append([f'Episode {key[1]} Act {key[3]}:', f'{rank}\nGames Played: {games}\nWinrate: {round((wins/games) * 100, 2)}%'])
+    for season in data:
+        if 'error' not in season.keys():
+            wins = season['wins']
+            games = season['games']
+            rank = season['end_tier']['name']
+
+            title = season.replace("e", " Ep ")
+            title = title.replace("a", ", Act ")
+            final.append([f'{title}:', f'{rank}\nGames Played: {games}\nWinrate: {round((wins/games) * 100, 2)}%'])
     
     try:
         john = get_data('ACCOUNT_BY_PUUID', puuid=puuid)
     except Exception as E:
         raise E
+    
+    try:
+        card_data = get_card_data(john['data']['card'])
+        card = card_data['displayIcon']
+    except:
+        card = False
 
-    card = john['data']['card']['small']
     return [final, card]
 
 def get_banner(ign, tag):
     try:
         data = get_data('ACCOUNT_BY_NAME', ign=ign, tag=tag)
+        card_data = get_card_data(data['data']['card'])
     except Exception as E:
         return False
     
-    url = data['data']['card']['large']
+    url = card_data['largeArt']
     r = requests.get(url, allow_redirects=True)
     open(f"{config.get('RES')}/banner.png", 'wb').write(r.content)
     return True
@@ -319,37 +340,6 @@ def servercheck():
         
     return report
 
-def add_player(ign, tag):
-
-    playerlist = playerclass.PlayerList("playerlist.csv")
-    playerlist.load()
-
-    try:
-        data = get_data('ACCOUNT_BY_NAME', ign=ign, tag=tag)
-    except Exception as E:
-        return E.message
-
-    puuid = data['data']['puuid']
-    player = playerclass.Player(ign.lower(), tag.lower(), puuid)
-    if playerlist.inList(player):
-        return "Account already added"
-    
-    playerlist.add(player)
-    playerlist.save()
-
-    return f'{ign}#{tag} successfully added'
-
-def crosshair(code):
-    try:
-        r = get_data("CROSSHAIR", crosshair_code=code)
-    except Exception as E:
-        raise E
-    
-    img = Image.open(BytesIO(r.content))
-    img = img.save("stuff/crosshair.png")
-
-    return True
-
 def random_crosshair():
     crosshairs = {  "Reyna Flash" : "0;P;c;6;t;6;o;0.3;f;0;0t;1;0l;5;0o;5;0a;1;0f;0;1t;10;1l;4;1o;5;1a;0.5;1m;0;1f;0", 
                     "Windmill"    : "0;P;c;1;t;6;o;1;d;1;z;6;a;0;f;0;m;1;0t;10;0l;20;0o;20;0a;1;0m;1;0e;0.1;1t;10;1l;10;1o;40;1a;1;1m;0",
@@ -364,32 +354,10 @@ def random_crosshair():
     name, code = random.choice(list(crosshairs.items()))
 
     try:
-        crosshair(code)
+        r = get_data("CROSSHAIR", crosshair_code=code)
+        img = Image.open(BytesIO(r.content))
+        img = img.save(config.get("CROSSHAIR"))
+        return (name, code)
+    
     except Exception as E:
         return E.message
-
-    return (name, code)
-
-def update_playerlist():
-    playerlist = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
-    playerlist.load()
-    updates = 0
-    for player in playerlist:
-
-        try:
-            response = get_data("ACCOUNT_BY_PUUID", puuid=player.puuid)
-        except Exception as E:
-            raise E
-
-        true_ign = response['data']['name'].lower()
-        true_tag = response['data']['name'].lower()
-
-        if (player.ign != true_ign) or (player.tag != true_tag):
-            updates += 1
-
-        player.ign = true_ign
-        player.tag = true_tag
-
-    playerlist.save()
-
-    return updates
