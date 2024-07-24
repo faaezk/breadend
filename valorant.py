@@ -287,7 +287,8 @@ def stats(puuid):
             games = season['games']
             rank = season['end_tier']['name']
 
-            title = season.replace("e", " Ep ")
+            title = season['season']['short']
+            title = title.replace("e", " Ep ")
             title = title.replace("a", ", Act ")
             final.append([f'{title}:', f'{rank}\nGames Played: {games}\nWinrate: {round((wins/games) * 100, 2)}%'])
     
