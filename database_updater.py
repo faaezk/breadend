@@ -111,5 +111,12 @@ def update_all(graph=True, output=False, printer=True):
     return log_msg
 
 if __name__ == "__main__":
-    update_file_entries()
-    update_all()
+    try:
+        update_file_entries()
+    except:
+        pass
+
+    try:
+        update_all()
+    except:
+        pass
