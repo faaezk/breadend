@@ -14,7 +14,7 @@ changes = []
 for player in playerlist:
     data = None
     for elem in data_list:
-        if player.puuid == elem[0]:
+        if player.puuid == elem[0] and 'data' in elem[1].keys():
             ign = elem[1]['data']['name'].lower()
             tag = elem[1]['data']['tag'].lower()
             if (player.ign != ign) or (player.tag != tag):
