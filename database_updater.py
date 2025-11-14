@@ -8,7 +8,7 @@ import valorant
 import playerclass
 from times import update_file_entries
 
-def update_all(graph=True, output=False, printer=True):
+def update_all(output=False, printer=True):
 
     playerlist = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
     playerlist.load()
@@ -47,10 +47,6 @@ def update_all(graph=True, output=False, printer=True):
             
             print(f'{i+1:02d}/{total}: Error at {ign}')
             errors_count += 1
-
-    if graph:
-        for player in playerlist:
-            graphs.graph(puuid=player.puuid, update=False)
 
     if printer:
         print(updates_list)
