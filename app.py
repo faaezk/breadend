@@ -36,7 +36,7 @@ def get_image(type, filename):
 @app.route('/valorant/leaderboard/<region>/<toUpdate>', methods=['GET'])
 def leaderboard(region, toUpdate):
     if toUpdate == 'true' and region == 'local':
-        database_updater.update_all(False, False, False)
+        database_updater.update_all(False, False)
 
     res = valorant.leaderboard(region)
     if "error" in res.keys():
