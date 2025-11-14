@@ -21,8 +21,7 @@ def update_all(graph=True, output=False, printer=True):
     errors_lists = {}
     total = str(len(playerlist))
 
-    puuid_list = playerlist.get_puuid_list()
-    data_list = valorant.get_data("MMR_HISTORY_BY_PUUID", puuid_list=puuid_list)
+    data_list = valorant.get_data("MMR_HISTORY_BY_PUUID", puuid_list=playerlist.get_puuid_list())
 
     for i, (puuid, data) in enumerate(data_list):
         if 'name' in data.keys() and data['name'] != None:
