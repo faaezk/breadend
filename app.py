@@ -1,15 +1,8 @@
-import os
-import json
-import requests
+import os, json, requests
 from datetime import datetime
 from flask import Flask, abort, jsonify, send_file, url_for
 
-import config
-import graphs
-import valorant
-import malsearch
-import playerclass
-import database_updater
+import config, graphs, valorant, malsearch, playerclass, database_updater
 
 app = Flask(__name__)
 
@@ -19,14 +12,20 @@ def bad_request_error(error):
     response.status_code = 400
     return response
 
+@app.errorhandler(500)
+def internal_error(error):
+    response = jsonify({"error": "Internal Server Error", "message": "An unexpected error occurred"})
+    response.status_code = 500
+    return response
+
 @app.route('/')
 def index():
     return "Hello"
 
-@app.route('/image/<type>/<filename>', methods=['GET'])
-def get_image(type, filename):
+@app.route('/image/<img_type>/<filename>', methods=['GET'])
+def get_image(img_type, filename):
     
-    image_path = f'{config.get(type)}/{filename}'
+    image_path = f'{config.get(img_type)}/{filename}'
     if not os.path.isfile(image_path):
         abort(400, "File not found")
 
@@ -59,13 +58,13 @@ def stats(ign, tag):
         try:
             player_data = valorant.get_data("ACCOUNT_BY_NAME", ign=ign, tag=tag)
         except Exception as E:
-            abort(400, E.message)
+            abort(400, str(E))
         puuid = player_data['data']['puuid']
     
     try:
         data = valorant.stats(puuid)
     except Exception as E:
-        abort(400, E.message)
+        abort(400, str(E))
     
     if not data[0]:
         abort(400, "Player not found")
@@ -119,6 +118,8 @@ def graph(ign_list, acts):
         
         if acts == 'true':
             graphs.graph(puuid, acts=True)
+        else:
+            graphs.graph(puuid, acts=False)
         
         # If last game is dated, extract day, month and year
         content = ""
@@ -147,13 +148,13 @@ def graph(ign_list, acts):
 
     return response
 
-@app.route('/mal/info/anime/<title>', defaults={'type': 'tv'}, methods=['GET'])
-@app.route('/mal/info/anime/<type>/<title>', methods=['GET'])
-def anime_stats(type, title):
-    anime = malsearch.anime_search(type, title)
-    if anime == False:
+@app.route('/mal/info/anime/<title>', defaults={'anime_type': 'tv'}, methods=['GET'])
+@app.route('/mal/info/anime/<anime_type>/<title>', methods=['GET'])
+def anime_stats(anime_type, title):
+    anime = malsearch.anime_search(anime_type, title)
+    if anime is False:
         abort(400, "Server connection error, try again.")
-    elif anime == None:
+    elif anime is None:
         abort(400, "Anime not found.")
     
     return jsonify(anime)
@@ -161,9 +162,9 @@ def anime_stats(type, title):
 @app.route('/mal/info/manga/<title>', methods=['GET'])
 def manga_stats(title):
     manga = malsearch.manga_search(title)
-    if manga == False:
+    if manga is False:
         abort(400, "Server connection error, try again.")
-    elif manga == None:
+    elif manga is None:
         abort(400, "Manga not found.")
 
     return jsonify(manga)
@@ -171,20 +172,20 @@ def manga_stats(title):
 @app.route('/mal/info/character/<name>', methods=['GET'])
 def character_stats(name):
     character = malsearch.character_search(name)
-    if character == False:
+    if character is False:
         abort(400, "Server connection error, try again.")
-    elif character == None:
+    elif character is None:
         abort(400, "Character not found.")
 
     return jsonify(character)
 
-@app.route('/mal/graph/<category>/<title>', defaults={'type': 'tv'}, methods=['GET'])
-@app.route('/mal/graph/<category>/<type>/<title>', methods=['GET'])
-def mal_graph(category, type, title):
-    content = malsearch.score_graph(title, category, type)
-    if content == False:
+@app.route('/mal/graph/<category>/<title>', defaults={'graph_type': 'tv'}, methods=['GET'])
+@app.route('/mal/graph/<category>/<graph_type>/<title>', methods=['GET'])
+def mal_graph(category, graph_type, title):
+    content = malsearch.score_graph(title, category, graph_type)
+    if content is False:
         abort(400, "Server connection error, try again.")
-    elif content == None:
+    elif content is None:
         abort(400, f"{category} not found.")
     
     content['file'] = url_for('get_image', type='RES', filename='mal_graph.png', _external=True)
@@ -192,8 +193,12 @@ def mal_graph(category, type, title):
 
 @app.route('/other/connected', methods=['GET'])
 def chairmen():
-    r = requests.get("https://rickies.co/api/chairmen.json", headers={'accept': 'application/json'})
-    chairmen = json.loads(r.text)
+    try:
+        r = requests.get("https://rickies.co/api/chairmen.json", headers={'accept': 'application/json'}, timeout=10)
+        r.raise_for_status()
+        chairmen = r.json()
+    except (requests.RequestException, json.JSONDecodeError) as e:
+        abort(400, f"Failed to fetch chairmen data: {str(e)}")
 
     keynote = chairmen['keynote_chairman']
     annual = chairmen['annual_chairman']
