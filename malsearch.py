@@ -1,10 +1,10 @@
-import json
 import requests
-import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 
 import config
 
 def trim(text, limit):
+    text = text or ""
     if len(text) > limit:
         text = text[0:limit]
         text += "...\nMore at MyAnimeList (link in title)"
@@ -13,15 +13,18 @@ def trim(text, limit):
 def api_request(query, category, type="null", stats=False):
 
     session = requests.Session()
-    if type == "null":
-        r = session.get(f'https://api.jikan.moe/v4/{category}?q={query}&page=1&limit=1')
-    else:
-        r = session.get(f'https://api.jikan.moe/v4/{category}?q={query}&type={type}&page=1&limit=1')
+    params = {'q': query, 'page': 1, 'limit': 1}
+    if type != "null":
+        params['type'] = type
 
-    if r.status_code != 200:
+    try:
+        r = session.get(f'https://api.jikan.moe/v4/{category}', params=params, timeout=10)
+        if r.status_code != 200:
+            return False
+        res = r.json()
+    except (requests.RequestException, ValueError):
         return False
 
-    res = json.loads(r.text)
     if not ('data' in res.keys() and len(res['data']) > 0):
         return None
     
@@ -31,19 +34,20 @@ def api_request(query, category, type="null", stats=False):
         url = res['data'][0]['url']
         typer = res['data'][0]['type']
 
-    if stats:
-        r = session.get(f'https://api.jikan.moe/v4/{category}/{id}/statistics')
-    else:
-        r = session.get(f'https://api.jikan.moe/v4/{category}/{id}/full')
-
-    if r.status_code != 200:
+    endpoint = 'statistics' if stats else 'full'
+    try:
+        r = session.get(f'https://api.jikan.moe/v4/{category}/{id}/{endpoint}', timeout=10)
+        if r.status_code != 200:
+            return False
+        res = r.json()
+    except (requests.RequestException, ValueError):
         return False
 
-    res = json.loads(r.text)
     if not ('data' in res.keys()):
         return None
 
     if stats:
+        res['data']['mal_id'] = id
         res['data']['title'] = title
         res['data']['url'] = url
         res['data']['type'] = typer
@@ -54,7 +58,7 @@ def anime_search(type, title):
 
     anime = api_request(title, "anime", type)
     if not anime:
-        return None
+        return anime
     
     data = {"Airing_Dates" : anime['aired']['string'], "source" : anime['source'], 
             "type" : anime['type'], "score" : anime['score'], "url" : anime['url'],
@@ -110,7 +114,7 @@ def manga_search(title):
 
     manga = api_request(title, "manga")
     if not manga:
-        return None
+        return manga
     
     data = {"publishing" : manga['published']['string'], "score" : manga['score'], 
             "type" : manga['type'], "rank" : manga['rank'], "url" : manga['url'],
@@ -149,7 +153,7 @@ def character_search(name):
     
     character = api_request(name, "characters")
     if not character:
-        return None
+        return character
 
     data = {"url" : character['url'], "name" : character['name'],
             "favorites" : character["favorites"]}
@@ -178,27 +182,24 @@ def character_search(name):
 
     return data
 
-def generate_graph(x, y, title):
-    plt.bar(x, y)
-    plt.title(title)
-    plt.xlabel('Scores')
-    plt.ylabel('Votes')
-    
-    # Create names on the x axis
-    plt.xticks(x)
-    plt.yticks()
+def generate_graph(x, y, title, filename):
+    fig = Figure()
+    ax = fig.subplots()
+    ax.bar(x, y)
+    ax.set_title(title)
+    ax.set_xlabel('Scores')
+    ax.set_ylabel('Votes')
 
     for i in range(len(x)):
-        plt.text(i, y[i], str(y[i]), ha = 'center')
+        ax.text(i, y[i], str(y[i]), ha = 'center')
 
-    plt.savefig(config.get("MAL_GRAPH"), bbox_inches='tight')
-    plt.clf()
+    fig.savefig(f"{config.get('RES')}/{filename}", bbox_inches='tight')
 
 def score_graph(title, category, type="null"):
 
     res = api_request(title, category, type, stats=True)
     if not res:
-        return None
+        return res
     
     data = {"completed" : f"{res['completed']:,}", "on_hold" : f"{res['on_hold']:,}",
         "dropped" : f"{res['dropped']:,}", "total" : f"{res['total']:,}", "title" : res['title'], "url" : res['url']}
@@ -210,8 +211,9 @@ def score_graph(title, category, type="null"):
         data["watching"] = f"{res['watching']:,}"
         data["plan_to_watch"] = f"{res['plan_to_watch']:,}"
 
-    x = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+    x = [str(score['score']) for score in res['scores']]
     y = [score['votes'] for score in res['scores']]
 
-    generate_graph(x, y, f"{res['title']} ({res['type']}) Vote distribution")
-    return data
+    filename = f"mal_graph_{category}_{res['mal_id']}.png"
+    generate_graph(x, y, f"{res['title']} ({res['type']}) Vote distribution", filename)
+    return data, filename

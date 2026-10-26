@@ -19,7 +19,7 @@ class Player():
         self.tag = tag
     
     def setPriority(self, priority):
-        self.priority = priority
+        self.priority = int(priority)
 
 class PlayerList():
     def __init__(self, filePath):
@@ -28,10 +28,7 @@ class PlayerList():
 
     def __iter__(self):
         return iter(self.players)
-    
-    def __next__(self):
-        return next(self.players)
-    
+
     def __len__(self):
         return len(self.players)
     
@@ -39,14 +36,16 @@ class PlayerList():
         self.players.append(player)
 
     def remove(self, ign):
+        ign = ign.lower()
         tag = self.get_tag_by_ign(ign)
         puuid = self.get_puuid_by_ign(ign)
-        player = Player(ign.lower(), tag, puuid)
+        player = Player(ign, tag, puuid)
 
         if not self.inList(player):
             return "Player not in list"
         else:
             self.players.remove(player)
+            self.save()
             return f'{ign}#{tag} has been removed'
 
     def save(self):
@@ -54,13 +53,16 @@ class PlayerList():
             f.writelines([x.getCsv() for x in self.players])
 
     def load(self):
+        self.players = []
         with open(self.filePath, 'r') as f:
             for line in f:
+                if not line.strip():
+                    continue
                 playerData = line.split(',')
                 ign = playerData[0]
                 tag = playerData[1]
                 puuid = playerData[2]
-                priority = playerData[3].strip()
+                priority = int(playerData[3].strip())
                 self.players.append(Player(ign, tag, puuid, priority))
     
     def sort(self):
@@ -94,7 +96,7 @@ class PlayerList():
 
         player = None
         for elem in self.players:
-            if elem.ign == old_ign:
+            if elem.ign.lower() == old_ign.lower():
                 player = elem
                 break
 
@@ -110,7 +112,7 @@ class PlayerList():
 
         player = None
         for elem in self.players:
-            if elem.ign == ign:
+            if elem.ign.lower() == ign.lower():
                 player = elem
                 break
 
@@ -124,7 +126,7 @@ class PlayerList():
 
     def get_puuid_by_ign(self, ign):
         for player in self.players:
-            if ign == player.ign:
+            if ign.lower() == player.ign.lower():
                 return player.puuid
         return False
     
@@ -136,6 +138,6 @@ class PlayerList():
     
     def get_tag_by_ign(self, ign):
         for player in self.players:
-            if ign == player.ign:
+            if ign.lower() == player.ign.lower():
                 return player.tag
         return False

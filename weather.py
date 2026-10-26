@@ -4,7 +4,7 @@ import requests
 
 def get_weather(city_id, api_key):
     url = "https://api.openweathermap.org/data/2.5/weather?id={}&appid={}&units=metric".format(city_id, api_key)
-    r = requests.get(url)
+    r = requests.get(url, timeout=10)
     return r.text
 
 def main():

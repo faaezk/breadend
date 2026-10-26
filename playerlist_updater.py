@@ -36,4 +36,4 @@ else:
     msg = msg[:-1]
 
 payload = {"username": "The Updater", "content": msg}
-requests.post(config.get("WEBHOOK_URL"), json=payload)
+requests.post(config.get("WEBHOOK_URL"), json=payload, timeout=10)

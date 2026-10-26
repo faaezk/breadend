@@ -59,6 +59,21 @@ Response:
 | -------- | ------ | ------------------------------ |
 | content  | String | Last update date/error message |
 | file     | String | API link to image of graph     |
+#### MMR Graph by Date: `/valorant/dategraph/<ign>`
+Plots a player's MMR against the date of each game, with the first, last, lowest and peak games labelled and year boundaries marked.
+
+Parameter Options:
+
+| Parameter | Type   | Required | Description                                                       |
+| --------- | ------ | -------- | ----------------------------------------------------------------- |
+| ign       | String | Yes      | Riot in-game name (first section of username in `ign#tag` format) |
+
+Response:
+
+| Name    | Type   | Description                         |
+| ------- | ------ | ----------------------------------- |
+| content | String | Date range of the games plotted     |
+| file    | String | API link to image of graph          |
 ### MyAnimeList:
 
 #### Anime information: `/mal/info/anime/<type>/<title>`

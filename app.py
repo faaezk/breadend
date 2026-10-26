@@ -1,10 +1,13 @@
 import os, json, requests
 from datetime import datetime
 from flask import Flask, abort, jsonify, send_file, url_for
+from werkzeug.security import safe_join
 
 import config, graphs, valorant, malsearch, playerclass, database_updater
 
 app = Flask(__name__)
+
+IMAGE_DIRS = {'RES', 'MMR_GRAPH'}
 
 @app.errorhandler(400)
 def bad_request_error(error):
@@ -14,6 +17,7 @@ def bad_request_error(error):
 
 @app.errorhandler(500)
 def internal_error(error):
+    app.logger.exception("Unhandled exception")
     response = jsonify({"error": "Internal Server Error", "message": "An unexpected error occurred"})
     response.status_code = 500
     return response
@@ -24,9 +28,11 @@ def index():
 
 @app.route('/image/<img_type>/<filename>', methods=['GET'])
 def get_image(img_type, filename):
-    
-    image_path = f'{config.get(img_type)}/{filename}'
-    if not os.path.isfile(image_path):
+    if img_type not in IMAGE_DIRS:
+        abort(400, "Invalid image type")
+
+    image_path = safe_join(config.get(img_type), filename)
+    if image_path is None or not os.path.isfile(image_path):
         abort(400, "File not found")
 
     return send_file(image_path, mimetype='image/png')
@@ -52,7 +58,7 @@ def stats(ign, tag):
         tag = playerList.get_tag_by_ign(ign)
         puuid = playerList.get_puuid_by_ign(ign)
         
-        if not ign or not tag:
+        if not tag or not puuid:
             abort(400, "Player not in database, provide ign and tag")
     else:
         try:
@@ -87,9 +93,10 @@ def banner(ign, tag):
         if not tag:
             abort(400, "Player not in database, provide ign and tag")
 
-    if valorant.get_banner(ign, tag):
+    filename = valorant.get_banner(ign, tag)
+    if filename:
         return jsonify({"content" : f'Banner for {ign}#{tag}', 
-                        "file" : url_for('get_image', type='RES', filename='banner.png', _external=True)})
+                        "file" : url_for('get_image', img_type='RES', filename=filename, _external=True)})
     else:
         abort(400, "An error occurred while contacting the server.")
 
@@ -102,7 +109,7 @@ def graph(ign_list, acts):
     puuid_list = []
 
     for ign in ign_list:
-        puuid = playerList.get_puuid_by_ign(ign.split('#')[0].lower().strip())
+        puuid = playerList.get_puuid_by_ign(ign.split('#')[0].strip())
         if puuid:
             puuid_list.append(puuid)
 
@@ -111,42 +118,57 @@ def graph(ign_list, acts):
     
     elif len(puuid_list) == 1:
         puuid = puuid_list[0]
-        with open(f"{config.get('MMR_HISTORY')}/{puuid}.txt") as f:
-            for line in f:
-                pass
-            last_game = line.strip()
-        
-        if acts == 'true':
-            graphs.graph(puuid, acts=True)
-        else:
-            graphs.graph(puuid, acts=False)
+
+        try:
+            graphs.graph(puuid, acts=(acts == 'true'))
+        except Exception as E:
+            abort(400, str(E))
         
         # If last game is dated, extract day, month and year
         content = ""
-        if len(last_game.split(',')) > 1:
+        last_game = valorant.get_file_mmr(puuid, date=True)
+        if last_game and len(last_game) > 1 and last_game[1].strip():
             output_format = "%H:%M on %d/%m/%y"
             input_format = "%A-%B-%d-%Y-%I:%M-%p"
             
-            date = datetime.strptime(last_game.split(',')[1], input_format)
+            date = datetime.strptime(last_game[1].strip(), input_format)
             content = f'Last game recorded at {date.strftime(output_format)}'
         
         response = jsonify({
             "content" : content, 
-            "file" : url_for('get_image', type='MMR_GRAPH', filename=f'{puuid}.png', _external=True)
+            "file" : url_for('get_image', img_type='MMR_GRAPH', filename=f'{puuid}.png', _external=True)
         })
 
     else:
-        res = graphs.multigraph(puuid_list)
-        if res[0] == True:
+        success, fails, filename = graphs.multigraph(puuid_list)
+        if success:
             response = jsonify({
-                "content" : f"{res[1]}", 
-                "file" : url_for('get_image', type='RES', filename='multigraph.png', _external=True)
+                "content" : f"{fails}", 
+                "file" : url_for('get_image', img_type='RES', filename=filename, _external=True)
             })
 
         else:
             abort(400, "No valid players given")
 
     return response
+
+@app.route('/valorant/dategraph/<ign>', methods=['GET'])
+def date_graph(ign):
+    playerList = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
+    playerList.load()
+    puuid = playerList.get_puuid_by_ign(ign.split('#')[0].strip())
+    if not puuid:
+        abort(400, "Player not in database")
+
+    try:
+        filename, first, last = graphs.date_graph(puuid)
+    except Exception as E:
+        abort(400, str(E))
+
+    return jsonify({
+        "content" : f"Games from {first.strftime('%d/%m/%y')} to {last.strftime('%d/%m/%y')}",
+        "file" : url_for('get_image', img_type='MMR_GRAPH', filename=filename, _external=True)
+    })
 
 @app.route('/mal/info/anime/<title>', defaults={'anime_type': 'tv'}, methods=['GET'])
 @app.route('/mal/info/anime/<anime_type>/<title>', methods=['GET'])
@@ -188,8 +210,9 @@ def mal_graph(category, graph_type, title):
     elif content is None:
         abort(400, f"{category} not found.")
     
-    content['file'] = url_for('get_image', type='RES', filename='mal_graph.png', _external=True)
-    return jsonify(content)
+    data, filename = content
+    data['file'] = url_for('get_image', img_type='RES', filename=filename, _external=True)
+    return jsonify(data)
 
 @app.route('/other/connected', methods=['GET'])
 def chairmen():
@@ -211,7 +234,5 @@ def chairmen():
     })
 
 if __name__ == "__main__":
-   app.run(debug=True)
-
-# def create_app():
-#    return app
+   # The Werkzeug debugger allows code execution, so only enable it explicitly
+   app.run(host='0.0.0.0', port=5001, debug=os.environ.get('FLASK_DEBUG') == '1')

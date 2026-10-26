@@ -1,20 +1,22 @@
-class UnknownException(Exception):
+class BreadException(Exception):
     message = "Unknown Error"
-    pass
 
-class KeyException(Exception):
+    def __str__(self):
+        return self.message
+
+class UnknownException(BreadException):
+    message = "Unknown Error"
+
+class KeyException(BreadException):
     message = "Invalid parameters"
-    pass
 
-class NoneException(Exception):
+class NoneException(BreadException):
     message = "Insufficient Data"
-    pass
 
-class MissingException(Exception):
+class MissingException(BreadException):
     message = "Player not found"
-    pass
 
-class DynamicException(Exception):
+class DynamicException(BreadException):
     def __init__(self, message, error_code):
         super().__init__(message)
         self.message = message
@@ -22,4 +24,3 @@ class DynamicException(Exception):
 
     def __str__(self):
         return f"{self.error_code}: {self.message}"
-    pass

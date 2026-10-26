@@ -2,7 +2,7 @@ import json
 import requests
 import pandas as pd
 import plotly.express as px
-import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 from requests.auth import HTTPBasicAuth
 
 import config
@@ -23,7 +23,7 @@ def get_data(endpoint):
     url = f"https://api.track.toggl.com/api/v9/{endpoints[endpoint]}"
     headers = {'content-type': 'application/json'}
     
-    r = requests.get(url, headers=headers, auth=HTTPBasicAuth(config.get("TOGGL_KEY"), 'api_token'))
+    r = requests.get(url, headers=headers, auth=HTTPBasicAuth(config.get("TOGGL_KEY"), 'api_token'), timeout=10)
     return json.loads(r.text)
 
 def get_project(projects, id):
@@ -36,20 +36,21 @@ def graph(title, df, labels, colours=""):
     if df.empty:
         return
 
-    plt.figure(figsize=(8, 8))
+    fig = Figure(figsize=(8, 8))
+    ax = fig.subplots()
     if title == "Projects":
-        plt.pie(df['duration'], labels=labels, autopct = '%.0f%%', colors=colours)
-        plt.title("title")
+        ax.pie(df['duration'], labels=labels, autopct = '%.0f%%', colors=colours)
+        ax.set_title(title)
     else:
-        plt.pie(df['duration'], labels=labels, autopct = '%.0f%%')
-        plt.title(f"Project: {title}")
+        ax.pie(df['duration'], labels=labels, autopct = '%.0f%%')
+        ax.set_title(f"Project: {title}")
     
-    plt.axis('equal')
+    ax.axis('equal')
 
     if "/" in title:
         title = title.replace("/", "-")
     
-    plt.savefig(f"{config.get('TIME_PLOTS_FP')}/{title}.png", bbox_inches='tight')
+    fig.savefig(f"{config.get('TIME_PLOTS_FP')}/{title}.png", bbox_inches='tight')
 
 def update_file_entries():
     proj_data = get_data("projects")
@@ -60,11 +61,16 @@ def update_file_entries():
     new_entries = []
     for elem in entries_data:
         if elem['duration'] > 0:
-            tag = "None" if len(elem['tags']) == 0 else elem['tags'][0]
-            project = get_project(projects, int(elem['project_id']))
+            tag = "None" if not elem.get('tags') else elem['tags'][0]
+            project = get_project(projects, elem.get('project_id')) or Project(None, "No Project", None)
             new_entries.append({"id" : elem['id'], "project_id" : project.id, "project" : project.name, 
                                 "tag" : tag, "description" : elem['description'], "start" : elem['start'], 
                                 "stop" : elem['stop'], "duration" : elem['duration'], "colour" : project.colour})
+
+    if not new_entries:
+        payload = {"username": "The Updater", "content": 'Added 0 time entries'}
+        requests.post(config.get("WEBHOOK_URL"), json=payload, timeout=10)
+        return
     
     new_df = pd.DataFrame(new_entries)
     new_df["duration"] = pd.to_numeric(new_df["duration"])
@@ -91,12 +97,12 @@ def update_file_entries():
 
     new_entries = len(df) - len(files_df)
     payload = {"username": "The Updater", "content": f'Added {new_entries} time entries'}
-    requests.post(config.get("WEBHOOK_URL"), json=payload)
+    requests.post(config.get("WEBHOOK_URL"), json=payload, timeout=10)
 
 def create_sunburst(start_date=None, end_date=None):
 
     # Load time entries data
-    df = pd.read_csv('/Users/faaezkamal/Code/database/time_tracking/time_entries.csv')
+    df = pd.read_csv(config.get("TIME_ENTRIES_FP"))
     
     # Convert start column to datetime
     df['start'] = pd.to_datetime(df['start'], utc=True)

@@ -1,10 +1,10 @@
 import os
 import math
-import matplotlib
-matplotlib.use('Agg')
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
+import hashlib
+from datetime import datetime
+import matplotlib.dates as mdates
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_agg import FigureCanvasAgg
 from adjustText import adjust_text
 
 import config
@@ -24,6 +24,8 @@ ranks = {
     2400 : "Radiant"
 }
 
+DATE_FORMAT = "%A-%B-%d-%Y-%I:%M-%p"
+
 def roundup(x):
     return int(math.ceil(x / 100.0)) * 100
 
@@ -31,33 +33,34 @@ def rounddown(x):
     return int(math.floor(x / 100.0)) * 100
 
 def get_mmr_list(puuid):
-    y = []
+    # First line of the history file is the last-update timestamp
     with open(f"{config.get('MMR_HISTORY')}/{puuid}.txt", 'r') as f:
-        for line in f:
-            y.append(int(line.split(',')[0].strip()))
+        lines = f.readlines()[1:]
 
-    if len(y) == 2:
+    y = [int(line.split(',')[0].strip()) for line in lines if line.strip()]
+    if len(y) < 2:
         raise NoneException
-    
-    y.pop(0)
+
     return range(1, len(y) + 1), y
 
-def generate_ticks(puuid, num_games=0):
-    try:
-        x, y = get_mmr_list(puuid)
-    except Exception as E:
-        raise E
+def get_dated_mmr_list(puuid):
+    with open(f"{config.get('MMR_HISTORY')}/{puuid}.txt", 'r') as f:
+        lines = f.readlines()[1:]
 
-    if not x:
+    dates, y = [], []
+    for line in lines:
+        parts = line.strip().split(',')
+        if len(parts) < 2 or not parts[1]:
+            continue
+        dates.append(datetime.strptime(parts[1], DATE_FORMAT))
+        y.append(int(parts[0]))
+
+    if len(y) < 2:
         raise NoneException
 
-    if num_games != 0:
-        y = y[-num_games:]
-        x = range(1, len(y) + 1)
+    return dates, y
 
-    y_min = rounddown(min(y))
-    y_max = roundup(max(y))
-
+def generate_y_ticks(y_min, y_max):
     y_ticks = []
     i = math.floor(y_min / 50.0) * 50
     y_range_len = int((y_max-y_min)/100)
@@ -73,12 +76,21 @@ def generate_ticks(puuid, num_games=0):
         else:
             i += 100
 
-    y_labels = []
-    for value in y_ticks:
-        if value in ranks.keys():
-            y_labels.append(ranks[value])
-        else:
-            y_labels.append(str(value))
+    return y_ticks, [ranks.get(value, str(value)) for value in y_ticks]
+
+def generate_ticks(puuid, num_games=0):
+    x, y = get_mmr_list(puuid)
+
+    if not x:
+        raise NoneException
+
+    if num_games != 0:
+        y = y[-num_games:]
+        x = range(1, len(y) + 1)
+
+    y_min = rounddown(min(y))
+    y_max = roundup(max(y))
+    y_ticks, y_labels = generate_y_ticks(y_min, y_max)
 
     x_ticks = []  
     i = 0
@@ -117,38 +129,28 @@ def graph(puuid, num_games=0, update=False, acts=False):
         raise MissingException
 
     if update:
-        try:
-            valorant.update_database(puuid)
-        except Exception as E:
-            raise E
+        valorant.update_database(puuid)
 
-    try:
-        x, y, x_ticks, y_ticks, y_labels, y_range = generate_ticks(puuid, num_games)
-    except Exception as E:
-        raise E
+    x, y, x_ticks, y_ticks, y_labels, y_range = generate_ticks(puuid, num_games)
 
-    fig, ax = plt.subplots()
-    axes = fig.gca()
-    axes.set_ylim(y_range)
+    fig = Figure()
+    ax = fig.subplots()
+    ax.set_ylim(y_range)
 
-    axes.set_yticks(y_ticks)
+    ax.set_yticks(y_ticks)
     if x_ticks:
-        axes.set_xticks(x_ticks)
-    axes.set_yticklabels(y_labels)
+        ax.set_xticks(x_ticks)
+    ax.set_yticklabels(y_labels)
 
     p = ax.plot(x, y)
     colour = p[0].get_color()
-    plt.axhline(y=y[-1], color=colour, linestyle=':', label='Cuurent MMR')
-    plt.axhline(y=max(y), color=colour, linestyle='--', label='peak MMR')
+    ax.axhline(y=y[-1], color=colour, linestyle=':', label='Current MMR')
+    ax.axhline(y=max(y), color=colour, linestyle='--', label='peak MMR')
     ax.set(xlabel='Games played', ylabel='MMR')
     ax.set_title(ign + '\'s MMR over time')
 
     if acts:
-        try:
-            act_data = valorant.get_data('MMR_BY_PUUID', puuid=puuid)
-        except Exception as E:
-            raise E
-
+        act_data = valorant.get_data('MMR_BY_PUUID', puuid=puuid)
         act_data = act_data['data']['by_season']
         act_games = []
 
@@ -166,8 +168,8 @@ def graph(puuid, num_games=0, update=False, acts=False):
                    'aqua',  'purple',  'orangered',  'yellow',  'palegreen',  
                    'skyblue',  'fuchsia',  'limegreen',  'blue',  'hotpink',  'lime']
 
-        while temp > 0:
-            plt.axvline(temp, linestyle="dotted", color=colours[i], label=act_games[i][0])
+        while temp > 0 and i < len(act_games):
+            ax.axvline(temp, linestyle="dotted", color=colours[i % len(colours)], label=act_games[i][0])
             temp -= act_games[i][1]
             i += 1
 
@@ -178,7 +180,6 @@ def graph(puuid, num_games=0, update=False, acts=False):
         ax.legend(loc='lower right')
     
     fig.savefig(f"{config.get('MMR_GRAPH')}/{puuid}.png", bbox_inches="tight")
-    plt.close(fig)
 
     return True
 
@@ -195,27 +196,27 @@ def multigraph(puuid_list: list, update=False):
     
     for puuid in puuid_list:
         ign = playerlist.get_ign_by_puuid(puuid)
-        if not puuid or not os.path.isfile(f"{config.get('HISTORY_FP')}/{puuid}.txt"):
+        if not puuid or not os.path.isfile(f"{config.get('MMR_HISTORY')}/{puuid}.txt"):
             fails.append((ign, "Player not in database"))
         else:
             player_list.append((puuid, ign))
 
-    if len(player_list) == 0:
-        return (False, fails)
-
+    plotted = []
     for player in player_list:
         if update:
             try:
                 valorant.update_database(player[0])
             except Exception as E:
-                fails.append((player[1], E.message))
+                fails.append((player[1], str(E)))
                 continue
         
         try:
             x, y = get_mmr_list(player[0])
         except Exception as E:
-            fails.append((player[1], E.message))
+            fails.append((player[1], str(E)))
+            continue
 
+        plotted.append(player)
         x_values.append(x)
         y_values.append(y)
 
@@ -228,8 +229,12 @@ def multigraph(puuid_list: list, update=False):
         if (len(y) > most_games):
             most_games = len(y)
 
-    axes = plt.gca()
-    axes.set_ylim([ymin,ymax])
+    if len(plotted) == 0:
+        return (False, fails, None)
+
+    fig = Figure()
+    ax = fig.subplots()
+    ax.set_ylim([ymin,ymax])
     
     y_ticks = []
     i = int(math.floor(ymin / 50.0)) * 50
@@ -244,148 +249,72 @@ def multigraph(puuid_list: list, update=False):
         else:
             i += 25
 
-    axes.set_yticks(y_ticks)
-    y_labels = []
+    ax.set_yticks(y_ticks)
+    ax.set_yticklabels([ranks.get(value, str(value)) for value in y_ticks])
 
-    for value in y_ticks:
-        label = str(value) if value % 100 != 0 else ranks[value]
-        y_labels.append(label)
-
-    axes.set_yticklabels(y_labels)
-
-    for i in range(len(player_list)):
-        p = plt.plot(x_values[i], y_values[i], label=player_list[i][1])
+    for i in range(len(plotted)):
+        p = ax.plot(x_values[i], y_values[i], label=plotted[i][1])
         colour = p[0].get_color()
-        plt.axhline(y=y_values[i][-1], color=colour, linestyle='--')
+        ax.axhline(y=y_values[i][-1], color=colour, linestyle='--')
 
-    plt.xlabel("Games played")
-    plt.ylabel("MMR")
-    plt.title("change in MMR over time")
-    plt.legend()
-    plt.savefig(f"{config.get('RES')}/multigraph.png", bbox_inches="tight")
-    plt.close()
+    ax.set_xlabel("Games played")
+    ax.set_ylabel("MMR")
+    ax.set_title("change in MMR over time")
+    ax.legend()
+
+    key = hashlib.sha1(','.join(sorted(player[0] for player in plotted)).encode()).hexdigest()[:12]
+    filename = f"multigraph_{key}.png"
+    fig.savefig(f"{config.get('RES')}/{filename}", bbox_inches="tight")
 
     if len(fails) == 0:
-        return (True, "")
+        return (True, "", filename)
     else:
-        return (True, fails)
+        return (True, fails, filename)
 
-def mark_graph(texts, x, yint, ydates, i, marked, r):
-    if i < 0:
-        i = len(yint) + i
+def date_graph(puuid):
+    playerlist = playerclass.PlayerList(config.get("PLAYERLIST_FP"))
+    playerlist.load()
+    ign = playerlist.get_ign_by_puuid(puuid)
 
-    if i not in marked:
-        texts.append(plt.text(s=ydates[i], x=x[i], y=yint[i], bbox=dict(boxstyle="round, pad=0.2", fc="cyan"), size=8.0))
-        for j in range(i - r, i + r):
-            if j >= 0 and j not in marked:
-                if j == len(yint):
-                    break
-                marked.append(j)
-    return marked, texts
+    if not ign:
+        raise MissingException
 
-def date_graph():
+    dates, y = get_dated_mmr_list(puuid)
 
-    months = {"January" : 1, "February" : 2, "March" : 3, 
-            "April" : 4, "May" : 5, "June" : 6,
-            "July" : 7, "August" : 8, "September" : 9, 
-            "October" : 10, "November" : 11, "December" : 12}
+    fig = Figure(figsize=(10, 5))
+    # adjust_text needs a canvas with a renderer
+    FigureCanvasAgg(fig)
+    ax = fig.subplots()
 
-    data = []
-    num_points = len(data)
-    rows_list, years = [], []
+    y_min, y_max = rounddown(min(y)), roundup(max(y))
+    y_ticks, y_labels = generate_y_ticks(y_min, y_max)
+    ax.set_yticks(y_ticks)
+    ax.set_yticklabels(y_labels)
+    ax.set_ylim([y_min - 15, y_max + 15])
 
-    for i in range(num_points):
-            temp = data[i].split(',')
-            ts = temp[1].split('-')
-            dict1 = {'x' : i + 1, 'MMR' : int(temp[0]), 'dates' : f"{ts[2]}/{months[ts[1]]}"}
-            dict1.update()
-            rows_list.append(dict1)
-
-            added = False
-            for year in years:
-                if ts[3] == year[0]:
-                    added = True
-                    if (i + 1) > year[1]:
-                        year[1] = (i + 1)
-                
-            if not added:
-                years.append([ts[3], i])
-
-    df = pd.DataFrame(rows_list)
-    y_labels, y_ticks, x_ticks = [], [], []
-    ymin = rounddown(min(df['MMR']) - 1) + 50
-    ymax = roundup(max(df['MMR']) + 1) + 25
-    i = int(math.floor((ymin) / 50.0)) * 50
-    ranger = int((ymax - ymin)/100)
-
-    while i <= int(math.ceil(ymax / 25.0)) * 25:
-        y_ticks.append(i)
-        label = ranks[i] if i % 100 == 0 else str(i)
-        y_labels.append(label)
-
-        if ranger == 1:
-            i += 20
-        elif ranger < 4:
-            i += 25
-        elif ranger < 8:
-            i += 50
-        else:
-            i += 100
-
-    axes = plt.gca()
-    axes.set_ylim([ymin,ymax])
-    axes.set_yticks(y_ticks)
-    axes.set_yticklabels(y_labels)
-
-    if num_points < 300:
-        i = 0
-        if num_points <= 15:
-            j = 1
-        elif num_points < 30:
-            j = 2
-        elif num_points < 70:
-            j = 5
-        elif num_points < 150:
-            j = 10
-        else:
-            j = 20
-
-        while i <= num_points:
-            x_ticks.append(i)
-            i += j
-
-        if (num_points - 1) not in x_ticks:
-            if ((num_points - 1) - x_ticks[-1]) < 5:
-                x_ticks[-1] = (num_points - 1)
-            else:
-                x_ticks.append((num_points - 1))
-
-        axes.set_xticks(x_ticks)
-
-    p = plt.plot(df['x'], df['MMR'], 'b-')
-    
-    r = math.floor(num_points/7.0)
-    minIndex = df.loc[df['MMR'] == min(df['MMR'])].index[0]
-    maxIndex = df.loc[df['MMR'] == max(df['MMR'])].index[0]
-    mark = [0, -1, minIndex, maxIndex]
-    topRightTexts, botRightTexts, topLeftTexts, botLeftTexts = [], [], [], []
-
-    diffed = np.diff(df['MMR'].to_numpy())
-
-    print(diffed)
-    
-    for year in years:
-        plt.axvline(year[1], linestyle="dotted", color="k", label=year[0])
-
-    adjust_text(topRightTexts, arrowprops=dict(arrowstyle='->'), force_points=(20, 30), force_text=(30, 30))
-    adjust_text(botRightTexts, arrowprops=dict(arrowstyle='->'), force_points=(20, -40), force_text=(30, 30))
-    adjust_text(botLeftTexts, arrowprops=dict(arrowstyle='->'), force_points=(-70, -40), force_text=(30, 30))
-    adjust_text(topLeftTexts, arrowprops=dict(arrowstyle='->'), force_points=(-70, 30), force_text=(30, 30))
-
+    p = ax.plot(dates, y, marker='.', markersize=3)
     colour = p[0].get_color()
-    plt.axhline(df['MMR'].iloc[num_points - 1], linestyle="dashed", color=colour, label='Current MMR')
-    plt.xlabel('Games played')
-    plt.ylabel('MMR')
-    plt.title('MMR over tifme')
-    plt.legend(loc='upper left')
-    plt.savefig('stuff/date-graph.png', bbox_inches="tight")
+    ax.axhline(y=y[-1], color=colour, linestyle=':', label='Current MMR')
+    ax.axhline(y=max(y), color=colour, linestyle='--', label='Peak MMR')
+
+    for year in range(dates[0].year + 1, dates[-1].year + 1):
+        ax.axvline(datetime(year, 1, 1), color='grey', linestyle='dotted')
+
+    locator = mdates.AutoDateLocator()
+    ax.xaxis.set_major_locator(locator)
+    ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(locator))
+
+    # Label the first, last, lowest and peak games with their dates
+    marked = sorted({0, len(y) - 1, y.index(min(y)), y.index(max(y))})
+    texts = [ax.text(dates[i], y[i], dates[i].strftime('%d/%m/%y'), size=8,
+                     bbox=dict(boxstyle="round, pad=0.2", fc="cyan")) for i in marked]
+    adjust_text(texts, ax=ax, arrowprops=dict(arrowstyle='->'))
+
+    ax.set(xlabel='Date', ylabel='MMR')
+    ax.set_title(ign + '\'s MMR over time')
+    ax.legend(loc='lower right')
+
+    filename = f"{puuid}_dates.png"
+    fig.savefig(f"{config.get('MMR_GRAPH')}/{filename}", bbox_inches="tight")
+
+    return filename, dates[0], dates[-1]

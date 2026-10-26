@@ -1,4 +1,5 @@
 import json
+import traceback
 import requests
 from datetime import datetime
 
@@ -40,10 +41,11 @@ def update_all(output=False, printer=True):
             dataless_count += 1
         else:
             ign = playerlist.get_ign_by_puuid(puuid)
-            if data['error'] in errors_lists.keys():
-                errors_lists[data['error']].append(ign)
+            error_msg = data.get('error', 'Unknown error')
+            if error_msg in errors_lists.keys():
+                errors_lists[error_msg].append(ign)
             else:
-                errors_lists[data['error']] = [ign]
+                errors_lists[error_msg] = [ign]
             
             print(f'{i+1:02d}/{total}: Error at {ign}')
             errors_count += 1
@@ -55,24 +57,28 @@ def update_all(output=False, printer=True):
     if dataless_count > 0:
         updates += f', {dataless_count} dataless players'
 
+    # Get errors from file
     try:
-        # Get errors from file
         with open(config.get("MMR_ERRORS_LIST"), 'r') as f:
             prev_errors = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        prev_errors = {}
 
-        # Overwrite new errors into file
+    # Overwrite file with the full current errors, regardless of whether the read above succeeded
+    try:
         with open(config.get("MMR_ERRORS_LIST"), 'w') as f:
             json.dump(errors_lists, f)
-
-        # Remove repeated errors for log message
-        for error in prev_errors:
-            if error in errors_lists.keys():
-                for player in prev_errors[error]:
-                    errors_lists[error].remove(player)
-                if len(errors_lists[error]) == 0:
-                    del errors_lists[error]
-    except:
+    except OSError:
         pass
+
+    # Remove already-known errors from the in-memory copy, so the log message only reports new ones
+    for error in prev_errors:
+        if error in errors_lists.keys():
+            for player in prev_errors[error]:
+                if player in errors_lists[error]:
+                    errors_lists[error].remove(player)
+            if len(errors_lists[error]) == 0:
+                del errors_lists[error]
 
     if errors_count > 0:
         updates += f', {errors_count} errors'
@@ -86,8 +92,8 @@ def update_all(output=False, printer=True):
             f.write(str(updates_list))
     
     update_msg = ""
-    for (ign, updates) in updates_list:
-        update_msg += f"{ign}: {updates}, "
+    for (ign, count) in updates_list:
+        update_msg += f"{ign}: {count}, "
     update_msg = "**No Updates**" if update_msg == "" else f"**Updates:** {update_msg[:-2]}"
 
     errors_msg = ""
@@ -102,16 +108,16 @@ def update_all(output=False, printer=True):
         f.write(log_msg + '\n')
 
     payload = {"username": "The Updater", "content": f'{log_msg}\n- {update_msg}\n- {errors_msg}'}
-    requests.post(config.get("WEBHOOK_URL"), json=payload)
+    requests.post(config.get("WEBHOOK_URL"), json=payload, timeout=10)
     return log_msg
 
 if __name__ == "__main__":
     try:
         update_file_entries()
-    except:
-        pass
+    except Exception:
+        traceback.print_exc()
 
     try:
         update_all()
-    except:
-        pass
+    except Exception:
+        traceback.print_exc()

@@ -33,7 +33,7 @@ def get_data(endpoint, **kwargs):
         for puuid in kwargs['puuid_list']:
             try:
                 url = f"{config.get('HENRIK_URL')}{endpoints[endpoint].format(puuid=puuid)}"
-                data_list.append((puuid, parse_req(session.get(url, headers=headers), endpoint)))
+                data_list.append((puuid, parse_req(session.get(url, headers=headers, timeout=10), endpoint)))
             except Exception as e:
                 data_list.append((puuid, {'error' : str(e)}))
         return data_list
@@ -43,17 +43,14 @@ def get_data(endpoint, **kwargs):
     except KeyError:
         raise KeyException
 
-    try:
-        return parse_req(requests.get(url, headers=headers), endpoint)
-    except Exception as E:
-        raise E
+    return parse_req(requests.get(url, headers=headers, timeout=10), endpoint)
 
 def get_card_data(playercard_uuid):
+    r = requests.get(f"{config.get('VALORANT-API_URL')}playercards/{playercard_uuid}", timeout=10)
     try:
-        r = requests.get(f"{config.get('VALORANT-API_URL')}playercards/{playercard_uuid}")
         john = json.loads(r.text)
         return john
-    except:
+    except Exception:
         if r.status_code in errors.keys():
             raise DynamicException(errors[r.status_code], r.status_code)
         else:
@@ -74,18 +71,21 @@ def parse_req(r, endpoint):
         else:
             raise UnknownException
     
-    if ('errors' in john.keys()) and (len(john['errors']) > 0) and ('message' in john['errors'][0].keys()):
-        raise DynamicException(john['errors'][0]['message'], r.status_code)
+    if not isinstance(john, dict):
+        raise UnknownException
+
+    if john.get('errors'):
+        first = john['errors'][0]
+        message = first.get('message') if isinstance(first, dict) else None
+        raise DynamicException(message or ' '.join(str(e) for e in john['errors']), r.status_code)
     
     if r.status_code == 200:
         if endpoint == 'LEADERBOARD':
             return john
 
-        if 'error' in john.keys() and john['error'] != None:
-            raise DynamicException(john['error']['message'], r.status_code)
-        
-        if 'errors' in john.keys():
-            raise DynamicException(' '.join(john['errors']), r.status_code)
+        error = john.get('error')
+        if error:
+            raise DynamicException(error.get('message', str(error)) if isinstance(error, dict) else str(error), r.status_code)
         
         return john
 
@@ -113,10 +113,7 @@ def replace_all(string: str, old_values, new_value):
 
 def update_database(puuid, data=None):
     if data is None:
-        try: 
-            data = get_data('MMR_HISTORY_BY_PUUID', puuid=puuid)
-        except Exception as E:
-            raise E
+        data = get_data('MMR_HISTORY_BY_PUUID', puuid=puuid)
 
     data = data['data']
     if len(data) == 0:
@@ -129,8 +126,11 @@ def update_database(puuid, data=None):
 
     with open(fp, 'r') as f:
         lines = f.readlines()
+
+    if not lines:
+        lines = ['\n']
     
-    last_file_update = 0 if lines[0] == '\n' else int(lines[0])
+    last_file_update = 0 if lines[0].strip() == '' else int(lines[0])
     new_list = []
 
     for game in data:
@@ -150,13 +150,10 @@ def update_database(puuid, data=None):
     return len(new_list)
 
 def get_elo_list(puuid):
-    try: 
-        update_database(puuid)
-    except Exception as E:
-        raise E
+    update_database(puuid)
 
-    if not get_file_mmr(puuid):
-        return MissingException
+    if get_file_mmr(puuid) is False:
+        raise MissingException
     
     lines = []
     with open(f"{config.get('MMR_HISTORY')}/{puuid}.txt", 'r') as f:
@@ -200,16 +197,16 @@ def leaderboard(region, length=20, last_played=90):
             data = get_data('LEADERBOARD', region=region)
             data = data['data']
         except Exception as E:
-            return {"error" : E.message}
+            return {"error" : str(E)}
 
-        regions = {"ap" : "Asia Pacific", "eu" : "Europe", "kr" : "Korea", "na" : "North America"}
+        regions = {"ap" : "Asia Pacific", "eu" : "Europe", "kr" : "Korea", "na" : "North America",
+                   "latam" : "Latin America", "br" : "Brazil"}
         players = []
         
-        for i in range(length):
-            player = data['players'][i]
+        for player in data['players'][:length]:
             players.append(("(Anonymous)" if player['is_anonymized'] else player['name'], player['rr']))
 
-        result['title'] = f'{regions[region]} Ranked Leaderboard\n'
+        result['title'] = f'{regions.get(region, region.upper())} Ranked Leaderboard\n'
 
     result['leaderboard'] = ""
     for i, player in enumerate(players):
@@ -219,10 +216,7 @@ def leaderboard(region, length=20, last_played=90):
     return result
 
 def stats(puuid):
-    try:
-        john = get_data('MMR_BY_PUUID', puuid=puuid)
-    except Exception as E:
-        raise E
+    john = get_data('MMR_BY_PUUID', puuid=puuid)
     
     data = john['data']['seasonal']
     final = []
@@ -236,17 +230,15 @@ def stats(puuid):
             title = season['season']['short']
             title = title.replace("e", " Ep ")
             title = title.replace("a", ", Act ")
-            final.append([f'{title}:', f'{rank}\nGames Played: {games}\nWinrate: {round((wins/games) * 100, 2)}%'])
+            winrate = f'{round((wins/games) * 100, 2)}%' if games else 'N/A'
+            final.append([f'{title}:', f'{rank}\nGames Played: {games}\nWinrate: {winrate}'])
     
-    try:
-        john = get_data('ACCOUNT_BY_PUUID', puuid=puuid)
-    except Exception as E:
-        raise E
+    john = get_data('ACCOUNT_BY_PUUID', puuid=puuid)
     
     try:
         card_data = get_card_data(john['data']['card'])
         card = card_data['data']['displayIcon']
-    except:
+    except Exception:
         card = False
 
     return [final, card]
@@ -255,9 +247,12 @@ def get_banner(ign, tag):
     try:
         data = get_data('ACCOUNT_BY_NAME', ign=ign, tag=tag)
         card_data = get_card_data(data['data']['card'])
-        r = requests.get(card_data['data']['largeArt'], allow_redirects=True)
-        open(f"{config.get('RES')}/banner.png", 'wb').write(r.content)
-        return True
+        r = requests.get(card_data['data']['largeArt'], allow_redirects=True, timeout=10)
+        r.raise_for_status()
+        filename = f"banner_{data['data']['puuid']}.png"
+        with open(f"{config.get('RES')}/{filename}", 'wb') as f:
+            f.write(r.content)
+        return filename
     except Exception:
         return False
 
@@ -277,8 +272,8 @@ def random_crosshair():
     try:
         r = get_data("CROSSHAIR", crosshair_code=code)
         img = Image.open(BytesIO(r.content))
-        img = img.save(config.get("CROSSHAIR"))
+        img.save(config.get("CROSSHAIR"))
         return (name, code)
     
     except Exception as E:
-        return E.message
+        return str(E)
